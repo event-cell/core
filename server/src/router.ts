@@ -1,13 +1,8 @@
 import { router, TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { PrismaClient } from '@prisma/client'
 
-const hellos: Hello[] = [
-  {
-    id: 1,
-    text: 'Hello',
-    language: 'en',
-  },
-]
+const prisma = new PrismaClient()
 
 const Hello = z.object({
   id: z.number(),
@@ -24,7 +19,11 @@ export const trpcRouter = router()
     input: z.number(),
     output: Hello,
     async resolve(req) {
-      const foundHello = hellos.find((hello) => hello.id === req.input)
+      const foundHello = await prisma.hello.findUnique({
+        where: {
+          id: req.input,
+        },
+      })
 
       if (!foundHello) {
         throw new TRPCError({
@@ -33,13 +32,14 @@ export const trpcRouter = router()
         })
       }
 
-      return foundHello
+      return foundHello as Hello
     },
   })
   .query('list', {
     output: HelloList,
     async resolve() {
-      return hellos
+      // return hellos
+      return (await prisma.hello.findMany()).map((lang) => lang as Hello)
     },
   })
 
