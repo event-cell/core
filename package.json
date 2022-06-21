@@ -1,9 +1,11 @@
 {
   "private": true,
   "workspaces": [
-    "server"
+    "server",
+    "client"
   ],
   "scripts": {
-    "server:dev": "cd server && yarn dev"
+    "server:dev": "cd server && yarn dev",
+    "client:dev": "cd client && yarn dev"
   }
 }
