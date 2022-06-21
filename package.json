@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "workspaces": [
+    "server"
+  ],
+  "scripts": {
+    "server:dev": "cd server && yarn dev"
+  }
+}
