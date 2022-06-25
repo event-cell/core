@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/event"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("EVENT_DB")
+}
+
+model TCOMPETITORS {
+  C_IDX          Int     @id @default(autoincrement())
+  C_NUM          Int?
+  C_TRANSPONDER1 String?
+  C_TRANSPONDER2 String?
+  C_LAST_NAME    String?
+  C_FIRST_NAME   String?
+  C_CODE         String?
+  C_SEX          Int?
+  C_YEAR         Int?
+  C_CATEGORY     String?
+  C_SERIE        String?
+  C_NATION       String?
+  C_COMMITTEE    String?
+  C_CLUB         String?
+  C_TEAM         String?
+  C_I15          Int?
+  C_I16          Int?
+  C_I17          String?
+  C_I18          String?
+  C_I19          Int?
+  C_I20          Int?
+  C_I21          Int?
+  C_I22          Int?
+  C_I23          Int?
+  C_I24          Int?
+  C_I25          Int?
+  C_I26          Int?
+  C_I27          String?
+  C_I28          String?
+  C_I29          String?
+  C_I30          String?
+  C_I31          String?
+  C_I32          String?
+  C_I33          String?
+  C_I34          String?
+  C_I35          String?
+  C_I36          String?
+  C_I37          String?
+
+  @@index([C_NUM], map: "I1TCOMPETITORS")
+}
+
+model TEDITINGFORMATS {
+  C_NUMEDIT Int
+  C_PARAM   String
+  C_VALUE   String?
+
+  @@id([C_NUMEDIT, C_PARAM])
+}
+
+model TEDITINGPARAMETERS {
+  C_PARAM String  @id
+  C_VALUE String?
+}
+
+model TKEYVALUES {
+  TABLENAME String @id
+  KEYVALUE  Int
+}
+
+model TPARAMETERS {
+  C_PARAM String  @id
+  C_VALUE String?
+}
+
+model TPARAMETERS_HEAT {
+  C_PARAM String  @id
+  C_VALUE String?
+}
+
+model TUPDATEVALUES {
+  TABLENAME   String @id
+  UPDATEVALUE Int
+}

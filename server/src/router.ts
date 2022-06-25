@@ -2,6 +2,12 @@ import { router, TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { PrismaClient } from '@prisma/client'
 
+// import { PrismaClient as pcEventData } from '../prisma/generated/eventData'
+// const eventData = new pcEventData()
+
+// import { PrismaClient as pcEvent } from '../prisma/generated/event'
+// const event = new pcEvent()
+
 const prisma = new PrismaClient()
 
 const Hello = z.object({
