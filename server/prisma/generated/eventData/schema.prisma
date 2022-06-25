@@ -1,0 +1,964 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/eventData"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:Events/Event049Ex.scdb"
+}
+
+model TKEYVALUES {
+  TABLENAME String @id
+  KEYVALUE  Int
+}
+
+model TUPDATEVALUES {
+  TABLENAME   String @id
+  UPDATEVALUE Int
+}
+
+model TCHRONOMESSAGES_HEAT1 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT2 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT3 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT4 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT5 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT6 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT7 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT8 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TCHRONOMESSAGES_HEAT9 {
+  C_LINE        Int     @id @default(autoincrement())
+  C_NUM         Int?
+  C_STATUS      Int?
+  C_TRANSPONDER String?
+  C_CANAL       String?
+  C_MESSAGE     String?
+}
+
+model TSTARTLIST_HEAT1 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT2 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT3 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT4 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT5 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT6 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT7 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT8 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TSTARTLIST_HEAT9 {
+  C_LINE  Int  @id @default(autoincrement())
+  C_NUM   Int?
+  C_START Int?
+}
+
+model TTIMEINFOS_HEAT1 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT2 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT3 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT4 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT5 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT6 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT7 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT8 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMEINFOS_HEAT9 {
+  C_NUM     Int     @id @default(autoincrement())
+  C_STATUS  Int?
+  C_TIME    Int?
+  C_PENALTY Int?
+  C_INTER1  Int?
+  C_INTER2  Int?
+  C_INTER3  Int?
+  C_INTER4  Int?
+  C_INTER5  Int?
+  C_INTER6  Int?
+  C_INTER7  Int?
+  C_INTER8  Int?
+  C_INTER9  Int?
+  C_SPEED1  Int?
+  C_SPEED2  Int?
+  C_SPEED3  Int?
+  C_SPEED4  Int?
+  C_SPEED5  Int?
+  C_SPEED6  Int?
+  C_SPEED7  Int?
+  C_SPEED8  Int?
+  C_SPEED9  Int?
+  C_DATA1   Int?
+  C_DATA2   Int?
+  C_DATA3   Int?
+  C_DATA4   Int?
+  C_DATA5   Int?
+  C_DATA6   Int?
+  C_DATA7   Int?
+  C_DATA8   Int?
+  C_REASON  String?
+}
+
+model TTIMERECORDS_HEAT1_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT1_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT1_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT1_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT2_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT2_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT2_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT2_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT3_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT3_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT3_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT3_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT4_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT4_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT4_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT4_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT5_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT5_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT5_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT5_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT6_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT6_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT6_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT6_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT7_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT7_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT7_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT7_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT8_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT8_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT8_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT8_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT9_FINISH {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT9_INTER1 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT9_INTER2 {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
+
+model TTIMERECORDS_HEAT9_START {
+  C_LINE              Int     @id @default(autoincrement())
+  C_NUM               Int?
+  C_STATUS            Int?
+  C_HOUR1             String?
+  C_HOUR2             String?
+  C_SPEED             Int?
+  C_LAP               Int?
+  C_TRANSPONDER_NUM   String?
+  C_TRANSPONDER_INFOS Int?
+  C_INFO1             Int?
+  C_INFO2             Int?
+}
