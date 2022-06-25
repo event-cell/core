@@ -9,6 +9,7 @@ const Hello = z.object({
   text: z.string(),
   language: z.string(),
 })
+
 const HelloList = z.array(Hello)
 
 export type Hello = z.infer<typeof Hello>
