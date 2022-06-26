@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:Events/Event049.scdb"
+  url      = env("EVENT_DB")
 }
 
 model TCOMPETITORS {

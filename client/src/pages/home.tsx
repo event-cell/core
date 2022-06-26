@@ -1,29 +1,48 @@
-import { CircularProgress, Container, Typography } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { trpc } from '../App'
+import {
+  CircularProgress,
+  Container,
+  Divider,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material'
 
-const helloColumns: GridColDef[] = [
-  { field: 'id', headerName: 'ID' },
-  { field: 'text', headerName: 'Text' },
-  { field: 'language', headerName: 'Language' },
-]
+import { trpc } from '../App'
+import { ResultsTable } from '../components/table'
 
 export const Home = () => {
-  const rows = trpc.useQuery(['list'])
+  const rows = trpc.useQuery(['competitors.list'])
+
+  let classes: string[] = []
+
+  if (!rows.data) {
+    // TODO: Pretty error message
+    return <CircularProgress />
+  }
+
+  for (const row of rows.data || []) {
+    if (classes.includes(row.class)) continue
+    classes.push(row.class)
+  }
+
+  const classesList = classes.map((eventClass) => ({
+    eventClass,
+    drivers: rows.data.filter((data) => data.class === eventClass),
+  }))
 
   return (
     <Container>
-      <Typography variant="h1">Home</Typography>
-
-      {rows.data ? (
-        <div style={{ display: 'flex', height: '40vh' }}>
-          <div style={{ flexGrow: 1 }}>
-            <DataGrid rows={rows.data} columns={helloColumns} />
-          </div>
+      {classesList.map((eventClass) => (
+        <div>
+          <ListItem>
+            <ListItemText
+              primary={eventClass.eventClass}
+              secondary={`Class Record: ${eventClass.drivers[0].classRecord}`}
+            />
+          </ListItem>
+          <ResultsTable data={eventClass.drivers} keyKey={'number'} />
         </div>
-      ) : (
-        <CircularProgress />
-      )}
+      ))}
     </Container>
   )
 }

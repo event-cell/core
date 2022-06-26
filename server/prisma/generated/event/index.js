@@ -68,8 +68,8 @@ const regularDirname = hasDirname && fs.existsSync(path.join(__dirname, 'schema.
 
 // if the client has been bundled, we need to look for the folders
 const foundDirname = !regularDirname && findSync(process.cwd(), [
-    "prisma/generated/event",
-    "generated/event",
+    "prisma\\generated\\event",
+    "generated\\event",
 ], ['d'], ['d'], 1)[0]
 
 const dirname = regularDirname || foundDirname || __dirname
@@ -183,7 +183,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/mnt/c/Users/lyall/WebstormProjects/event-cell/core/server/prisma/generated/event",
+      "value": "C:\\Users\\lyall\\WebstormProjects\\event-cell\\core\\server\\prisma\\generated\\event",
       "fromEnvVar": null
     },
     "config": {
@@ -196,7 +196,7 @@ const config = {
   "relativeEnvPaths": {
     "rootEnvPath": null
   },
-  "relativePath": "../..",
+  "relativePath": "..\\..",
   "clientVersion": "3.15.2",
   "engineVersion": "461d6a05159055555eb7dfb337c9fb271cbd4d7e",
   "datasourceNames": [
@@ -221,7 +221,7 @@ const PrismaClient = getPrismaClient(config)
 exports.PrismaClient = PrismaClient
 Object.assign(exports, Prisma)
 
-path.join(__dirname, "libquery_engine-debian-openssl-1.1.x.so.node");
-path.join(process.cwd(), "prisma/generated/event/libquery_engine-debian-openssl-1.1.x.so.node")
+path.join(__dirname, "query_engine-windows.dll.node");
+path.join(process.cwd(), "prisma\\generated\\event\\query_engine-windows.dll.node")
 path.join(__dirname, "schema.prisma");
-path.join(process.cwd(), "prisma/generated/event/schema.prisma")
+path.join(process.cwd(), "prisma\\generated\\event\\schema.prisma")

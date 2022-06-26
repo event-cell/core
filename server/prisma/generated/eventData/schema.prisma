@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:Events/Event049Ex.scdb"
+  url      = env("EVENT_DATA_DB")
 }
 
 model TKEYVALUES {
