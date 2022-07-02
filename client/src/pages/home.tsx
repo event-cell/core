@@ -12,11 +12,12 @@ import { ResultsTable } from '../components/table'
 
 export const Home = () => {
   const rows = trpc.useQuery(['competitors.list'])
+  const runCount = trpc.useQuery(['runs.count'])
 
   let classes: string[] = []
 
-  if (!rows.data) {
-    // TODO: Pretty error message
+  if (!rows.data || !runCount.data) {
+    // TODO: Center the loading spinner
     return <CircularProgress />
   }
 
@@ -33,14 +34,18 @@ export const Home = () => {
   return (
     <Container>
       {classesList.map((eventClass) => (
-        <div>
+        <div key={eventClass.eventClass}>
           <ListItem>
             <ListItemText
               primary={eventClass.eventClass}
               secondary={`Class Record: ${eventClass.drivers[0].classRecord}`}
             />
           </ListItem>
-          <ResultsTable data={eventClass.drivers} keyKey={'number'} />
+          <ResultsTable
+            data={eventClass.drivers}
+            keyKey={'number'}
+            runCount={runCount.data}
+          />
         </div>
       ))}
     </Container>
