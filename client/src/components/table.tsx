@@ -7,8 +7,26 @@ import {
   TableHead,
   TableRow,
   Table as MUITable,
-  ListItemText,
+  Chip,
+  Typography,
+  Box,
 } from '@mui/material'
+
+import { CarCrash, EmojiEvents } from '@mui/icons-material'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+
+const finishTimeThemeChip = createTheme({
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontSize: '16px',
+          fontWeight: 'bold',
+        },
+      },
+    },
+  },
+})
 
 export const ResultsTable: FC<{
   data: Record<string, string | number | any>[]
@@ -31,27 +49,70 @@ export const ResultsTable: FC<{
         <TableBody>
           {data.map((row) => (
             <TableRow key={row[keyKey]}>
+              <TableCell>{row['number']}</TableCell>
               <TableCell>
-                {row['number']} {row['special']}
-              </TableCell>
-              <TableCell>
-                {row['firstName']} {row['lastName']}
+                {row['lastName']} {row['firstName']}
+                {row['special'] ? (
+                  <Chip
+                    label={row['special']}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                ) : null}
               </TableCell>
               <TableCell>{row['vehicle']}</TableCell>
               {row['times'].map(
                 (run: {
                   run: number
+                  status: number
                   time: number
                   split1: number
                   split2: number
-                }) => (
-                  <TableCell key={run.run}>
-                    <div>{run.time / 1000}</div>
-                    <div>
-                      {run.split1 / 1000} {run.split2 / 1000}
-                    </div>
-                  </TableCell>
-                )
+                }) =>
+                  run.status === 0 &&
+                  run.time / 1000 < row['classRecord'] === true ? (
+                    <TableCell key={run.run}>
+                      <Typography component="div">
+                        <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
+                          <Chip
+                            label={run.time / 1000}
+                            variant="filled"
+                            color="warning"
+                            size="small"
+                            icon={<EmojiEvents />}
+                          />
+                        </Box>
+                      </Typography>
+                      <div>
+                        {run.split1 / 1000} {run.split2 / 1000}
+                      </div>
+                    </TableCell>
+                  ) : run.status === 0 ? (
+                    <TableCell key={run.run}>
+                      <Typography component="div">
+                        <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
+                          {run.time / 1000}
+                        </Box>
+                      </Typography>
+                      <div>
+                        {run.split1 / 1000} {run.split2 / 1000}
+                      </div>
+                    </TableCell>
+                  ) : run.status === 2 ? (
+                    <TableCell key={run.run}>
+                      <Chip
+                        label="DNF"
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        icon={<CarCrash />}
+                      />
+                      <div>
+                        {run.split1 / 1000} {run.split2 / 1000}
+                      </div>
+                    </TableCell>
+                  ) : null
               )}
             </TableRow>
           ))}
@@ -60,24 +121,3 @@ export const ResultsTable: FC<{
     </TableContainer>
   )
 }
-
-//     <TableContainer component={Paper}>
-//     <MUITable sx={{ minWidth: 650 }} size="small">
-//     <TableHead>
-//     <TableRow>
-//     {header.map(({ headerName }) => (
-//           <TableCell>{headerName}</TableCell>
-//       ))}
-// </TableRow>
-// </TableHead>
-// <TableBody>
-//   {data.map((row) => (
-//       <TableRow key={row[keyKey]}>
-//         {header.map(({ field }) => (
-//             <TableCell>{row[field]}</TableCell>
-//         ))}
-//       </TableRow>
-//   ))}
-// </TableBody>
-// </MUITable>
-// </TableContainer>

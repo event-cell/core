@@ -1,4 +1,6 @@
 import {
+  Box,
+  Chip,
   CircularProgress,
   Container,
   Divider,
@@ -9,6 +11,7 @@ import {
 
 import { trpc } from '../App'
 import { ResultsTable } from '../components/table'
+import { Cancel, Timer } from '@mui/icons-material'
 
 export const Home = () => {
   const rows = trpc.useQuery(['competitors.list'])
@@ -35,12 +38,19 @@ export const Home = () => {
     <Container>
       {classesList.map((eventClass) => (
         <div key={eventClass.eventClass}>
-          <ListItem>
-            <ListItemText
-              primary={eventClass.eventClass}
-              secondary={`Class Record: ${eventClass.drivers[0].classRecord}`}
-            />
-          </ListItem>
+          <Typography component="div">
+            <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
+              {eventClass.eventClass}
+            </Box>
+          </Typography>
+          <Chip
+            label={'Class Record: ' + eventClass.drivers[0].classRecord}
+            variant="outlined"
+            color="info"
+            size="medium"
+            icon={<Timer />}
+          />
+          <p />
           <ResultsTable
             data={eventClass.drivers}
             keyKey={'number'}

@@ -13,9 +13,14 @@ import { createReactQueryHooks } from '@trpc/react'
 import { TRPCRouter } from '../../server/src/router'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { config } from '.'
+import { CssBaseline } from '@mui/material'
 
 // MUI theme is here so we can modify it later. Currently, it is just stock
-export const theme = createTheme()
+export const theme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+})
 
 // The tRPC hook. Will be used to make requests to the server
 export const trpc = createReactQueryHooks<TRPCRouter>()
@@ -30,6 +35,7 @@ function App() {
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
+          <CssBaseline />
           <Router>
             <Routes>
               <Route path="/" element={<Home />} />
