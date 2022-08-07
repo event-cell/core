@@ -22,4 +22,8 @@ app.use(
   })
 )
 
-app.listen(8080, () => console.log('Server listening on port 8080'))
+const serverPort = process.env.PORT || 8080
+
+app.listen(serverPort, () =>
+  console.log(`Server listening on port ${serverPort}`)
+)
