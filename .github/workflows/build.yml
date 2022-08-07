@@ -3,6 +3,7 @@ name: Build Nightly
 on:
   schedule:
     - cron: '53 3 * * *'
+  push:
 
   workflow_dispatch:
 
