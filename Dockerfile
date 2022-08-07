@@ -3,7 +3,7 @@ FROM node:16
 WORKDIR /app
 
 COPY server/package.json .
-COPY server/yarn.lock .
+COPY yarn.lock .
 
 RUN yarn
 
