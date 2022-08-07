@@ -3,15 +3,12 @@ import {
   Chip,
   CircularProgress,
   Container,
-  Divider,
-  ListItem,
-  ListItemText,
   Typography,
 } from '@mui/material'
 
 import { trpc } from '../App'
 import { ResultsTable } from '../components/table'
-import { Cancel, Timer } from '@mui/icons-material'
+import { Timer } from '@mui/icons-material'
 
 export const Home = () => {
   const rows = trpc.useQuery(['competitors.list'])

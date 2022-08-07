@@ -13,20 +13,6 @@ import {
 } from '@mui/material'
 
 import { CarCrash, EmojiEvents } from '@mui/icons-material'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-
-const finishTimeThemeChip = createTheme({
-  components: {
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          fontSize: '16px',
-          fontWeight: 'bold',
-        },
-      },
-    },
-  },
-})
 
 export const ResultsTable: FC<{
   data: Record<string, string | number | any>[]
@@ -70,8 +56,7 @@ export const ResultsTable: FC<{
                   split1: number
                   split2: number
                 }) =>
-                  run.status === 0 &&
-                  run.time / 1000 < row['classRecord'] === true ? (
+                  run.status === 0 && run.time / 1000 < row['classRecord'] ? (
                     <TableCell key={run.run}>
                       <Typography component="div">
                         <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
