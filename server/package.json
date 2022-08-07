@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev --exit-child --respawn src/index.ts",
-    "build": "tsc"
+    "build": "tsc && cp ../client/build build/ui"
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.3",
