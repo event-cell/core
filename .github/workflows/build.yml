@@ -29,7 +29,7 @@ jobs:
         run: yarn
 
       - name: Generate prisma
-        run: yarn prisma generate
+        run: cd server && yarn prisma generate
 
       - name: Build
         run: yarn build
