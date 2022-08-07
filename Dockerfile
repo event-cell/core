@@ -17,5 +17,5 @@ COPY server/build build
 ENV PORT=80
 EXPOSE 80
 
-CMD [ "node", "./index.js" ]
+CMD [ "node", "./build/index.js" ]
 
