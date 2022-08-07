@@ -25,8 +25,11 @@ jobs:
           node-version: 16
           cache: 'yarn'
 
-      - name: Install dependancies
+      - name: Install dependencies
         run: yarn
+
+      - name: Generate prisma
+        run: yarn prisma generate
 
       - name: Build
         run: yarn build
