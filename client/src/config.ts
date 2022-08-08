@@ -15,6 +15,6 @@ export class Config {
    * development and `/api/v1/` in production.
    */
   public backendUrl = this.development
-    ? 'http://localhost:8080/api/v1/'
-    : '/api/v1/'
+    ? 'http://localhost:8080/api/v1'
+    : '/api/v1'
 }
