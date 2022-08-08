@@ -12,7 +12,7 @@ const app = express()
 
 // We only want to serve the UI in production. In development we will handle it
 // elsewhere
-if (existsSync(uiPath)) app.use(uiPath)
+if (existsSync(uiPath)) app.use(express.static(uiPath))
 else winston.info('UI not found, skipping static serving')
 
 app.use(express.json())
