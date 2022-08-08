@@ -71,4 +71,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: main
+          tags: ghcr.io/event-cell/core:main
