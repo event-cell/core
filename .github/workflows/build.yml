@@ -72,5 +72,5 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/event-cell/core:main
-          cache-from: type=registry,ref=ghcr.io/event-cell/core:buildcache
-          cache-to: type=registry,ref=ghcr.io/event-cell/core:buildcache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
