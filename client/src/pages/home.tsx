@@ -16,6 +16,19 @@ export const Home = () => {
 
   let classes: string[] = []
 
+  if (rows.error) {
+    return (
+      <Container>
+        <Typography variant="h4">Error</Typography>
+        <Typography variant="body1">{rows.error.message}</Typography>
+        <Typography variant="h5">Technical details</Typography>
+        <Typography variant="body1">
+          {JSON.stringify(rows.error.data, null, 2)}
+        </Typography>
+      </Container>
+    )
+  }
+
   if (!rows.data || !runCount.data) {
     // TODO: Center the loading spinner
     return <CircularProgress />
