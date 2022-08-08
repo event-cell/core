@@ -9,6 +9,6 @@
     "server:build": "cd server && yarn build",
     "client:dev": "cd client && yarn dev",
     "client:build": "cd client && yarn build",
-    "build": "yarn client:build && yarn server:build"
+    "build": "y yarn server:build && yarn client:build"
   }
 }
