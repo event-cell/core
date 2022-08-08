@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev --exit-child --respawn src/index.ts",
-    "build": "yarn prismaGenerate && tsc && cp -r ../client/build build/ui",
+    "setup": "yarn prismaGenerate",
+    "build": "tsc && cp -r ../client/build build/ui",
     "prismaGenerate": "prisma generate --schema=./prisma/schemaEvent.prisma && prisma generate --schema=./prisma/schemaEventData.prisma"
   },
   "devDependencies": {

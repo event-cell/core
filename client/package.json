@@ -29,6 +29,7 @@
     "zod": "^3.17.3"
   },
   "scripts": {
+    "setup": "echo 'Unused client setup'",
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
