@@ -30,8 +30,18 @@ export const Home = () => {
   }
 
   if (!rows.data || !runCount.data) {
-    // TODO: Center the loading spinner
-    return <CircularProgress />
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </div>
+    )
   }
 
   for (const row of rows.data || []) {
