@@ -1,5 +1,14 @@
 import { readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
+import { z } from 'zod'
+
+export const ConfigType = z.object({
+  eventId: z.optional(z.string()),
+  eventName: z.optional(z.string()),
+
+  eventDatabasePath: z.optional(z.string()),
+})
+export type ConfigType = z.infer<typeof ConfigType>
 
 /**
  * Config singleton
@@ -15,14 +24,14 @@ class Config {
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
     const config = JSON.parse(fileContents)
-    this.updateConfig(config)
+    this.set(config)
   }
 
   /**
    * Sets all of the local config variables to the contents of the file
    * @param config The new config
    */
-  protected updateConfig(config: any) {
+  public set(config: ConfigType) {
     if (config.eventId) this.eventId = config.eventId
     if (config.eventName) this.eventName = config.eventName
 
@@ -30,17 +39,20 @@ class Config {
       this.eventDatabasePath = config.eventDatabasePath
   }
 
+  public asJSON() {
+    return {
+      eventId: this.eventId,
+      eventName: this.eventName,
+
+      eventDatabasePath: this.eventDatabasePath,
+    }
+  }
+
   /**
    * Stores local config changes to disk
    */
   public storeConfig() {
-    const config = {
-      eventId: this.eventId,
-      eventName: this.eventName,
-      eventDatabasePath: this.eventDatabasePath,
-    }
-
-    const fileContents = JSON.stringify(config, null, 2)
+    const fileContents = JSON.stringify(this.asJSON(), null, 2)
     writeFileSync(this.configPath, fileContents)
   }
 }

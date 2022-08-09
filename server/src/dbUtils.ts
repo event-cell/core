@@ -4,10 +4,12 @@ import { PrismaClient as pcEvent } from '../prisma/generated/event'
 import { PrismaClient as pcEventData } from '../prisma/generated/eventData'
 import { config } from './config'
 
-export function getEventDatabases(eventId: string): {
+export type EventDB = {
   event: pcEvent
   eventData: pcEventData
-} {
+}
+
+export function getEventDatabases(eventId: string): EventDB {
   const eventPath = config.eventDatabasePath
 
   return {
