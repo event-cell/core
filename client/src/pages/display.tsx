@@ -10,7 +10,7 @@ import { trpc } from '../App'
 import { ResultsTable } from '../components/table'
 import { Timer } from '@mui/icons-material'
 
-export const Home = () => {
+export const Display = () => {
   const rows = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 

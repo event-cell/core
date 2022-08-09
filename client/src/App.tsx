@@ -8,7 +8,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
-import { Home } from './pages/home'
+import { Display } from './pages/display'
 import { createReactQueryHooks } from '@trpc/react'
 import { TRPCRouter } from '../../server/src/router'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -38,7 +38,7 @@ function App() {
           <CssBaseline />
           <Router>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/display/" element={<Display />} />
             </Routes>
           </Router>
         </ThemeProvider>
