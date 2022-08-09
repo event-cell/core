@@ -39,6 +39,13 @@ export const competitors = router().query('list', {
     let tCOMPETITORSTable
     let heats = []
 
+    if (!event || !eventData) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Event database not found',
+      })
+    }
+
     try {
       tCOMPETITORSTable = await event.tCOMPETITORS.findMany()
     } catch (e) {
