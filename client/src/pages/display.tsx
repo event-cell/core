@@ -1,14 +1,10 @@
-import {
-  Box,
-  Chip,
-  CircularProgress,
-  Container,
-  Typography,
-} from '@mui/material'
+import { Box, Chip, Container, Typography } from '@mui/material'
 
 import { trpc } from '../App'
 import { ResultsTable } from '../components/table'
 import { Timer } from '@mui/icons-material'
+
+import { requestWrapper } from '../components/requestWrapper'
 
 export const Display = () => {
   const rows = trpc.useQuery(['competitors.list'])
@@ -16,33 +12,9 @@ export const Display = () => {
 
   let classes: string[] = []
 
-  if (rows.error) {
-    return (
-      <Container>
-        <Typography variant="h4">Error</Typography>
-        <Typography variant="body1">{rows.error.message}</Typography>
-        <Typography variant="h5">Technical details</Typography>
-        <Typography variant="body1">
-          {JSON.stringify(rows.error.data, null, 2)}
-        </Typography>
-      </Container>
-    )
-  }
-
-  if (!rows.data || !runCount.data) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <CircularProgress />
-      </div>
-    )
-  }
+  const requestErrors = requestWrapper(rows, runCount)
+  if (requestErrors) return requestErrors
+  if (!rows.data || !runCount.data) return null // This will never be called, but it is needed to make typescript happy
 
   for (const row of rows.data || []) {
     if (classes.includes(row.class)) continue
