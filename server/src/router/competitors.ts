@@ -1,33 +1,8 @@
 import { router, TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { PrismaClient } from '@prisma/client'
-import { join } from 'path'
 
-import { PrismaClient as pcEvent } from '../prisma/generated/event'
-import {
-  PrismaClient as pcEventData,
-  TTIMEINFOS_HEAT1,
-} from '../prisma/generated/eventData'
-import { nullToUndefined } from './utils'
-
-const EVENT_ID = process.env.EVENT_ID || '001'
-const eventPath = join(__dirname, '..', 'prisma/Events')
-
-const event = new pcEvent({
-  datasources: {
-    db: {
-      url: `file:${join(eventPath, `Event${EVENT_ID}.scdb`)}`,
-    },
-  },
-})
-
-const eventData = new pcEventData({
-  datasources: {
-    db: {
-      url: `file:${join(eventPath, `Event${EVENT_ID}Ex.scdb`)}`,
-    },
-  },
-})
+import { nullToUndefined } from '../utils'
+import { event, eventData } from './shared'
 
 const TimeInfo = z
   .object({
@@ -121,30 +96,3 @@ export const competitors = router().query('list', {
     return competitors
   },
 })
-
-export const runs = router().query('count', {
-  output: z.number(),
-  resolve: async (req) => {
-    let heats = []
-
-    try {
-      heats.push(await eventData.tTIMEINFOS_HEAT1.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT2.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT3.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT4.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT5.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT6.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT7.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT8.count())
-      heats.push(await eventData.tTIMEINFOS_HEAT9.count())
-    } catch (e) {}
-
-    return heats.filter((cars) => cars > 0).length
-  },
-})
-
-export const trpcRouter = router()
-  .merge('competitors.', competitors)
-  .merge('runs.', runs)
-
-export type TRPCRouter = typeof trpcRouter
