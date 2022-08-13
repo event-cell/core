@@ -5,10 +5,21 @@ import { ResultsTable } from '../components/table'
 import { Timer } from '@mui/icons-material'
 
 import { requestWrapper } from '../components/requestWrapper'
+import { useEffect } from 'react'
+
+let displayInterval: any
 
 export const Display = () => {
   const rows = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
+
+  useEffect(() => {
+    if (displayInterval) clearTimeout(displayInterval)
+    displayInterval = setTimeout(() => {
+      console.log('refreshing')
+      rows.refetch()
+    }, 1000 * 120)
+  }, [rows])
 
   let classes: string[] = []
 
