@@ -1,8 +1,8 @@
 version: '3'
-restart: always
 
 services:
   core:
+    restart: always
     image: 'ghcr.io/event-cell/core:main'
     ports:
       - '80:80'
