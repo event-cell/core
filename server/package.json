@@ -7,7 +7,10 @@
   "scripts": {
     "start": "node build/index.js",
     "dev": "ts-node-dev --exit-child --respawn src/index.ts",
-    "build": "tsc"
+    "setup": "yarn prismaGenerate",
+    "build": "tsc && cp -r ../client/build build/ui",
+    "prismaGenerate": "prisma generate --schema=./prisma/schemaEvent.prisma && prisma generate --schema=./prisma/schemaEventData.prisma",
+    "prismaIntrospect": "yarn prisma db pull --schema prisma/schemaEvent.prisma && yarn prisma db pull --schema prisma/schemaEventData.prisma"
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.3",

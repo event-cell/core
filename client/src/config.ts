@@ -1,12 +1,20 @@
 /**
- * A class that can be used to load the configuration manually in the future.
- * Currently, it just contains hard coded constants
- *
- * @todo Find a way of loading this from the server
+ * Provides the configuration for the application.
  */
 export class Config {
   /**
-   * The URL of the server
+   * Will be true if the node environment is set to development
    */
-  public backendUrl: string = 'http://localhost:8080/api/v1/'
+  protected development =
+    !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
+
+  /**
+   * The URL of the server
+   *
+   * The current behavior is to use `http://localhost:8080/api/v1/` in
+   * development and `/api/v1/` in production.
+   */
+  public backendUrl = this.development
+    ? 'http://localhost:8080/api/v1'
+    : '/api/v1'
 }

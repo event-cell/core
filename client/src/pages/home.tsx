@@ -3,15 +3,12 @@ import {
   Chip,
   CircularProgress,
   Container,
-  Divider,
-  ListItem,
-  ListItemText,
   Typography,
 } from '@mui/material'
 
 import { trpc } from '../App'
 import { ResultsTable } from '../components/table'
-import { Cancel, Timer } from '@mui/icons-material'
+import { Timer } from '@mui/icons-material'
 
 export const Home = () => {
   const rows = trpc.useQuery(['competitors.list'])
@@ -19,9 +16,32 @@ export const Home = () => {
 
   let classes: string[] = []
 
+  if (rows.error) {
+    return (
+      <Container>
+        <Typography variant="h4">Error</Typography>
+        <Typography variant="body1">{rows.error.message}</Typography>
+        <Typography variant="h5">Technical details</Typography>
+        <Typography variant="body1">
+          {JSON.stringify(rows.error.data, null, 2)}
+        </Typography>
+      </Container>
+    )
+  }
+
   if (!rows.data || !runCount.data) {
-    // TODO: Center the loading spinner
-    return <CircularProgress />
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </div>
+    )
   }
 
   for (const row of rows.data || []) {

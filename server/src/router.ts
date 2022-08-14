@@ -10,7 +10,7 @@ import {
 } from '../prisma/generated/eventData'
 import { nullToUndefined } from './utils'
 
-const EVENT_ID = '049'
+const EVENT_ID = process.env.EVENT_ID || '001'
 const eventPath = join(__dirname, '..', 'prisma/Events')
 
 const event = new pcEvent({

@@ -6,6 +6,12 @@
   ],
   "scripts": {
     "server:dev": "cd server && yarn dev",
-    "client:dev": "cd client && yarn dev"
+    "server:setup": "cd server && yarn setup",
+    "server:build": "cd server && yarn build",
+    "client:dev": "cd client && yarn dev",
+    "client:setup": "cd client && yarn setup",
+    "client:build": "cd client && yarn build",
+    "setup": "yarn client:setup && yarn server:setup",
+    "build": "yarn client:build && yarn server:build"
   }
 }
