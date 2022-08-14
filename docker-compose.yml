@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  core:
+    image: 'ghcr.io/event-cell/core:main'
+    ports:
+      - '80:80'
+    volumes:
+      - core-data:/data
+      - type: bind
+        source: "${TIMING_DB}"
+        target: /app/prisma/Events
+        read_only: true
+
+volumes:
+  core-data:
