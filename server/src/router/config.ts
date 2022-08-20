@@ -1,6 +1,7 @@
 import { router } from '@trpc/server'
-import winston from 'winston'
 import { z } from 'zod'
+import { setupLogger } from './../utils'
+const logger = setupLogger('router/config')
 
 import { config, ConfigType } from '../config'
 import { getEventDatabases } from '../dbUtils'
@@ -12,14 +13,14 @@ export const configRoute = router()
   .query('get', {
     output: ConfigType,
     resolve: (req) => {
-      winston.warn('TODO: config.get should be protected by authentication')
+      logger.warn('TODO: config.get should be protected by authentication')
       return config.asJSON()
     },
   })
   .mutation('set', {
     input: ConfigType,
     resolve: (req) => {
-      winston.warn('TODO: config.set should be protected by authentication')
+      logger.warn('TODO: config.set should be protected by authentication')
 
       config.set(req.input)
       config.storeConfig()

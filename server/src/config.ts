@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
-import winston from 'winston'
+import { setupLogger } from './utils'
+const logger = setupLogger('config')
 import { z } from 'zod'
 
 export const ConfigType = z.object({
@@ -36,7 +37,7 @@ class Config {
     // should create the config file in the folder
     if (existsSync('/data/')) {
       if (!existsSync('/data/config.json')) {
-        winston.info(
+        logger.info(
           'Creating config file in `/data/`. If this is not where you want it, specify the CONFIG_DIR env variable'
         )
         writeFileSync('/data/config.json', '{}')

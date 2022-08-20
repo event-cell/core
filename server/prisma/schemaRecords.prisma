@@ -18,4 +18,6 @@ model RECORDS {
   CAR   String
   TIME  Float
   DATE_SET  DateTime
+  EVENT_ID  Int
+  LAPS Int
   }

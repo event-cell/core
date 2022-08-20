@@ -1,7 +1,8 @@
 import { join } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { Database } from 'sqlite3'
-import winston from 'winston'
+import { setupLogger } from './../utils'
+const logger = setupLogger('setupRecordsDB')
 
 import { config } from '../config'
 
@@ -12,7 +13,7 @@ export async function setupRecordsDB() {
 
   if (existsSync(recordsLocation)) return
 
-  winston.info('Creating records db')
+  logger.info('Creating records db')
 
   const database = new Database(recordsLocation)
 
