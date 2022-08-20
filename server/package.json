@@ -9,13 +9,14 @@
     "dev": "ts-node-dev --exit-child --respawn src/index.ts",
     "setup": "yarn prismaGenerate",
     "build": "tsc && cp -r ../client/build build/ui",
-    "prismaGenerate": "prisma generate --schema=./prisma/schemaEvent.prisma && prisma generate --schema=./prisma/schemaEventData.prisma",
+    "prismaGenerate": "prisma generate --schema=./prisma/schemaEvent.prisma && prisma generate --schema=./prisma/schemaEventData.prisma && prisma generate --schema=./prisma/schemaRecords.prisma",
     "prismaIntrospect": "yarn prisma db pull --schema prisma/schemaEvent.prisma && yarn prisma db pull --schema prisma/schemaEventData.prisma"
   },
   "devDependencies": {
     "@tsconfig/node14": "^1.0.3",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
+    "@types/sqlite3": "^3.1.8",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.7.4"
   },
@@ -25,6 +26,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "prisma": "^3.15.2",
+    "sqlite3": "^5.0.11",
     "winston": "^3.7.2",
     "zod": "^3.17.3"
   }

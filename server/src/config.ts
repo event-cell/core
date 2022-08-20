@@ -8,6 +8,7 @@ export const ConfigType = z.object({
   eventName: z.optional(z.string()),
 
   eventDatabasePath: z.optional(z.string()),
+  recordsDatabasePath: z.optional(z.string()),
 })
 export type ConfigType = z.infer<typeof ConfigType>
 
@@ -19,6 +20,7 @@ class Config {
   public eventName = 'Unnamed Event'
 
   public eventDatabasePath = join(__dirname, '..', 'prisma/Events')
+  public recordsDatabasePath = '/data/records'
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
@@ -56,6 +58,8 @@ class Config {
 
     if (config.eventDatabasePath)
       this.eventDatabasePath = config.eventDatabasePath
+    if (config.recordsDatabasePath)
+      this.recordsDatabasePath = config.recordsDatabasePath
   }
 
   public asJSON() {
