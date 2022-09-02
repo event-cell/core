@@ -15,17 +15,16 @@ export function setupLogger(name: string) {
   )
   const logfileFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(
-      (info) => `${info.timestamp} ${info.level}: ${info.message}`
-    )
+    winston.format.printf((options) => {
+      return `${options.timestamp} [${options.moduleName}] ${options.level}: ${options.message}`
+    })
   )
   const logger = winston.createLogger({
     transports: [
-      new winston.transports.Console({ format: consoleFormat, level: 'debug' }),
+      new winston.transports.Console({ format: consoleFormat }),
       new winston.transports.File({
         filename: 'logfile.log',
         format: logfileFormat,
-        level: 'debug',
       }),
     ],
   })

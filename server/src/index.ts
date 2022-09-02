@@ -62,7 +62,9 @@ const app = express()
   )
 
   const mins = 1
-
+  // Start Immediately
+  scheduledTasks()
+  // and then loop
   setInterval(() => {
     scheduledTasks()
   }, mins * 60 * 1000)

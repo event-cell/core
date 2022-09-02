@@ -21,3 +21,10 @@ model RECORDS {
   EVENT_ID  Int
   LAPS Int
   }
+
+model EVENT_PROCESSING {
+IDX Int @id @default(autoincrement())
+EVENT    Int
+FIRST_UPDATED  DateTime
+LAST_UPDATED DateTime
+}
