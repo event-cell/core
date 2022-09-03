@@ -18,7 +18,7 @@ export const Display = () => {
     displayInterval = setTimeout(() => {
       console.log('refreshing')
       rows.refetch()
-    }, 1000 * 15)
+    }, 1000 * 5)
   }, [rows])
 
   let classes: string[] = []
