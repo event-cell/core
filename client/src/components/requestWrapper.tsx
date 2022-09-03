@@ -19,7 +19,7 @@ export function requestWrapper(
       )
     }
 
-    if (!request.data || !request.data) {
+    if (typeof request.data === 'undefined') {
       return (
         <div
           style={{

@@ -25,7 +25,10 @@ export const Display = () => {
 
   const requestErrors = requestWrapper(rows, runCount)
   if (requestErrors) return requestErrors
-  if (!rows.data || !runCount.data) return null // This will never be called, but it is needed to make typescript happy
+  if (!rows.data || typeof runCount.data == 'undefined') {
+    console.warn('A function was called that should not be called')
+    return null
+  } // This will never be called, but it is needed to make typescript happy
 
   for (const row of rows.data || []) {
     if (classes.includes(row.class)) continue
@@ -36,6 +39,8 @@ export const Display = () => {
     eventClass,
     drivers: rows.data.filter((data) => data.class === eventClass),
   }))
+
+  console.log(classes, classesList)
 
   return (
     <Container>
@@ -55,9 +60,13 @@ export const Display = () => {
           />
           <p />
           <ResultsTable
-            data={eventClass.drivers}
+            data={eventClass.drivers.sort(
+              (a, b) =>
+                Math.min(...a.times.map((time) => time?.time || 10000000)) -
+                Math.min(...b.times.map((time) => time?.time || 10000000))
+            )}
             keyKey={'number'}
-            runCount={runCount.data}
+            runCount={runCount.data as number}
           />
         </div>
       ))}

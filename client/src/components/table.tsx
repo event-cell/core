@@ -12,7 +12,70 @@ import {
   Box,
 } from '@mui/material'
 
-import { CarCrash, EmojiEvents } from '@mui/icons-material'
+import { Cancel, CarCrash, EmojiEvents, MeetingRoom } from '@mui/icons-material'
+
+type Optional<T> = T | undefined
+type RunTime = {
+  run: number
+  status: number
+  time: number
+  split1: number
+  split2: number
+}
+
+function ensureData(data: RunTime[]): Optional<RunTime>[] {
+  let max_run = Math.max(...data.map((data) => data.run), 0)
+
+  if (max_run <= 0) return []
+
+  return Array.apply(null, Array(max_run)).map((_, index) =>
+    data.find((data) => data.run == index + 1)
+  )
+}
+
+const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
+  run,
+  classRecord,
+}) =>
+  run.status === 0 && run.time / 1000 < classRecord ? (
+    <Chip
+      label={run.time / 1000}
+      variant="filled"
+      color="warning"
+      size="small"
+      icon={<EmojiEvents />}
+    />
+  ) : run.status === 0 ? (
+    <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
+      {run.time / 1000}
+    </Box>
+  ) : run.status === 1 ? (
+    <Chip
+      label="DNS"
+      variant="outlined"
+      color="info"
+      size="small"
+      icon={<MeetingRoom />}
+    />
+  ) : run.status === 2 ? (
+    <Chip
+      label="DNF"
+      variant="outlined"
+      color="error"
+      size="small"
+      icon={<CarCrash />}
+    />
+  ) : run.status === 3 ? (
+    <Chip
+      label="DSQ"
+      variant="outlined"
+      color="error"
+      size="small"
+      icon={<Cancel />}
+    />
+  ) : (
+    <div>Unknown status {run.status}</div>
+  )
 
 export const ResultsTable: FC<{
   data: Record<string, string | number | any>[]
@@ -48,56 +111,28 @@ export const ResultsTable: FC<{
                 ) : null}
               </TableCell>
               <TableCell>{row['vehicle']}</TableCell>
-              {row['times'].map(
-                (run: {
-                  run: number
-                  status: number
-                  time: number
-                  split1: number
-                  split2: number
-                }) =>
-                  run.status === 0 && run.time / 1000 < row['classRecord'] ? (
-                    <TableCell key={run.run}>
+              {ensureData(
+                row['times'].filter(
+                  (time: RunTime) => time.time != 0 || time.status != 0
+                )
+              ).map((run, index) =>
+                !run ? (
+                  <TableCell key={index}></TableCell>
+                ) : (
+                  <TableCell key={index}>
+                    <Typography component="div">
+                      <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
+                        <TimeTag run={run} classRecord={row.classRecord} />
+                      </Box>
+                    </Typography>
+
+                    {run.status != 3 && run.status != 1 && (
                       <Typography component="div">
-                        <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
-                          <Chip
-                            label={run.time / 1000}
-                            variant="filled"
-                            color="warning"
-                            size="small"
-                            icon={<EmojiEvents />}
-                          />
-                        </Box>
+                        {run.split1 / 1000} {run.split2 / 1000}
                       </Typography>
-                      <div>
-                        {run.split1 / 1000} {run.split2 / 1000}
-                      </div>
-                    </TableCell>
-                  ) : run.status === 0 ? (
-                    <TableCell key={run.run}>
-                      <Typography component="div">
-                        <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
-                          {run.time / 1000}
-                        </Box>
-                      </Typography>
-                      <div>
-                        {run.split1 / 1000} {run.split2 / 1000}
-                      </div>
-                    </TableCell>
-                  ) : run.status === 2 ? (
-                    <TableCell key={run.run}>
-                      <Chip
-                        label="DNF"
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        icon={<CarCrash />}
-                      />
-                      <div>
-                        {run.split1 / 1000} {run.split2 / 1000}
-                      </div>
-                    </TableCell>
-                  ) : null
+                    )}
+                  </TableCell>
+                )
               )}
             </TableRow>
           ))}

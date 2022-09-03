@@ -35,7 +35,7 @@ export type CompetitorList = z.infer<typeof CompetitorList>
 
 export const competitors = router().query('list', {
   output: CompetitorList,
-  resolve: async function (req) {
+  resolve: async function () {
     let tCOMPETITORSTable
     let heats = []
 
@@ -92,9 +92,15 @@ export const competitors = router().query('list', {
           .map((timedRun) => ({
             run: index + 1,
             status: timedRun.C_STATUS || 0,
-            time: timedRun.C_TIME || 0,
-            split1: timedRun.C_INTER1 || 0,
-            split2: timedRun.C_INTER2 || 0,
+            ...(timedRun.C_STATUS === 3
+              ? { time: 0 }
+              : { time: timedRun.C_TIME || 0 }),
+            ...(timedRun.C_STATUS === 3
+              ? { split1: 0 }
+              : { split1: timedRun.C_INTER1 || 0 }),
+            ...(timedRun.C_STATUS === 3
+              ? { split2: 0 }
+              : { split2: timedRun.C_INTER2 || 0 }),
           }))
         competitors[i].times = [...competitors[i].times, ...run]
       })
