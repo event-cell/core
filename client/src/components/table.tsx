@@ -29,7 +29,7 @@ function ensureData(data: RunTime[]): Optional<RunTime>[] {
   if (max_run <= 0) return []
 
   return Array.apply(null, Array(max_run)).map((_, index) =>
-    data.find((data) => data.run == index + 1)
+    data.find((data) => data.run === index + 1)
   )
 }
 
@@ -113,7 +113,7 @@ export const ResultsTable: FC<{
               <TableCell>{row['vehicle']}</TableCell>
               {ensureData(
                 row['times'].filter(
-                  (time: RunTime) => time.time != 0 || time.status != 0
+                  (time: RunTime) => time.time !== 0 || time.status !== 0
                 )
               ).map((run, index) =>
                 !run ? (
@@ -126,7 +126,7 @@ export const ResultsTable: FC<{
                       </Box>
                     </Typography>
 
-                    {run.status != 3 && run.status != 1 && (
+                    {run.status !== 3 && run.status !== 1 && (
                       <Typography component="div">
                         {run.split1 / 1000} {run.split2 / 1000}
                       </Typography>
