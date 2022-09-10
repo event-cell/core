@@ -66,17 +66,16 @@ export const Display = () => {
         <div key={eventClass.currentElement.class}>
           <Typography component='div'>
             <Box fontWeight='fontWeightMedium' display='inline' lineHeight='3'>
-              {eventClass.currentElement.class}
+              {eventClass.currentElement.class}&nbsp;&nbsp;&nbsp;&nbsp;
             </Box>
+            <Chip
+              label={'Class Record: ' + eventClass.drivers[0].classRecord}
+              variant='outlined'
+              color='info'
+              size='medium'
+              icon={<Timer />}
+            />
           </Typography>
-          <Chip
-            label={'Class Record: ' + eventClass.drivers[0].classRecord}
-            variant='outlined'
-            color='info'
-            size='medium'
-            icon={<Timer />}
-          />
-          <p />
           <ResultsTable
             data={eventClass.drivers.sort(
               (a, b) =>
