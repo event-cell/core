@@ -19,9 +19,9 @@ export const Display = () => {
       rows.refetch()
       runCount.refetch()
     }, 1000 * 5)
-  }, [rows,runCount])
+  }, [rows, runCount])
 
-  let classes: string[] = []
+  let classes: { classIndex:number, class:string }[] = []
 
   const requestErrors = requestWrapper(rows, runCount)
   if (requestErrors) return requestErrors
@@ -43,25 +43,30 @@ export const Display = () => {
   })
 
   for (let i = 1; i < maxClassIndex + 1; i++) {
+    let shouldSkip = false
     rows.data.forEach(row => {
-      if (row.classIndex === i && !classes.includes((row.class))) {
-        classes.push(row.class)
+      if (shouldSkip) {
+        return
+      }
+      if (row.classIndex === i) {
+        classes.push({ classIndex: row.classIndex, class: row.class })
+        shouldSkip = true
       }
     })
   }
 
-  const classesList = classes.map((eventClass) => ({
-    eventClass,
-    drivers: rows.data.filter((data) => data.class === eventClass)
+  const classesList = classes.map((currentElement) => ({
+    currentElement,
+    drivers: rows.data.filter((data) => data.classIndex === currentElement.classIndex)
   }))
 
   return (
     <Container>
       {classesList.map((eventClass) => (
-        <div key={eventClass.eventClass}>
+        <div key={eventClass.currentElement.class}>
           <Typography component='div'>
             <Box fontWeight='fontWeightMedium' display='inline' lineHeight='3'>
-              {eventClass.eventClass}
+              {eventClass.currentElement.class}
             </Box>
           </Typography>
           <Chip
