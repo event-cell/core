@@ -16,10 +16,10 @@ export const Display = () => {
   useEffect(() => {
     if (displayInterval) clearTimeout(displayInterval)
     displayInterval = setTimeout(() => {
-      console.log('refreshing')
       rows.refetch()
+      runCount.refetch()
     }, 1000 * 5)
-  }, [rows])
+  }, [rows,runCount])
 
   let classes: string[] = []
 
@@ -30,32 +30,45 @@ export const Display = () => {
     return null
   } // This will never be called, but it is needed to make typescript happy
 
-  for (const row of rows.data || []) {
-    if (classes.includes(row.class)) continue
-    classes.push(row.class)
+
+  // Sort classes in class order as per the index value
+  // in the timing software
+
+  let maxClassIndex = 0
+
+  rows.data.forEach(a => {
+    if (a.classIndex > maxClassIndex) {
+      maxClassIndex = a.classIndex
+    }
+  })
+
+  for (let i = 1; i < maxClassIndex + 1; i++) {
+    rows.data.forEach(row => {
+      if (row.classIndex === i && !classes.includes((row.class))) {
+        classes.push(row.class)
+      }
+    })
   }
 
   const classesList = classes.map((eventClass) => ({
     eventClass,
-    drivers: rows.data.filter((data) => data.class === eventClass),
+    drivers: rows.data.filter((data) => data.class === eventClass)
   }))
-
-  console.log(classes, classesList)
 
   return (
     <Container>
       {classesList.map((eventClass) => (
         <div key={eventClass.eventClass}>
-          <Typography component="div">
-            <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
+          <Typography component='div'>
+            <Box fontWeight='fontWeightMedium' display='inline' lineHeight='3'>
               {eventClass.eventClass}
             </Box>
           </Typography>
           <Chip
             label={'Class Record: ' + eventClass.drivers[0].classRecord}
-            variant="outlined"
-            color="info"
-            size="medium"
+            variant='outlined'
+            color='info'
+            size='medium'
             icon={<Timer />}
           />
           <p />
