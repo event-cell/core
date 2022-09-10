@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join } from 'path'
-import winston from 'winston'
+import { setupLogger } from './utils'
+const logger = setupLogger('config')
 import { z } from 'zod'
 
 export const ConfigType = z.object({
@@ -8,6 +9,7 @@ export const ConfigType = z.object({
   eventName: z.optional(z.string()),
 
   eventDatabasePath: z.optional(z.string()),
+  recordsDatabasePath: z.optional(z.string()),
 })
 export type ConfigType = z.infer<typeof ConfigType>
 
@@ -19,6 +21,7 @@ class Config {
   public eventName = 'Unnamed Event'
 
   public eventDatabasePath = join(__dirname, '..', 'prisma/Events')
+  public recordsDatabasePath = '/data/records'
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
@@ -34,7 +37,7 @@ class Config {
     // should create the config file in the folder
     if (existsSync('/data/')) {
       if (!existsSync('/data/config.json')) {
-        winston.info(
+        logger.info(
           'Creating config file in `/data/`. If this is not where you want it, specify the CONFIG_DIR env variable'
         )
         writeFileSync('/data/config.json', '{}')
@@ -56,6 +59,8 @@ class Config {
 
     if (config.eventDatabasePath)
       this.eventDatabasePath = config.eventDatabasePath
+    if (config.recordsDatabasePath)
+      this.recordsDatabasePath = config.recordsDatabasePath
   }
 
   public asJSON() {
