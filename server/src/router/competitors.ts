@@ -15,7 +15,6 @@ const TimeInfo = z
   .optional()
 
 const TimeInfoList = z.array(TimeInfo)
-export type TimeInfo = z.infer<typeof TimeInfo>
 export type TimeInfoList = z.infer<typeof TimeInfoList>
 
 const Competitor = z.object({
@@ -23,6 +22,7 @@ const Competitor = z.object({
   firstName: z.string(),
   lastName: z.string(),
   class: z.string(),
+  classIndex: z.number(),
   vehicle: z.string(),
   classRecord: z.string(),
   special: z.optional(z.string()),
@@ -30,7 +30,6 @@ const Competitor = z.object({
   times: TimeInfoList,
 })
 const CompetitorList = z.array(Competitor)
-export type Competitor = z.infer<typeof Competitor>
 export type CompetitorList = z.infer<typeof CompetitorList>
 
 export const competitors = router().query('list', {
@@ -74,6 +73,7 @@ export const competitors = router().query('list', {
       firstName: competitor.C_FIRST_NAME || 'N/A',
       lastName: competitor.C_LAST_NAME || 'N/A',
       class: competitor.C_SERIE || 'N/A',
+      classIndex: competitor.C_I21 || 0,
       vehicle: competitor.C_COMMITTEE || 'N/A',
       classRecord: competitor.C_TEAM || '0.00',
       special: nullToUndefined(competitor.C_I28),

@@ -11,10 +11,10 @@ export class Config {
   /**
    * The URL of the server
    *
-   * The current behavior is to use `http://localhost:8080/api/v1/` in
+   * The current behavior is to use `http://timingserver.local:8080/api/v1/` in
    * development and `/api/v1/` in production.
    */
   public backendUrl = this.development
-    ? 'http://localhost:8080/api/v1'
+    ? 'http://timingserver.local:8080/api/v1'
     : '/api/v1'
 }
