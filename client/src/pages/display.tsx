@@ -21,7 +21,7 @@ export const Display = () => {
     }, 1000 * 5)
   }, [rows, runCount])
 
-  let classes: { classIndex:number, class:string }[] = []
+  let classes: { classIndex: number, class: string }[] = []
 
   const requestErrors = requestWrapper(rows, runCount)
   if (requestErrors) return requestErrors
@@ -55,18 +55,59 @@ export const Display = () => {
     })
   }
 
-  const classesList = classes.map((currentElement) => ({
-    currentElement,
-    drivers: rows.data.filter((data) => data.classIndex === currentElement.classIndex)
+  const classesList = classes.map((carClass) => ({
+    carClass,
+    drivers: rows.data.filter((data) => data.classIndex === carClass.classIndex)
   }))
+
+  // Calculate ClassesList for each screen
+  // Max 20 elements per screen
+
+  let classesListScreen01: { carClass: any, drivers: any }[] = []
+  let classesListScreen02: { carClass: any, drivers: any }[] = []
+  let classesListScreen03: { carClass: any, drivers: any }[] = []
+  let classesListScreen04: { carClass: any, drivers: any }[] = []
+
+  let screenLength = 0
+  const targetScreenLength = 23
+  if (window.location.pathname !== '/display') {
+    classesList.forEach(currentClass => {
+      screenLength = screenLength + Object.keys(currentClass.drivers).length + 1
+      if (screenLength <= targetScreenLength) {
+        classesListScreen01.push(currentClass)
+      } else if (screenLength > targetScreenLength && screenLength <= targetScreenLength * 2) {
+        classesListScreen02.push(currentClass)
+      }
+      if (screenLength > targetScreenLength * 2 && screenLength <= targetScreenLength * 3) {
+        classesListScreen03.push(currentClass)
+      } else if (screenLength > targetScreenLength * 3) {
+        classesListScreen04.push(currentClass)
+      }
+    })
+  }
+
+  let printClassesList: { carClass: any, drivers: any }[] = []
+  if (window.location.pathname !== '/display') {
+    if (window.location.pathname === '/display/1') {
+      printClassesList = classesListScreen01
+    } else if (window.location.pathname === '/display/2') {
+      printClassesList = classesListScreen02
+    } else if (window.location.pathname === '/display/3') {
+      printClassesList = classesListScreen03
+    } else if (window.location.pathname === '/display/4') {
+      printClassesList = classesListScreen04
+    }
+  } else {
+    printClassesList = classesList
+  }
 
   return (
     <Container>
-      {classesList.map((eventClass) => (
-        <div key={eventClass.currentElement.class}>
+      {printClassesList.map((eventClass) => (
+        <div key={eventClass.carClass.class}>
           <Typography component='div'>
             <Box fontWeight='fontWeightMedium' display='inline' lineHeight='3'>
-              {eventClass.currentElement.class}&nbsp;&nbsp;&nbsp;&nbsp;
+              {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
             </Box>
             <Chip
               label={'Class Record: ' + eventClass.drivers[0].classRecord}
@@ -78,7 +119,7 @@ export const Display = () => {
           </Typography>
           <ResultsTable
             data={eventClass.drivers.sort(
-              (a, b) =>
+              (a: { times: any[] }, b: { times: any[] }) =>
                 Math.min(...a.times.map((time) => time?.time || 10000000)) -
                 Math.min(...b.times.map((time) => time?.time || 10000000))
             )}

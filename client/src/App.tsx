@@ -12,7 +12,7 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
 import { Display } from './pages/display'
-import { TRPCRouter } from '../../server/src/router'
+import { TRPCRouter } from 'server/src/router'
 import { config } from '.'
 import { Admin } from './pages/admin'
 
@@ -41,6 +41,11 @@ function App() {
             <Routes>
               <Route path="/admin/" element={<Admin />} />
               <Route path="/display/" element={<Display />} />
+              <Route path="/display/1" element={<Display />} />
+              <Route path="/display/2" element={<Display />} />
+              <Route path="/display/3" element={<Display />} />
+              <Route path="/display/4" element={<Display />} />
+
             </Routes>
           </Router>
         </ThemeProvider>
