@@ -4,6 +4,7 @@ import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
 import { useEffect } from 'react'
+import { CarCrash } from '@mui/icons-material'
 
 let displayInterval: any
 
@@ -21,7 +22,11 @@ export const TrackDisplay = () => {
 
   const requestErrors = requestWrapper(currentRun)
   if (requestErrors) return requestErrors
-  if (!currentRun.data || !allRuns.data) {
+  if (
+    !currentRun.data ||
+    !allRuns.data ||
+    typeof currentRun.data.times === 'undefined'
+  ) {
     console.warn('A function was called that should not be called')
     return null
   } // This will never be called, but it is needed to make typescript happy
@@ -32,6 +37,9 @@ export const TrackDisplay = () => {
   let split1Colour = 'background.default'
   let split2Colour = 'background.default'
   let timeColour = 'background.default'
+  let split1txtColour = 'background.default'
+  let split2txtColour = 'background.default'
+  let timetxtColour = 'background.default'
 
   let bestSplit1 = 999999.0
   let bestSplit2 = 999999.0
@@ -77,28 +85,37 @@ export const TrackDisplay = () => {
     }
   }
 
-  if (split1 <= bestSplit1) {
+  if (split1 <= bestSplit1 && split1 !== 0) {
     split1Colour = 'purple'
-  } else if (split1 <= personalBestSplit1) {
+    split1txtColour = 'default'
+  } else if (split1 <= personalBestSplit1 && split1 !== 0) {
     split1Colour = 'green'
-  } else {
+    split1txtColour = 'default'
+  } else if (split1 !== 0) {
     split1Colour = 'yellow'
+    split1txtColour = 'default'
   }
 
-  if (split2 <= bestSplit2) {
+  if (split2 <= bestSplit2 && split2 > 0) {
     split2Colour = 'purple'
-  } else if (split2 <= personalBestSplit2) {
+    split2txtColour = 'default'
+  } else if (split2 <= personalBestSplit2 && split2 > 0) {
     split2Colour = 'green'
-  } else {
+    split2txtColour = 'default'
+  } else if (split2 > 0) {
     split2Colour = 'yellow'
+    split2txtColour = 'default'
   }
 
-  if (time <= bestTime) {
+  if (time <= bestTime && time > 0) {
     timeColour = 'purple'
-  } else if (time <= personalBestTime) {
+    timetxtColour = 'default'
+  } else if (time <= personalBestTime && time > 0) {
     timeColour = 'green'
-  } else {
+    timetxtColour = 'default'
+  } else if (time > 0) {
     timeColour = 'yellow'
+    timetxtColour = 'default'
   }
 
   // console.log(split1, split2, time)
@@ -109,6 +126,32 @@ export const TrackDisplay = () => {
   split1 = split1 / 1000
   split2 = split2 / 1000
   time = time / 1000
+
+  // Render functions
+  const renderTime = () => {
+    const idx = currentRun.data.times.length - 1
+    const times = currentRun.data.times[idx]
+
+    if (typeof times !== 'undefined') {
+      if (times.status === 2) {
+        return (
+          <Grid>
+            <CarCrash color="error" sx={{ fontSize: 200 }} />
+            DNF
+          </Grid>
+        )
+      } else if (times.status === 3) {
+        return (
+          <Grid sx={{ color: 'white' }}>
+            <CarCrash color="error" sx={{ fontSize: 200 }} />
+            DSQ
+          </Grid>
+        )
+      } else {
+        return time.toFixed(2)
+      }
+    }
+  }
 
   return (
     <Container maxWidth={false}>
@@ -138,6 +181,7 @@ export const TrackDisplay = () => {
                 display: 'block',
                 textAlign: 'center',
                 bgcolor: 'background.default',
+                color: split1txtColour,
               }}
             >
               {split1.toFixed(2)}
@@ -151,6 +195,7 @@ export const TrackDisplay = () => {
                 display: 'block',
                 textAlign: 'center',
                 bgcolor: 'background.default',
+                color: split2txtColour,
               }}
             >
               {split2.toFixed(2)}
@@ -170,9 +215,10 @@ export const TrackDisplay = () => {
                 display: 'block',
                 textAlign: 'center',
                 bgcolor: 'background.default',
+                color: timetxtColour,
               }}
             >
-              {time.toFixed(2)}
+              {renderTime()}
             </Box>
           </Grid>
           <Grid item xs={6}>
