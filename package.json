@@ -12,6 +12,13 @@
     "client:setup": "cd client && yarn setup",
     "client:build": "cd client && yarn build",
     "setup": "yarn client:setup && yarn server:setup",
-    "build": "yarn client:build && yarn server:build"
+    "build": "yarn client:build && yarn server:build",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "eslint": "^8.23.1",
+    "eslint-plugin-react": "^7.31.8"
   }
 }
