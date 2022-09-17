@@ -135,7 +135,7 @@ export const TrackDisplay = () => {
     if (typeof times !== 'undefined') {
       if (times.status === 2) {
         return (
-          <Grid>
+          <Grid sx={{ color: 'white' }}>
             <CarCrash color="error" sx={{ fontSize: 200 }} />
             DNF
           </Grid>
