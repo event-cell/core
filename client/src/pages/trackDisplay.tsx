@@ -51,17 +51,17 @@ export const TrackDisplay = () => {
   // Best split1 of the day
 
   for (const run of currentRun.data.times) {
-    if (typeof run !== 'undefined') {
+    if (typeof run !== 'undefined' && run.status === 0) {
       split1 = run.split1
       split2 = run.split2
       time = run.time
-      if (run.split1 < personalBestSplit1) {
+      if (run.split1 < personalBestSplit1 && run.split1 > 0) {
         personalBestSplit1 = run.split1
       }
-      if (run.split2 < personalBestSplit2) {
+      if (run.split2 < personalBestSplit2 && run.split2 > 0) {
         personalBestSplit2 = run.split2
       }
-      if (run.time < personalBestTime) {
+      if (run.time < personalBestTime && run.time > 0) {
         personalBestTime = run.time
       }
     }
@@ -70,7 +70,7 @@ export const TrackDisplay = () => {
   for (const person of allRuns.data) {
     if (person.classIndex === currentRun.data.classIndex) {
       for (const run of person.times) {
-        if (typeof run !== 'undefined') {
+        if (typeof run !== 'undefined' && run.status === 0) {
           if (run.split1 < bestSplit1) {
             bestSplit1 = run.split1
           }
@@ -85,13 +85,13 @@ export const TrackDisplay = () => {
     }
   }
 
-  if (split1 <= bestSplit1 && split1 !== 0) {
+  if (split1 <= bestSplit1 && split1 > 0) {
     split1Colour = 'purple'
     split1txtColour = 'default'
-  } else if (split1 <= personalBestSplit1 && split1 !== 0) {
+  } else if (split1 <= personalBestSplit1 && split1 > 0) {
     split1Colour = 'green'
     split1txtColour = 'default'
-  } else if (split1 !== 0) {
+  } else if (split1 > 0) {
     split1Colour = 'yellow'
     split1txtColour = 'default'
   }
