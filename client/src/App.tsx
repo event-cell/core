@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { createReactQueryHooks } from '@trpc/react'
@@ -16,6 +16,7 @@ import { TRPCRouter } from 'server/src/router'
 import { config } from '.'
 import { Admin } from './pages/admin'
 import { TrackDisplay } from './pages/trackDisplay'
+import { Announcer } from './pages/announcer'
 
 // MUI theme is here so we can modify it later. Currently, it is just stock
 export const theme = createTheme({
@@ -46,9 +47,8 @@ function App() {
               <Route path="/display/2" element={<Display />} />
               <Route path="/display/3" element={<Display />} />
               <Route path="/display/4" element={<Display />} />
-              <Route path="/trackDisplay" element={<TrackDisplay />} />
-
-
+              <Route path="/trackdisplay" element={<TrackDisplay />} />
+              <Route path="/announcer" element={<Announcer />} />
             </Routes>
           </Router>
         </ThemeProvider>

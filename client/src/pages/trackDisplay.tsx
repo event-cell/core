@@ -9,27 +9,28 @@ import { CarCrash } from '@mui/icons-material'
 let displayInterval: any
 
 export const TrackDisplay = () => {
-  const currentRun = trpc.useQuery(['currentcompetitor.currentRun'])
+  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
   const allRuns = trpc.useQuery(['competitors.list'])
 
   useEffect(() => {
     if (displayInterval) clearTimeout(displayInterval)
     displayInterval = setTimeout(() => {
-      currentRun.refetch()
+      currentCompetitor.refetch()
       allRuns.refetch()
     }, 1000 * 5)
-  }, [currentRun, allRuns])
+  }, [currentCompetitor, allRuns])
 
-  const requestErrors = requestWrapper(currentRun)
+  const requestErrors = requestWrapper(currentCompetitor, allRuns)
   if (requestErrors) return requestErrors
-  if (
-    !currentRun.data ||
-    !allRuns.data ||
-    typeof currentRun.data.times === 'undefined'
-  ) {
+  if (!currentCompetitor.data || !allRuns.data) {
     console.warn('A function was called that should not be called')
     return null
   } // This will never be called, but it is needed to make typescript happy
+
+  const currentRunArray = allRuns.data.filter(
+    (a) => a.number === currentCompetitor.data
+  )
+  const currentRun = currentRunArray[0]
 
   let split1 = 0.0
   let split2 = 0.0
@@ -50,7 +51,7 @@ export const TrackDisplay = () => {
 
   // Best split1 of the day
 
-  for (const run of currentRun.data.times) {
+  for (const run of currentRun.times) {
     if (typeof run !== 'undefined' && run.status === 0) {
       split1 = run.split1
       split2 = run.split2
@@ -68,7 +69,7 @@ export const TrackDisplay = () => {
   }
 
   for (const person of allRuns.data) {
-    if (person.classIndex === currentRun.data.classIndex) {
+    if (person.classIndex === currentRun.classIndex) {
       for (const run of person.times) {
         if (typeof run !== 'undefined' && run.status === 0) {
           if (run.split1 < bestSplit1) {
@@ -129,8 +130,8 @@ export const TrackDisplay = () => {
 
   // Render functions
   const renderTime = () => {
-    const idx = currentRun.data.times.length - 1
-    const times = currentRun.data.times[idx]
+    const idx = currentRun.times.length - 1
+    const times = currentRun.times[idx]
 
     if (typeof times !== 'undefined') {
       if (times.status === 2) {
@@ -231,7 +232,7 @@ export const TrackDisplay = () => {
                 bgcolor: 'background.default',
               }}
             >
-              {currentRun.data.number}
+              {currentRun.number}
             </Box>
           </Grid>
           <Grid item xs={6}>
@@ -244,7 +245,7 @@ export const TrackDisplay = () => {
                 bgcolor: 'background.default',
               }}
             >
-              {currentRun.data.lastName} {currentRun.data.firstName}
+              {currentRun.lastName} {currentRun.firstName}
             </Box>
           </Grid>
         </Grid>

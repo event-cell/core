@@ -1,15 +1,14 @@
 import { FC } from 'react'
 import {
+  Box,
+  Chip,
   Paper,
+  Table as MUITable,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Table as MUITable,
-  Chip,
-  Typography,
-  Box,
 } from '@mui/material'
 
 import { Cancel, CarCrash, EmojiEvents, MeetingRoom } from '@mui/icons-material'
@@ -39,7 +38,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
 }) =>
   run.status === 0 && run.time / 1000 < classRecord ? (
     <Chip
-      label={run.time / 1000}
+      label={(run.time / 1000).toFixed(2)}
       variant="filled"
       color="warning"
       size="small"
@@ -47,7 +46,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
     />
   ) : run.status === 0 ? (
     <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
-      {run.time / 1000}
+      {(run.time / 1000).toFixed(2)}
     </Box>
   ) : run.status === 1 ? (
     <Chip
@@ -120,16 +119,14 @@ export const ResultsTable: FC<{
                   <TableCell key={index}></TableCell>
                 ) : (
                   <TableCell key={index}>
-                    <Typography component="div">
-                      <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
-                        <TimeTag run={run} classRecord={row.classRecord} />
-                      </Box>
-                    </Typography>
-
+                    <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
+                      <TimeTag run={run} classRecord={row.classRecord} />
+                    </Box>
                     {run.status !== 3 && run.status !== 1 && (
-                      <Typography component="div">
-                        {run.split1 / 1000} {run.split2 / 1000}
-                      </Typography>
+                      <Box>
+                        {(run.split1 / 1000).toFixed(2)}{' '}
+                        {(run.split2 / 1000).toFixed(2)}
+                      </Box>
                     )}
                   </TableCell>
                 )
