@@ -15,6 +15,7 @@ import { Display } from './pages/display'
 import { TRPCRouter } from 'server/src/router'
 import { config } from '.'
 import { Admin } from './pages/admin'
+import { TrackDisplay } from './pages/trackDisplay'
 
 // MUI theme is here so we can modify it later. Currently, it is just stock
 export const theme = createTheme({
@@ -45,6 +46,8 @@ function App() {
               <Route path="/display/2" element={<Display />} />
               <Route path="/display/3" element={<Display />} />
               <Route path="/display/4" element={<Display />} />
+              <Route path="/trackDisplay" element={<TrackDisplay />} />
+
 
             </Routes>
           </Router>

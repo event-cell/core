@@ -1,36 +1,8 @@
 import { router, TRPCError } from '@trpc/server'
-import { z } from 'zod'
 
 import { nullToUndefined } from '../utils'
 import { event, eventData } from './shared'
-
-const TimeInfo = z
-  .object({
-    run: z.number(),
-    status: z.number(),
-    time: z.number(),
-    split1: z.number(),
-    split2: z.number(),
-  })
-  .optional()
-
-const TimeInfoList = z.array(TimeInfo)
-export type TimeInfoList = z.infer<typeof TimeInfoList>
-
-const Competitor = z.object({
-  number: z.number(),
-  firstName: z.string(),
-  lastName: z.string(),
-  class: z.string(),
-  classIndex: z.number(),
-  vehicle: z.string(),
-  classRecord: z.string(),
-  special: z.optional(z.string()),
-  miscAward: z.optional(z.string()),
-  times: TimeInfoList,
-})
-const CompetitorList = z.array(Competitor)
-export type CompetitorList = z.infer<typeof CompetitorList>
+import { CompetitorList, TimeInfoList } from './objects'
 
 export const competitors = router().query('list', {
   output: CompetitorList,
@@ -94,11 +66,11 @@ export const competitors = router().query('list', {
             status: timedRun.C_STATUS || 0,
             ...(timedRun.C_STATUS === 3
               ? { time: 0, split1: 0, split2: 0 }
-              : { 
-              time: timedRun.C_TIME || 0,
-              split1: timedRun.C_INTER1 || 0,
-              split2: timedRun.C_INTER2 || 0
-            }),
+              : {
+                  time: timedRun.C_TIME || 0,
+                  split1: timedRun.C_INTER1 || 0,
+                  split2: timedRun.C_INTER2 || 0,
+                }),
           }))
         competitors[i].times = [...competitors[i].times, ...run]
       })
