@@ -1,4 +1,17 @@
-import { Box, Chip, Container, Typography } from '@mui/material'
+import {
+  Box,
+  Chip,
+  Container,
+  Grid,
+  Paper,
+  styled,
+  Table as MUITable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
 
 import { trpc } from '../App'
 import { ResultsTable } from '../components/table'
@@ -6,33 +19,47 @@ import { Timer } from '@mui/icons-material'
 
 import { requestWrapper } from '../components/requestWrapper'
 import { useEffect } from 'react'
+import { RankTimes, TimeDeltas } from '../components/functions'
 
-let displayInterval: any
+const PrimaryPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(1),
+  textAlign: 'left',
+  color: theme.palette.text.secondary,
+}))
 
 export const Display = () => {
+  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
   const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
   useEffect(() => {
-    if (displayInterval) clearTimeout(displayInterval)
-    displayInterval = setTimeout(() => {
-      allRuns.refetch()
-      runCount.refetch()
-    }, 1000 * 5)
-  }, [allRuns, runCount])
+    const timeout = setTimeout(async () => {
+      await Promise.all([
+        currentCompetitor.refetch(),
+        allRuns.refetch(),
+        runCount.refetch(),
+      ])
+    }, 1000 * 4)
+    return () => clearTimeout(timeout)
+  }, [currentCompetitor, allRuns, runCount])
 
-  let classes: { classIndex: number; class: string }[] = []
-
-  const requestErrors = requestWrapper(allRuns, runCount)
+  const requestErrors = requestWrapper(currentCompetitor, allRuns, runCount)
   if (requestErrors) return requestErrors
-  if (!allRuns.data || typeof runCount.data == 'undefined') {
+
+  if (!currentCompetitor.data || !allRuns.data || !runCount.data) {
     console.warn('A function was called that should not be called')
     return null
   } // This will never be called, but it is needed to make typescript happy
 
+  const currentRunArray = allRuns.data.filter(
+    (a) => a.number === currentCompetitor.data
+  )
+  const currentRun = currentRunArray[0]
+
   // Sort classes in class order as per the index value
   // in the timing software
 
+  let classes: { classIndex: number; class: string }[] = []
   let maxClassIndex = 0
 
   allRuns.data.forEach((a) => {
@@ -61,6 +88,295 @@ export const Display = () => {
     ),
   }))
 
+  // Calculate best times of day
+  //
+
+  let {
+    launchColour,
+    sector1Colour,
+    sector2Colour,
+    finishColour,
+    bestLaunch,
+    previousBestLaunch,
+    bestSector1,
+    previousBestSector1,
+    bestSector2,
+    previousBestSector2,
+    bestFinishTime,
+    previousBestFinishTime,
+    personalBestLaunch,
+    previousPersonalBestLaunch,
+    personalBestSector1,
+    previousPersonalBestSector1,
+    personalBestSector2,
+    previousPersonalBestSector2,
+    personalBestFinishTime,
+    previousPersonalBestFinishTime,
+    defaultBest,
+    bestFinishTimeOfTheDay,
+    bestFinishTimeOfTheDayName,
+    bestFinishTimeOfTheDayCar,
+    bestFinishTimeOfTheDayLady,
+    bestFinishTimeOfTheDayLadyName,
+    bestFinishTimeOfTheDayLadyCar,
+    bestFinishTimeOfTheDayJunior,
+    bestFinishTimeOfTheDayJuniorName,
+    bestFinishTimeOfTheDayJuniorCar,
+  } = RankTimes(currentRun, allRuns.data)
+
+  const renderInfos = () => {
+    const idx = currentRun.times.length - 1
+    const times = currentRun.times[idx]
+
+    if (typeof times !== 'undefined') {
+      let {
+        launch,
+        sector1,
+        sector2,
+        finishTime,
+        launchDeltaPB,
+        launchDeltaLeader,
+        sector1DeltaPB,
+        sector1DeltaLeader,
+        sector2DeltaPB,
+        sector2DeltaLeader,
+        finishDeltaPB,
+        finishDeltaLeader,
+      } = TimeDeltas(
+        times,
+        personalBestLaunch,
+        previousPersonalBestLaunch,
+        bestLaunch,
+        previousBestLaunch,
+        personalBestSector1,
+        previousPersonalBestSector1,
+        bestSector1,
+        previousBestSector1,
+        personalBestSector2,
+        previousPersonalBestSector2,
+        bestSector2,
+        previousBestSector2,
+        personalBestFinishTime,
+        previousPersonalBestFinishTime,
+        bestFinishTime,
+        previousBestFinishTime
+      )
+
+      const tableFontSizeSml = '1rem'
+      const tableFontSizeMid = '1.2rem'
+      const tableFontSizeLarge = '1.4rem'
+      const blockSize = 30
+
+      return (
+        <PrimaryPaper>
+          <MUITable sx={{ minWidth: 200 }} size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell width={2}></TableCell>
+                <TableCell width={1}></TableCell>
+                <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
+                  Time
+                </TableCell>
+                <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
+                  &Delta; PB
+                </TableCell>
+                <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
+                  &Delta; #1
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  Launch
+                </TableCell>
+                <TableCell>
+                  <Box
+                    sx={{
+                      width: blockSize,
+                      height: blockSize,
+                      backgroundColor: launchColour,
+                      borderRadius: '4px',
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {launch !== 0
+                    ? launch > 0
+                      ? (launch / 1000).toFixed(2)
+                      : ''
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {launch !== 0 &&
+                  personalBestLaunch !== defaultBest &&
+                  personalBestLaunch !== launch
+                    ? launchDeltaPB > 0
+                      ? '+' + (launchDeltaPB / 1000).toFixed(2)
+                      : (launchDeltaPB / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {launch !== 0 && bestLaunch !== defaultBest
+                    ? launchDeltaLeader > 0
+                      ? '+' + (launchDeltaLeader / 1000).toFixed(2)
+                      : (launchDeltaLeader / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  Sector 1
+                </TableCell>
+                <TableCell>
+                  <Box
+                    sx={{
+                      width: blockSize,
+                      height: blockSize,
+                      backgroundColor: sector1Colour,
+                      borderRadius: '4px',
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {sector1 !== 0
+                    ? sector1 > 0
+                      ? (sector1 / 1000).toFixed(2)
+                      : ''
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {sector1 !== 0 &&
+                  personalBestSector1 !== defaultBest &&
+                  personalBestSector1 - defaultBest !== sector1DeltaPB
+                    ? sector1DeltaPB > 0
+                      ? '+' + (sector1DeltaPB / 1000).toFixed(2)
+                      : (sector1DeltaPB / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {sector1 !== 0 && bestSector1 !== defaultBest
+                    ? sector1DeltaLeader > 0
+                      ? '+' + (sector1DeltaLeader / 1000).toFixed(2)
+                      : (sector1DeltaLeader / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  Sector 2
+                </TableCell>
+                <TableCell>
+                  <Box
+                    sx={{
+                      width: blockSize,
+                      height: blockSize,
+                      backgroundColor: sector2Colour,
+                      borderRadius: '4px',
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {sector2 !== 0
+                    ? sector2 > 0
+                      ? (sector2 / 1000).toFixed(2)
+                      : ''
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {sector2DeltaPB !== 0 &&
+                  personalBestSector2 !== defaultBest &&
+                  personalBestSector2 - defaultBest !== sector2DeltaPB
+                    ? sector2DeltaPB > 0
+                      ? '+' + (sector2DeltaPB / 1000).toFixed(2)
+                      : (sector2DeltaPB / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {sector2DeltaLeader !== 0 && bestSector2 !== defaultBest
+                    ? sector2DeltaLeader > 0
+                      ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
+                      : (sector2DeltaLeader / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  Finish
+                </TableCell>
+                <TableCell>
+                  <Box
+                    sx={{
+                      width: blockSize,
+                      height: blockSize,
+                      backgroundColor: finishColour,
+                      borderRadius: '4px',
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {finishTime !== 0
+                    ? finishTime > 0
+                      ? (finishTime / 1000).toFixed(2)
+                      : ''
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {finishDeltaPB !== 0 &&
+                  personalBestFinishTime !== defaultBest &&
+                  personalBestFinishTime - defaultBest !== finishDeltaPB
+                    ? finishDeltaPB > 0
+                      ? '+' + (finishDeltaPB / 1000).toFixed(2)
+                      : (finishDeltaPB / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+                <TableCell sx={{ fontSize: tableFontSizeLarge }}>
+                  {finishDeltaLeader !== 0 && bestFinishTime !== defaultBest
+                    ? finishDeltaLeader > 0
+                      ? '+' + (finishDeltaLeader / 1000).toFixed(2)
+                      : (finishDeltaLeader / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </MUITable>
+          <p />
+          <Grid sx={{ fontSize: tableFontSizeSml }}>
+            Fastest finish times for the day
+            <br />
+            {bestFinishTimeOfTheDayName !== ''
+              ? 'Outright: ' +
+                (bestFinishTimeOfTheDay / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayName +
+                ' in the ' +
+                bestFinishTimeOfTheDayCar
+              : ''}
+            <br />
+            {bestFinishTimeOfTheDayLadyName !== ''
+              ? 'Lady: ' +
+                (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayLadyName +
+                ' in the ' +
+                bestFinishTimeOfTheDayLadyCar
+              : ''}
+            <br />
+            {bestFinishTimeOfTheDayJuniorName !== ''
+              ? 'Junior: ' +
+                (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayJuniorName +
+                ' in the ' +
+                bestFinishTimeOfTheDayJuniorCar
+              : ''}
+            <br />
+          </Grid>
+        </PrimaryPaper>
+      )
+    }
+  }
+
   // Calculate ClassesList for each screen
   // Max 20 elements per screen
 
@@ -70,7 +386,7 @@ export const Display = () => {
   let classesListScreen04: { carClass: any; drivers: any }[] = []
 
   let screenLength = 0
-  const targetScreenLength = 23
+  const targetScreenLength = 24
   if (window.location.pathname !== '/display') {
     classesList.forEach((currentClass) => {
       screenLength = screenLength + Object.keys(currentClass.drivers).length + 1
@@ -113,14 +429,14 @@ export const Display = () => {
       {printClassesList.map((eventClass) => (
         <div key={eventClass.carClass.class}>
           <Typography component="div">
-            <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
+            <Box fontWeight="fontWeightMedium" display="inline" lineHeight="2">
               {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
             </Box>
             <Chip
               label={'Class Record: ' + eventClass.drivers[0].classRecord}
               variant="outlined"
               color="info"
-              size="medium"
+              size="small"
               icon={<Timer />}
             />
           </Typography>
@@ -135,6 +451,37 @@ export const Display = () => {
           />
         </div>
       ))}
+      {window.location.pathname === '/display/4' ? (
+        <Grid>
+          <Grid
+            sx={{
+              height: 6,
+            }}
+          ></Grid>
+          <Grid
+            sx={{
+              fontSize: 24,
+              height: 130,
+            }}
+          >
+            <PrimaryPaper>
+              ON TRACK
+              <br />
+              {currentRun.number}: {currentRun.lastName} {currentRun.firstName}
+              {', '}
+              {currentRun.vehicle}
+              <br></br>
+              {currentRun.class}
+            </PrimaryPaper>
+          </Grid>
+
+          <Grid item xs={4}>
+            {renderInfos()}
+          </Grid>
+        </Grid>
+      ) : (
+        ''
+      )}
     </Container>
   )
 }

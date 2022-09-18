@@ -42,8 +42,8 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
   let sector1
   let launch
 
-  let mainFontSize = '0.75rem'
-  let mainWidth = 80
+  let mainFontSize = '0.6rem'
+  let mainWidth = 65
 
   finishTime = (run.time / 1000).toFixed(2)
   sector2 = ((run.time - run.split2) / 1000).toFixed(2)
@@ -153,7 +153,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
           alignItems="center"
           border="1px"
           color="gold"
-          sx={{ fontSize: '0.95rem', fontWeight: 700 }}
+          sx={{ fontSize: '0.7rem', fontWeight: 700 }}
         >
           {finishTime}
         </Grid2>
@@ -186,7 +186,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
         alignItems="center"
         border="1px"
         color="primary.dark"
-        sx={{ fontSize: '0.9rem', fontWeight: 700 }}
+        sx={{ fontSize: '0.7rem', fontWeight: 700 }}
       >
         {finishTime}
       </Grid2>
@@ -209,12 +209,16 @@ export const ResultsTable: FC<{
     <TableContainer component={Paper}>
       <MUITable sx={{ minWidth: 640 }} size="small">
         <TableHead>
-          <TableRow>
-            <TableCell width={200}>Competitor</TableCell>
-            {Array.apply(null, Array(runCount)).map((_, index) => (
-              <TableCell key={index}>Run {index + 1}</TableCell>
-            ))}
-          </TableRow>
+          {/*<TableRow sx={{ height: 10, m: 0, p: 0 }}>*/}
+          {/*  <TableCell width={200} sx={{ fontSize: '0.8rem' }}>*/}
+          {/*    Competitor*/}
+          {/*  </TableCell>*/}
+          {/*  {Array.apply(null, Array(runCount)).map((_, index) => (*/}
+          {/*    <TableCell key={index} sx={{ fontSize: '0.8rem' }}>*/}
+          {/*      Run {index + 1}*/}
+          {/*    </TableCell>*/}
+          {/*  ))}*/}
+          {/*</TableRow>*/}
         </TableHead>
         <TableBody>
           {data.map((row) => (
