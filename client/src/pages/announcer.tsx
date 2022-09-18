@@ -20,13 +20,13 @@ import { useEffect } from 'react'
 import { requestWrapper } from '../components/requestWrapper'
 import { RankTimes, TimeDeltas } from '../components/functions'
 
-const SecondaryPaper = styled(Paper)(({ theme }) => ({
+const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  textAlign: 'center',
+  textAlign: 'left',
   color: theme.palette.text.secondary,
 }))
 
-const PrimaryPaper = styled(Paper)(({ theme }) => ({
+const PrimaryPaperCenter = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
@@ -118,6 +118,15 @@ export const Announcer = () => {
     personalBestFinishTime,
     previousPersonalBestFinishTime,
     defaultBest,
+    bestFinishTimeOfTheDay,
+    bestFinishTimeOfTheDayName,
+    bestFinishTimeOfTheDayCar,
+    bestFinishTimeOfTheDayLady,
+    bestFinishTimeOfTheDayLadyName,
+    bestFinishTimeOfTheDayLadyCar,
+    bestFinishTimeOfTheDayJunior,
+    bestFinishTimeOfTheDayJuniorName,
+    bestFinishTimeOfTheDayJuniorCar,
   } = RankTimes(currentRun, allRuns.data)
 
   // Render functions
@@ -147,13 +156,6 @@ export const Announcer = () => {
     ))
   }
 
-  const renderNextDriver = () => {
-    return <SecondaryPaper>Next Driver</SecondaryPaper>
-  }
-
-  const renderPreviousDriver = () => {
-    return <SecondaryPaper>Previous Driver</SecondaryPaper>
-  }
   const renderInfos = () => {
     const idx = currentRun.times.length - 1
     const times = currentRun.times[idx]
@@ -351,6 +353,38 @@ export const Announcer = () => {
               </TableRow>
             </TableBody>
           </MUITable>
+          <p />
+          <Grid>
+            Fastest finish times for the day
+            <br />
+            {bestFinishTimeOfTheDayName !== ''
+              ? 'Outright: ' +
+                (bestFinishTimeOfTheDay / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayName +
+                ' in the ' +
+                bestFinishTimeOfTheDayCar
+              : ''}
+            <br />
+            {bestFinishTimeOfTheDayLadyName !== ''
+              ? 'Lady: ' +
+                (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayLadyName +
+                ' in the ' +
+                bestFinishTimeOfTheDayLadyCar
+              : ''}
+            <br />
+            {bestFinishTimeOfTheDayJuniorName !== ''
+              ? 'Junior: ' +
+                (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayJuniorName +
+                ' in the ' +
+                bestFinishTimeOfTheDayJuniorCar
+              : ''}
+            <br />
+          </Grid>
         </PrimaryPaper>
       )
     }
@@ -365,17 +399,41 @@ export const Announcer = () => {
           columnSpacing={{ xs: 1, sm: 1, md: 2, lg: 4, xl: 4 }}
         >
           <Grid item xs={4}>
-            {renderPreviousDriver()}
-          </Grid>
-          <Grid item xs={4}>
-            <PrimaryPaper>
-              {currentRun.lastName} {currentRun.firstName}
-              <p />
+            <PrimaryPaper
+              sx={{
+                fontSize: 24,
+                height: 96,
+              }}
+            >
+              {currentRun.number}: {currentRun.lastName} {currentRun.firstName}
+              {', '}
               {currentRun.vehicle}
+              <br></br>
+              {currentRun.class}
             </PrimaryPaper>
           </Grid>
           <Grid item xs={4}>
-            {renderNextDriver()}
+            <PrimaryPaperCenter
+              sx={{
+                fontSize: 48,
+                fontWeight: 500,
+                height: 96,
+              }}
+            >
+              {currentRun.special}
+            </PrimaryPaperCenter>
+          </Grid>
+          <Grid item xs={4}>
+            {' '}
+            <PrimaryPaperCenter
+              sx={{
+                fontSize: 48,
+                fontWeight: 500,
+                height: 96,
+              }}
+            >
+              Run {currentRun.times.length}
+            </PrimaryPaperCenter>
           </Grid>
           <Grid item xs={4}>
             {renderInfos()}

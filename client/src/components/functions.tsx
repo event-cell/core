@@ -26,6 +26,15 @@ interface BestTimeProps {
   bestSector2: number
   bestFinishTime: number
   defaultBest: number
+  bestFinishTimeOfTheDay: number
+  bestFinishTimeOfTheDayName: string
+  bestFinishTimeOfTheDayCar: string
+  bestFinishTimeOfTheDayLady: number
+  bestFinishTimeOfTheDayLadyName: string
+  bestFinishTimeOfTheDayLadyCar: string
+  bestFinishTimeOfTheDayJunior: number
+  bestFinishTimeOfTheDayJuniorName: string
+  bestFinishTimeOfTheDayJuniorCar: string
 }
 
 export function RankTimes(
@@ -58,6 +67,15 @@ export function RankTimes(
   let previousPersonalBestSector2 = defaultBest
   let personalBestFinishTime = defaultBest
   let previousPersonalBestFinishTime = defaultBest
+  let bestFinishTimeOfTheDay = defaultBest
+  let bestFinishTimeOfTheDayName = ''
+  let bestFinishTimeOfTheDayCar = ''
+  let bestFinishTimeOfTheDayLady = defaultBest
+  let bestFinishTimeOfTheDayLadyName = ''
+  let bestFinishTimeOfTheDayLadyCar = ''
+  let bestFinishTimeOfTheDayJunior = defaultBest
+  let bestFinishTimeOfTheDayJuniorName = ''
+  let bestFinishTimeOfTheDayJuniorCar = ''
 
   // Personal Bests
   //
@@ -86,6 +104,7 @@ export function RankTimes(
   }
 
   for (const person of allRuns) {
+    // Class best times
     if (person.classIndex === currentRun.classIndex) {
       for (const run of person.times) {
         if (typeof run !== 'undefined' && run.status === 0) {
@@ -104,6 +123,46 @@ export function RankTimes(
           if (run.time < bestFinishTime) {
             previousBestFinishTime = bestFinishTime
             bestFinishTime = run.time
+          }
+        }
+      }
+    }
+    // Best time of the day
+    for (const run of person.times) {
+      if (typeof run !== 'undefined' && run.status === 0) {
+        if (
+          run.status === 0 &&
+          run.time > 0 &&
+          run.time < bestFinishTimeOfTheDay
+        ) {
+          bestFinishTimeOfTheDay = run.time
+          bestFinishTimeOfTheDayName = person.lastName + ' ' + person.firstName
+          bestFinishTimeOfTheDayCar = person.vehicle
+        }
+      }
+      if (typeof run !== 'undefined' && typeof person.special !== 'undefined') {
+        if (person.special.toString().toLowerCase().includes('lady')) {
+          if (
+            run.status === 0 &&
+            run.time > 0 &&
+            run.time < bestFinishTimeOfTheDayLady
+          ) {
+            bestFinishTimeOfTheDayLady = run.time
+            bestFinishTimeOfTheDayLadyName =
+              person.lastName + ' ' + person.firstName
+            bestFinishTimeOfTheDayLadyCar = person.vehicle
+          }
+        }
+        if (person.special.toString().toLowerCase().includes('junior')) {
+          if (
+            run.status === 0 &&
+            run.time > 0 &&
+            run.time < bestFinishTimeOfTheDayJunior
+          ) {
+            bestFinishTimeOfTheDayJunior = run.time
+            bestFinishTimeOfTheDayJuniorName =
+              person.lastName + ' ' + person.firstName
+            bestFinishTimeOfTheDayJuniorCar = person.vehicle
           }
         }
       }
@@ -163,6 +222,15 @@ export function RankTimes(
     personalBestFinishTime,
     previousPersonalBestFinishTime,
     defaultBest,
+    bestFinishTimeOfTheDay,
+    bestFinishTimeOfTheDayName,
+    bestFinishTimeOfTheDayCar,
+    bestFinishTimeOfTheDayLady,
+    bestFinishTimeOfTheDayLadyName,
+    bestFinishTimeOfTheDayLadyCar,
+    bestFinishTimeOfTheDayJunior,
+    bestFinishTimeOfTheDayJuniorName,
+    bestFinishTimeOfTheDayJuniorCar,
   }
 }
 
@@ -185,10 +253,6 @@ export function TimeDeltas(
   bestFinishTime: number,
   previousBestFinishTime: number
 ) {
-  let launch: number = 0
-  let sector1: number = 0
-  let sector2: number = 0
-  let finishTime: number = 0
   let launchDeltaPB: number = 0
   let launchDeltaLeader: number = 0
   let sector1DeltaPB: number = 0
@@ -198,10 +262,10 @@ export function TimeDeltas(
   let finishDeltaPB: number = 0
   let finishDeltaLeader: number = 0
 
-  launch = times.split1
-  sector1 = times.split2 - times.split1
-  sector2 = times.time - times.split2
-  finishTime = times.time
+  let launch = times.split1
+  let sector1 = times.split2 - times.split1
+  let sector2 = times.time - times.split2
+  let finishTime = times.time
 
   if (times.split1 > 0) {
     if (launch === personalBestLaunch) {
