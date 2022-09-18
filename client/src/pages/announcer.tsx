@@ -340,7 +340,7 @@ export const Announcer = () => {
                 <TableCell>
                   {launch !== 0
                     ? launch > 0
-                      ? '+' + (launch / 1000).toFixed(2)
+                      ? (launch / 1000).toFixed(2)
                       : (launch / 1000).toFixed(2)
                     : ''}
                 </TableCell>
@@ -374,7 +374,7 @@ export const Announcer = () => {
                 <TableCell>
                   {sector1 !== 0
                     ? sector1 > 0
-                      ? '+' + (sector1 / 1000).toFixed(2)
+                      ? (sector1 / 1000).toFixed(2)
                       : (sector1 / 1000).toFixed(2)
                     : ''}
                 </TableCell>
@@ -408,7 +408,7 @@ export const Announcer = () => {
                 <TableCell>
                   {sector2 !== 0
                     ? sector2 > 0
-                      ? '+' + (sector2 / 1000).toFixed(2)
+                      ? (sector2 / 1000).toFixed(2)
                       : (sector2 / 1000).toFixed(2)
                     : ''}
                 </TableCell>
@@ -442,7 +442,7 @@ export const Announcer = () => {
                 <TableCell>
                   {finishTime !== 0
                     ? finishTime > 0
-                      ? '+' + (finishTime / 1000).toFixed(2)
+                      ? (finishTime / 1000).toFixed(2)
                       : (finishTime / 1000).toFixed(2)
                     : ''}
                 </TableCell>
