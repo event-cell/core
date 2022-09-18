@@ -9,7 +9,17 @@ const TimeInfo = z
     split2: z.number(),
   })
   .optional()
+
+export const TimeInfoManditory = z.object({
+  run: z.number(),
+  status: z.number(),
+  time: z.number(),
+  split1: z.number(),
+  split2: z.number(),
+})
+
 export const TimeInfoList = z.array(TimeInfo)
+export type TimeInfoManditory = z.infer<typeof TimeInfoManditory>
 export type TimeInfoList = z.infer<typeof TimeInfoList>
 
 export const Competitor = z.object({

@@ -4,6 +4,7 @@ import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
 import { useEffect } from 'react'
+import { RankTimes, TimeDeltas } from '../components/functions'
 import { CarCrash } from '@mui/icons-material'
 
 let displayInterval: any
@@ -32,101 +33,66 @@ export const TrackDisplay = () => {
   )
   const currentRun = currentRunArray[0]
 
-  let split1 = 0.0
-  let split2 = 0.0
-  let time = 0.0
-  let split1Colour = 'background.default'
-  let split2Colour = 'background.default'
-  let timeColour = 'background.default'
-  let split1txtColour = 'background.default'
-  let split2txtColour = 'background.default'
-  let timetxtColour = 'background.default'
+  let {
+    launchColour,
+    sector1Colour,
+    sector2Colour,
+    finishColour,
+    bestLaunch,
+    previousBestLaunch,
+    bestSector1,
+    previousBestSector1,
+    bestSector2,
+    previousBestSector2,
+    bestFinishTime,
+    previousBestFinishTime,
+    personalBestLaunch,
+    previousPersonalBestLaunch,
+    personalBestSector1,
+    previousPersonalBestSector1,
+    personalBestSector2,
+    previousPersonalBestSector2,
+    personalBestFinishTime,
+    previousPersonalBestFinishTime,
+  } = RankTimes(currentRun, allRuns.data)
 
-  let bestSplit1 = 999999.0
-  let bestSplit2 = 999999.0
-  let bestTime = 999999.0
-  let personalBestSplit1 = 999999.0
-  let personalBestSplit2 = 999999.0
-  let personalBestTime = 999999.0
+  const idx = currentRun.times.length - 1
+  const times = currentRun.times[idx]
 
-  // Best split1 of the day
+  if (typeof times === 'undefined') return null
 
-  for (const run of currentRun.times) {
-    if (typeof run !== 'undefined' && run.status === 0) {
-      split1 = run.split1
-      split2 = run.split2
-      time = run.time
-      if (run.split1 < personalBestSplit1 && run.split1 > 0) {
-        personalBestSplit1 = run.split1
-      }
-      if (run.split2 < personalBestSplit2 && run.split2 > 0) {
-        personalBestSplit2 = run.split2
-      }
-      if (run.time < personalBestTime && run.time > 0) {
-        personalBestTime = run.time
-      }
-    }
-  }
-
-  for (const person of allRuns.data) {
-    if (person.classIndex === currentRun.classIndex) {
-      for (const run of person.times) {
-        if (typeof run !== 'undefined' && run.status === 0) {
-          if (run.split1 < bestSplit1) {
-            bestSplit1 = run.split1
-          }
-          if (run.split2 < bestSplit2) {
-            bestSplit2 = run.split2
-          }
-          if (run.time < bestTime) {
-            bestTime = run.time
-          }
-        }
-      }
-    }
-  }
-
-  if (split1 <= bestSplit1 && split1 > 0) {
-    split1Colour = 'purple'
-    split1txtColour = 'default'
-  } else if (split1 <= personalBestSplit1 && split1 > 0) {
-    split1Colour = 'green'
-    split1txtColour = 'default'
-  } else if (split1 > 0) {
-    split1Colour = 'yellow'
-    split1txtColour = 'default'
-  }
-
-  if (split2 <= bestSplit2 && split2 > 0) {
-    split2Colour = 'purple'
-    split2txtColour = 'default'
-  } else if (split2 <= personalBestSplit2 && split2 > 0) {
-    split2Colour = 'green'
-    split2txtColour = 'default'
-  } else if (split2 > 0) {
-    split2Colour = 'yellow'
-    split2txtColour = 'default'
-  }
-
-  if (time <= bestTime && time > 0) {
-    timeColour = 'purple'
-    timetxtColour = 'default'
-  } else if (time <= personalBestTime && time > 0) {
-    timeColour = 'green'
-    timetxtColour = 'default'
-  } else if (time > 0) {
-    timeColour = 'yellow'
-    timetxtColour = 'default'
-  }
-
-  // console.log(split1, split2, time)
-  // console.log(personalBestSplit1, personalBestSplit2, personalBestTime)
-  // console.log(bestSplit1, bestSplit2, bestTime)
-
-  // fix decimals
-  split1 = split1 / 1000
-  split2 = split2 / 1000
-  time = time / 1000
+  let {
+    launch,
+    sector1,
+    sector2,
+    finishTime,
+    launchDeltaPB,
+    launchDeltaLeader,
+    sector1DeltaPB,
+    sector1DeltaLeader,
+    sector2DeltaPB,
+    sector2DeltaLeader,
+    finishDeltaPB,
+    finishDeltaLeader,
+  } = TimeDeltas(
+    times,
+    personalBestLaunch,
+    previousPersonalBestLaunch,
+    bestLaunch,
+    previousBestLaunch,
+    personalBestSector1,
+    previousPersonalBestSector1,
+    bestSector1,
+    previousBestSector1,
+    personalBestSector2,
+    previousPersonalBestSector2,
+    bestSector2,
+    previousBestSector2,
+    personalBestFinishTime,
+    previousPersonalBestFinishTime,
+    bestFinishTime,
+    previousBestFinishTime
+  )
 
   // Render functions
   const renderTime = () => {
@@ -148,8 +114,12 @@ export const TrackDisplay = () => {
             DSQ
           </Grid>
         )
+      } else if (finishTime !== 0) {
+        if (finishTime > 0) {
+          return (finishTime / 1000).toFixed(2)
+        }
       } else {
-        return time.toFixed(2)
+        return ''
       }
     }
   }
@@ -162,19 +132,25 @@ export const TrackDisplay = () => {
           rowSpacing={0}
           columnSpacing={{ xs: 1, sm: 1, md: 2, lg: 4, xl: 4 }}
         >
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Box
               sx={{ height: 48, borderRadius: '4px', display: 'block' }}
-              bgcolor={split1Colour}
+              bgcolor={launchColour}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Box
               sx={{ height: 48, borderRadius: '4px', display: 'block' }}
-              bgcolor={split2Colour}
+              bgcolor={sector1Colour}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
+            <Box
+              sx={{ height: 48, borderRadius: '4px', display: 'block' }}
+              bgcolor={sector2Colour}
+            />
+          </Grid>
+          <Grid item xs={4}>
             <Box
               sx={{
                 fontSize: 144,
@@ -182,13 +158,17 @@ export const TrackDisplay = () => {
                 display: 'block',
                 textAlign: 'center',
                 bgcolor: 'background.default',
-                color: split1txtColour,
+                height: 200,
               }}
             >
-              {split1.toFixed(2)}
+              {launch !== 0
+                ? launch > 0
+                  ? (launch / 1000).toFixed(2)
+                  : ''
+                : ''}{' '}
             </Box>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Box
               sx={{
                 fontSize: 144,
@@ -196,16 +176,38 @@ export const TrackDisplay = () => {
                 display: 'block',
                 textAlign: 'center',
                 bgcolor: 'background.default',
-                color: split2txtColour,
+                height: 200,
               }}
             >
-              {split2.toFixed(2)}
-            </Box>{' '}
+              {sector1 !== 0
+                ? sector1 > 0
+                  ? (sector1 / 1000).toFixed(2)
+                  : ''
+                : ''}{' '}
+            </Box>
+          </Grid>
+          <Grid item xs={4}>
+            <Box
+              sx={{
+                fontSize: 144,
+                borderRadius: '4px',
+                display: 'block',
+                textAlign: 'center',
+                bgcolor: 'background.default',
+                height: 200,
+              }}
+            >
+              {sector2 !== 0
+                ? sector2 > 0
+                  ? (sector2 / 1000).toFixed(2)
+                  : ''
+                : ''}{' '}
+            </Box>
           </Grid>
           <Grid item xs={12}>
             <Box
-              sx={{ height: 48, borderRadius: '4px', display: 'block' }}
-              bgcolor={timeColour}
+              sx={{ height: 92, borderRadius: '4px', display: 'block' }}
+              bgcolor={finishColour}
             />
           </Grid>
           <Grid item xs={12}>
@@ -216,7 +218,7 @@ export const TrackDisplay = () => {
                 display: 'block',
                 textAlign: 'center',
                 bgcolor: 'background.default',
-                color: timetxtColour,
+                height: 280,
               }}
             >
               {renderTime()}
