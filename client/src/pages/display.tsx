@@ -210,14 +210,16 @@ export const Display = () => {
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
                   {launch !== 0 &&
                   personalBestLaunch !== defaultBest &&
-                  personalBestLaunch !== launch
+                  personalBestLaunch - defaultBest !== launchDeltaPB
                     ? launchDeltaPB > 0
                       ? '+' + (launchDeltaPB / 1000).toFixed(2)
                       : (launchDeltaPB / 1000).toFixed(2)
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {launch !== 0 && bestLaunch !== defaultBest
+                  {launch !== 0 &&
+                  bestLaunch !== defaultBest &&
+                  bestLaunch - defaultBest !== launchDeltaLeader
                     ? launchDeltaLeader > 0
                       ? '+' + (launchDeltaLeader / 1000).toFixed(2)
                       : (launchDeltaLeader / 1000).toFixed(2)
@@ -239,14 +241,14 @@ export const Display = () => {
                   />
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {sector1 !== 0
+                  {sector1 > 0
                     ? sector1 > 0
                       ? (sector1 / 1000).toFixed(2)
                       : ''
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {sector1 !== 0 &&
+                  {sector1 > 0 &&
                   personalBestSector1 !== defaultBest &&
                   personalBestSector1 - defaultBest !== sector1DeltaPB
                     ? sector1DeltaPB > 0
@@ -255,7 +257,9 @@ export const Display = () => {
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {sector1 !== 0 && bestSector1 !== defaultBest
+                  {sector1 > 0 &&
+                  bestSector1 !== defaultBest &&
+                  bestSector1 - defaultBest !== sector1DeltaLeader
                     ? sector1DeltaLeader > 0
                       ? '+' + (sector1DeltaLeader / 1000).toFixed(2)
                       : (sector1DeltaLeader / 1000).toFixed(2)
@@ -277,14 +281,15 @@ export const Display = () => {
                   />
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {sector2 !== 0
+                  {sector2 > 0
                     ? sector2 > 0
                       ? (sector2 / 1000).toFixed(2)
                       : ''
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {sector2DeltaPB !== 0 &&
+                  {sector2 > 0 &&
+                  sector2DeltaPB !== 0 &&
                   personalBestSector2 !== defaultBest &&
                   personalBestSector2 - defaultBest !== sector2DeltaPB
                     ? sector2DeltaPB > 0
@@ -293,7 +298,10 @@ export const Display = () => {
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {sector2DeltaLeader !== 0 && bestSector2 !== defaultBest
+                  {sector2 > 0 &&
+                  sector2DeltaLeader !== 0 &&
+                  bestSector2 !== defaultBest &&
+                  bestSector2 - defaultBest !== sector2DeltaLeader
                     ? sector2DeltaLeader > 0
                       ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
                       : (sector2DeltaLeader / 1000).toFixed(2)
@@ -315,14 +323,15 @@ export const Display = () => {
                   />
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {finishTime !== 0
+                  {finishTime > 0
                     ? finishTime > 0
                       ? (finishTime / 1000).toFixed(2)
                       : ''
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {finishDeltaPB !== 0 &&
+                  {finishTime > 0 &&
+                  finishDeltaPB !== 0 &&
                   personalBestFinishTime !== defaultBest &&
                   personalBestFinishTime - defaultBest !== finishDeltaPB
                     ? finishDeltaPB > 0
@@ -331,7 +340,10 @@ export const Display = () => {
                     : ''}
                 </TableCell>
                 <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-                  {finishDeltaLeader !== 0 && bestFinishTime !== defaultBest
+                  {finishTime > 0 &&
+                  finishDeltaLeader !== 0 &&
+                  bestFinishTime !== defaultBest &&
+                  bestFinishTime - defaultBest !== finishDeltaLeader
                     ? finishDeltaLeader > 0
                       ? '+' + (finishDeltaLeader / 1000).toFixed(2)
                       : (finishDeltaLeader / 1000).toFixed(2)

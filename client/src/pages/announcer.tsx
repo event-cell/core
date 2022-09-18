@@ -236,7 +236,9 @@ export const Announcer = () => {
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {launch !== 0 && bestLaunch !== defaultBest
+                  {launch !== 0 &&
+                  bestLaunch !== defaultBest &&
+                  bestLaunch - defaultBest !== launchDeltaLeader
                     ? launchDeltaLeader > 0
                       ? '+' + (launchDeltaLeader / 1000).toFixed(2)
                       : (launchDeltaLeader / 1000).toFixed(2)
