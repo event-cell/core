@@ -10,10 +10,11 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
-
-import { Cancel, CarCrash, EmojiEvents, MeetingRoom } from '@mui/icons-material'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import { Cancel, CarCrash, MeetingRoom } from '@mui/icons-material'
 
 type Optional<T> = T | undefined
+
 type RunTime = {
   run: number
   status: number
@@ -35,46 +36,169 @@ function ensureData(data: RunTime[]): Optional<RunTime>[] {
 const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
   run,
   classRecord,
-}) =>
-  run.status === 0 && run.time / 1000 < classRecord ? (
-    <Chip
-      label={(run.time / 1000).toFixed(2)}
-      variant="filled"
-      color="warning"
-      size="small"
-      icon={<EmojiEvents />}
-    />
-  ) : run.status === 0 ? (
-    <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
-      {(run.time / 1000).toFixed(2)}
-    </Box>
-  ) : run.status === 1 ? (
-    <Chip
-      label="DNS"
-      variant="outlined"
-      color="info"
-      size="small"
-      icon={<MeetingRoom />}
-    />
-  ) : run.status === 2 ? (
-    <Chip
-      label="DNF"
-      variant="outlined"
-      color="error"
-      size="small"
-      icon={<CarCrash />}
-    />
-  ) : run.status === 3 ? (
-    <Chip
-      label="DSQ"
-      variant="outlined"
-      color="error"
-      size="small"
-      icon={<Cancel />}
-    />
-  ) : (
-    <div>Unknown status {run.status}</div>
+}) => {
+  let finishTime
+  let sector2
+  let sector1
+  let launch
+
+  let mainFontSize = '0.75rem'
+  let mainWidth = 80
+
+  finishTime = (run.time / 1000).toFixed(2)
+  sector2 = ((run.time - run.split2) / 1000).toFixed(2)
+  sector1 = ((run.split2 - run.split1) / 1000).toFixed(2)
+  launch = (run.split1 / 1000).toFixed(2)
+
+  // if run did not start
+  if (run.status === 1) {
+    return (
+      <Grid2
+        container
+        spacing={0.25}
+        sx={{
+          fontSize: mainFontSize,
+          width: mainWidth,
+        }}
+      >
+        <Grid2 xs={12} display="flex" justifyContent="left" alignItems="center">
+          <Chip
+            label="DNS"
+            variant="outlined"
+            color="info"
+            size="small"
+            icon={<MeetingRoom />}
+          />
+        </Grid2>
+      </Grid2>
+    )
+  }
+
+  // if run DNF
+  if (run.status === 2) {
+    return (
+      <Grid2
+        container
+        spacing={0.25}
+        sx={{
+          fontSize: mainFontSize,
+          width: mainWidth,
+        }}
+      >
+        <Grid2
+          xs={12}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Chip
+            label="DNF"
+            variant="outlined"
+            color="error"
+            size="small"
+            icon={<CarCrash />}
+          />
+        </Grid2>
+        <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+          {launch}
+        </Grid2>
+        <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
+          {sector1}
+        </Grid2>
+      </Grid2>
+    )
+  }
+
+  // if run disqualified
+  if (run.status === 3) {
+    return (
+      <Grid2
+        container
+        spacing={0.25}
+        sx={{
+          fontSize: mainFontSize,
+          width: mainWidth,
+        }}
+      >
+        <Grid2 xs={12} display="flex" justifyContent="left" alignItems="center">
+          <Chip
+            label="DSQ"
+            variant="outlined"
+            color="error"
+            size="small"
+            icon={<Cancel />}
+          />
+        </Grid2>
+      </Grid2>
+    )
+  }
+
+  if (run.status === 0 && run.time / 1000 < classRecord) {
+    return (
+      <Grid2
+        container
+        spacing={0.25}
+        sx={{
+          fontSize: mainFontSize,
+          width: mainWidth,
+        }}
+      >
+        <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+          {sector2}
+        </Grid2>
+        <Grid2
+          xs={6}
+          display="flex"
+          justifyContent="right"
+          alignItems="center"
+          border="1px"
+          color="gold"
+          sx={{ fontSize: '0.95rem', fontWeight: 700 }}
+        >
+          {finishTime}
+        </Grid2>
+        <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+          {launch}
+        </Grid2>
+        <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
+          {sector1}
+        </Grid2>
+      </Grid2>
+    )
+  }
+
+  return (
+    <Grid2
+      container
+      spacing={0.25}
+      sx={{
+        fontSize: mainFontSize,
+        width: mainWidth,
+      }}
+    >
+      <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+        {sector2}
+      </Grid2>
+      <Grid2
+        xs={6}
+        display="flex"
+        justifyContent="right"
+        alignItems="center"
+        border="1px"
+        color="primary.dark"
+        sx={{ fontSize: '0.9rem', fontWeight: 700 }}
+      >
+        {finishTime}
+      </Grid2>
+      <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+        {launch}
+      </Grid2>
+      <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
+        {sector1}
+      </Grid2>
+    </Grid2>
   )
+}
 
 export const ResultsTable: FC<{
   data: Record<string, string | number | any>[]
@@ -83,12 +207,10 @@ export const ResultsTable: FC<{
 }> = ({ data, keyKey, runCount }) => {
   return (
     <TableContainer component={Paper}>
-      <MUITable sx={{ minWidth: 200 }} size="small">
+      <MUITable sx={{ minWidth: 640 }} size="small">
         <TableHead>
           <TableRow>
-            <TableCell width={1}>Num</TableCell>
-            <TableCell width={2}>Name</TableCell>
-            <TableCell width={2}>Car</TableCell>
+            <TableCell width={200}>Competitor</TableCell>
             {Array.apply(null, Array(runCount)).map((_, index) => (
               <TableCell key={index}>Run {index + 1}</TableCell>
             ))}
@@ -97,19 +219,67 @@ export const ResultsTable: FC<{
         <TableBody>
           {data.map((row) => (
             <TableRow key={row[keyKey]}>
-              <TableCell>{row['number']}</TableCell>
               <TableCell>
-                {row['lastName']} {row['firstName']}
-                {row['special'] ? (
-                  <Chip
-                    label={row['special']}
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                  />
-                ) : null}
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridAutoColumns: '1fr',
+                    gap: 0.5,
+                    ml: -1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      fontSize: '0.875rem',
+                      fontWeight: '700',
+                      textAlign: 'center',
+                      gridRow: '1',
+                      gridColumn: '1',
+                    }}
+                  >
+                    {row['number']}
+                  </Box>
+                  <Box
+                    sx={{
+                      textAlign: 'left',
+                      fontSize: '0.8rem',
+                      gridRow: '1',
+                      gridColumn: '2/5',
+                    }}
+                  >
+                    {row['lastName']} {row['firstName']}
+                  </Box>
+                  {row['special'] ? (
+                    <Box
+                      sx={{
+                        border: '1px solid',
+                        borderColor: 'primary.dark',
+                        color: 'primary.dark',
+                        borderRadius: 1,
+                        fontSize: '0.6rem',
+                        fontWeight: '500',
+                        textAlign: 'center',
+                        gridRow: '2',
+                        gridColumn: '1',
+                      }}
+                    >
+                      {row['special']}
+                    </Box>
+                  ) : null}
+
+                  <Box
+                    sx={{
+                      textAlign: 'left',
+                      fontSize: '0.7rem',
+                      gridRow: '2',
+                      gridColumn: '2/5',
+                    }}
+                  >
+                    {row['vehicle']}
+                  </Box>
+                </Box>
               </TableCell>
-              <TableCell>{row['vehicle']}</TableCell>
+
               {ensureData(
                 row['times'].filter(
                   (time: RunTime) => time.time !== 0 || time.status !== 0
@@ -119,15 +289,7 @@ export const ResultsTable: FC<{
                   <TableCell key={index}></TableCell>
                 ) : (
                   <TableCell key={index}>
-                    <Box sx={{ fontWeight: 'medium', textAlign: 'left' }}>
-                      <TimeTag run={run} classRecord={row.classRecord} />
-                    </Box>
-                    {run.status !== 3 && run.status !== 1 && (
-                      <Box>
-                        {(run.split1 / 1000).toFixed(2)}{' '}
-                        {(run.split2 / 1000).toFixed(2)}
-                      </Box>
-                    )}
+                    <TimeTag run={run} classRecord={row.classRecord} />
                   </TableCell>
                 )
               )}

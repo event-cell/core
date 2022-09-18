@@ -141,7 +141,10 @@ export function RankTimes(
         }
       }
       if (typeof run !== 'undefined' && typeof person.special !== 'undefined') {
-        if (person.special.toString().toLowerCase().includes('lady')) {
+        if (
+          person.special.toString().toLowerCase().includes('lady') ||
+          person.special.toString().toLowerCase().includes('female')
+        ) {
           if (
             run.status === 0 &&
             run.time > 0 &&

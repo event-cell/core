@@ -10,33 +10,32 @@ import { useEffect } from 'react'
 let displayInterval: any
 
 export const Display = () => {
-  const rows = trpc.useQuery(['competitors.list'])
+  const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
   useEffect(() => {
     if (displayInterval) clearTimeout(displayInterval)
     displayInterval = setTimeout(() => {
-      rows.refetch()
+      allRuns.refetch()
       runCount.refetch()
     }, 1000 * 5)
-  }, [rows, runCount])
+  }, [allRuns, runCount])
 
-  let classes: { classIndex: number, class: string }[] = []
+  let classes: { classIndex: number; class: string }[] = []
 
-  const requestErrors = requestWrapper(rows, runCount)
+  const requestErrors = requestWrapper(allRuns, runCount)
   if (requestErrors) return requestErrors
-  if (!rows.data || typeof runCount.data == 'undefined') {
+  if (!allRuns.data || typeof runCount.data == 'undefined') {
     console.warn('A function was called that should not be called')
     return null
   } // This will never be called, but it is needed to make typescript happy
-
 
   // Sort classes in class order as per the index value
   // in the timing software
 
   let maxClassIndex = 0
 
-  rows.data.forEach(a => {
+  allRuns.data.forEach((a) => {
     if (a.classIndex > maxClassIndex) {
       maxClassIndex = a.classIndex
     }
@@ -44,7 +43,7 @@ export const Display = () => {
 
   for (let i = 1; i < maxClassIndex + 1; i++) {
     let shouldSkip = false
-    rows.data.forEach(row => {
+    allRuns.data.forEach((row) => {
       if (shouldSkip) {
         return
       }
@@ -57,28 +56,36 @@ export const Display = () => {
 
   const classesList = classes.map((carClass) => ({
     carClass,
-    drivers: rows.data.filter((data) => data.classIndex === carClass.classIndex)
+    drivers: allRuns.data.filter(
+      (data) => data.classIndex === carClass.classIndex
+    ),
   }))
 
   // Calculate ClassesList for each screen
   // Max 20 elements per screen
 
-  let classesListScreen01: { carClass: any, drivers: any }[] = []
-  let classesListScreen02: { carClass: any, drivers: any }[] = []
-  let classesListScreen03: { carClass: any, drivers: any }[] = []
-  let classesListScreen04: { carClass: any, drivers: any }[] = []
+  let classesListScreen01: { carClass: any; drivers: any }[] = []
+  let classesListScreen02: { carClass: any; drivers: any }[] = []
+  let classesListScreen03: { carClass: any; drivers: any }[] = []
+  let classesListScreen04: { carClass: any; drivers: any }[] = []
 
   let screenLength = 0
   const targetScreenLength = 23
   if (window.location.pathname !== '/display') {
-    classesList.forEach(currentClass => {
+    classesList.forEach((currentClass) => {
       screenLength = screenLength + Object.keys(currentClass.drivers).length + 1
       if (screenLength <= targetScreenLength) {
         classesListScreen01.push(currentClass)
-      } else if (screenLength > targetScreenLength && screenLength <= targetScreenLength * 2) {
+      } else if (
+        screenLength > targetScreenLength &&
+        screenLength <= targetScreenLength * 2
+      ) {
         classesListScreen02.push(currentClass)
       }
-      if (screenLength > targetScreenLength * 2 && screenLength <= targetScreenLength * 3) {
+      if (
+        screenLength > targetScreenLength * 2 &&
+        screenLength <= targetScreenLength * 3
+      ) {
         classesListScreen03.push(currentClass)
       } else if (screenLength > targetScreenLength * 3) {
         classesListScreen04.push(currentClass)
@@ -86,7 +93,7 @@ export const Display = () => {
     })
   }
 
-  let printClassesList: { carClass: any, drivers: any }[] = []
+  let printClassesList: { carClass: any; drivers: any }[] = []
   if (window.location.pathname !== '/display') {
     if (window.location.pathname === '/display/1') {
       printClassesList = classesListScreen01
@@ -105,15 +112,15 @@ export const Display = () => {
     <Container>
       {printClassesList.map((eventClass) => (
         <div key={eventClass.carClass.class}>
-          <Typography component='div'>
-            <Box fontWeight='fontWeightMedium' display='inline' lineHeight='3'>
+          <Typography component="div">
+            <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
               {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
             </Box>
             <Chip
               label={'Class Record: ' + eventClass.drivers[0].classRecord}
-              variant='outlined'
-              color='info'
-              size='medium'
+              variant="outlined"
+              color="info"
+              size="medium"
               icon={<Timer />}
             />
           </Typography>
