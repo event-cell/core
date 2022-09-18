@@ -117,6 +117,7 @@ export const Announcer = () => {
     previousPersonalBestSector2,
     personalBestFinishTime,
     previousPersonalBestFinishTime,
+    defaultBest,
   } = RankTimes(currentRun, allRuns.data)
 
   // Render functions
@@ -224,14 +225,16 @@ export const Announcer = () => {
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {launchDeltaPB !== 0
+                  {launch !== 0 &&
+                  personalBestLaunch !== defaultBest &&
+                  personalBestLaunch !== launch
                     ? launchDeltaPB > 0
                       ? '+' + (launchDeltaPB / 1000).toFixed(2)
                       : (launchDeltaPB / 1000).toFixed(2)
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {launchDeltaLeader !== 0
+                  {launch !== 0 && bestLaunch !== defaultBest
                     ? launchDeltaLeader > 0
                       ? '+' + (launchDeltaLeader / 1000).toFixed(2)
                       : (launchDeltaLeader / 1000).toFixed(2)
@@ -258,14 +261,16 @@ export const Announcer = () => {
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {sector1DeltaPB !== 0
+                  {sector1 !== 0 &&
+                  personalBestSector1 !== defaultBest &&
+                  personalBestSector1 - defaultBest !== sector1DeltaPB
                     ? sector1DeltaPB > 0
                       ? '+' + (sector1DeltaPB / 1000).toFixed(2)
                       : (sector1DeltaPB / 1000).toFixed(2)
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {sector1DeltaLeader !== 0
+                  {sector1 !== 0 && bestSector1 !== defaultBest
                     ? sector1DeltaLeader > 0
                       ? '+' + (sector1DeltaLeader / 1000).toFixed(2)
                       : (sector1DeltaLeader / 1000).toFixed(2)
@@ -292,14 +297,16 @@ export const Announcer = () => {
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {sector2DeltaPB !== 0
+                  {sector2DeltaPB !== 0 &&
+                  personalBestSector2 !== defaultBest &&
+                  personalBestSector2 - defaultBest !== sector2DeltaPB
                     ? sector2DeltaPB > 0
                       ? '+' + (sector2DeltaPB / 1000).toFixed(2)
                       : (sector2DeltaPB / 1000).toFixed(2)
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {sector2DeltaLeader !== 0
+                  {sector2DeltaLeader !== 0 && bestSector2 !== defaultBest
                     ? sector2DeltaLeader > 0
                       ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
                       : (sector2DeltaLeader / 1000).toFixed(2)
@@ -326,14 +333,16 @@ export const Announcer = () => {
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {finishDeltaPB !== 0
+                  {finishDeltaPB !== 0 &&
+                  personalBestFinishTime !== defaultBest &&
+                  personalBestFinishTime - defaultBest !== finishDeltaPB
                     ? finishDeltaPB > 0
                       ? '+' + (finishDeltaPB / 1000).toFixed(2)
                       : (finishDeltaPB / 1000).toFixed(2)
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {finishDeltaLeader !== 0
+                  {finishDeltaLeader !== 0 && bestFinishTime !== defaultBest
                     ? finishDeltaLeader > 0
                       ? '+' + (finishDeltaLeader / 1000).toFixed(2)
                       : (finishDeltaLeader / 1000).toFixed(2)

@@ -25,6 +25,7 @@ interface BestTimeProps {
   finishColour: string
   bestSector2: number
   bestFinishTime: number
+  defaultBest: number
 }
 
 export function RankTimes(
@@ -39,22 +40,24 @@ export function RankTimes(
   let sector2Colour = 'background.default'
   let finishColour = 'background.default'
 
-  let bestLaunch = 9999999.0
-  let previousBestLaunch = 9999999.0
-  let bestSector1 = 9999999.0
-  let previousBestSector1 = 9999999.0
-  let bestSector2 = 9999999.0
-  let previousBestSector2 = 9999999.0
-  let bestFinishTime = 9999999.0
-  let previousBestFinishTime = 9999999.0
-  let personalBestLaunch = 9999999.0
-  let previousPersonalBestLaunch = 9999999.0
-  let personalBestSector1 = 9999999.0
-  let previousPersonalBestSector1 = 9999999.0
-  let personalBestSector2 = 9999999.0
-  let previousPersonalBestSector2 = 9999999.0
-  let personalBestFinishTime = 9999999.0
-  let previousPersonalBestFinishTime = 9999999.0
+  let defaultBest = 9999999
+
+  let bestLaunch = defaultBest
+  let previousBestLaunch = defaultBest
+  let bestSector1 = defaultBest
+  let previousBestSector1 = defaultBest
+  let bestSector2 = defaultBest
+  let previousBestSector2 = defaultBest
+  let bestFinishTime = defaultBest
+  let previousBestFinishTime = defaultBest
+  let personalBestLaunch = defaultBest
+  let previousPersonalBestLaunch = defaultBest
+  let personalBestSector1 = defaultBest
+  let previousPersonalBestSector1 = defaultBest
+  let personalBestSector2 = defaultBest
+  let previousPersonalBestSector2 = defaultBest
+  let personalBestFinishTime = defaultBest
+  let previousPersonalBestFinishTime = defaultBest
 
   // Personal Bests
   //
@@ -159,6 +162,7 @@ export function RankTimes(
     previousPersonalBestSector2,
     personalBestFinishTime,
     previousPersonalBestFinishTime,
+    defaultBest,
   }
 }
 
