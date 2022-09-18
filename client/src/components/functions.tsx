@@ -100,6 +100,10 @@ export function RankTimes(
         previousPersonalBestFinishTime = personalBestFinishTime
         personalBestFinishTime = run.time
       }
+    } else {
+      split1 = 0
+      split2 = 0
+      time = 0
     }
   }
 
