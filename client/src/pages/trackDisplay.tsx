@@ -66,13 +66,21 @@ export const TrackDisplay = () => {
     sector1,
     sector2,
     finishTime,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     launchDeltaPB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     launchDeltaLeader,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector1DeltaPB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector1DeltaLeader,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector2DeltaPB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector2DeltaLeader,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     finishDeltaPB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     finishDeltaLeader,
   } = TimeDeltas(
     times,
