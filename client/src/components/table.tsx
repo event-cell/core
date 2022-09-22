@@ -223,7 +223,7 @@ export const ResultsTable: FC<{
         <TableBody>
           {data.map((row) => (
             <TableRow key={row[keyKey]}>
-              <TableCell>
+              <TableCell width={200}>
                 <Box
                   sx={{
                     display: 'grid',
