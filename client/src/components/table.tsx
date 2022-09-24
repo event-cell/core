@@ -43,7 +43,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
   let launch
 
   let mainFontSize = '0.8rem'
-  let mainWidth = 65
+  let mainWidth = 80
 
   finishTime = (run.time / 1000).toFixed(2)
   sector2 = ((run.time - run.split2) / 1000).toFixed(2)
