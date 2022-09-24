@@ -214,14 +214,14 @@ export const TrackDisplay = () => {
           </Grid>
           <Grid item xs={12}>
             <Box
-              sx={{ height: 92, borderRadius: '4px', display: 'block' }}
+              sx={{ height: 48, borderRadius: '4px', display: 'block' }}
               bgcolor={finishColour}
             />
           </Grid>
           <Grid item xs={12}>
             <Box
               sx={{
-                fontSize: 200,
+                fontSize: 260,
                 borderRadius: '4px',
                 display: 'block',
                 textAlign: 'center',
