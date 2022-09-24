@@ -221,7 +221,7 @@ export const TrackDisplay = () => {
           <Grid item xs={12}>
             <Box
               sx={{
-                fontSize: 260,
+                fontSize: 320,
                 borderRadius: '4px',
                 display: 'block',
                 textAlign: 'center',
