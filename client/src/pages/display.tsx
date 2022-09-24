@@ -538,8 +538,8 @@ export const Display = () => {
               <PrimaryPaper>
                 ON TRACK
                 <br />
-                {currentRun.number}: {currentRun.lastName}{' '}
-                {currentRun.firstName}
+                {currentRun.number}: {currentRun.firstName}{' '}
+                {currentRun.lastName}
                 {', '}
                 {currentRun.vehicle}
                 <br></br>
