@@ -251,7 +251,7 @@ export const ResultsTable: FC<{
                       gridColumn: '2/5',
                     }}
                   >
-                    {row['lastName']} {row['firstName']}
+                    {row['firstName']} {row['lastName']}
                   </Box>
                   {row['special'] ? (
                     <Box

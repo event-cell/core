@@ -140,7 +140,7 @@ export function RankTimes(
           run.time < bestFinishTimeOfTheDay
         ) {
           bestFinishTimeOfTheDay = run.time
-          bestFinishTimeOfTheDayName = person.lastName + ' ' + person.firstName
+          bestFinishTimeOfTheDayName = person.firstName + ' ' + person.lastName
           bestFinishTimeOfTheDayCar = person.vehicle
         }
       }
@@ -156,7 +156,7 @@ export function RankTimes(
           ) {
             bestFinishTimeOfTheDayLady = run.time
             bestFinishTimeOfTheDayLadyName =
-              person.lastName + ' ' + person.firstName
+              person.firstName + ' ' + person.lastName
             bestFinishTimeOfTheDayLadyCar = person.vehicle
           }
         }
@@ -168,7 +168,7 @@ export function RankTimes(
           ) {
             bestFinishTimeOfTheDayJunior = run.time
             bestFinishTimeOfTheDayJuniorName =
-              person.lastName + ' ' + person.firstName
+              person.firstName + ' ' + person.lastName
             bestFinishTimeOfTheDayJuniorCar = person.vehicle
           }
         }

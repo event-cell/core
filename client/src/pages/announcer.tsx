@@ -417,7 +417,7 @@ export const Announcer = () => {
                 height: 96,
               }}
             >
-              {currentRun.number}: {currentRun.lastName} {currentRun.firstName}
+              {currentRun.number}: {currentRun.firstName} {currentRun.lastName}
               {', '}
               {currentRun.vehicle}
               <br></br>
