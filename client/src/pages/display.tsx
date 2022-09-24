@@ -27,6 +27,59 @@ const PrimaryPaper = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }))
 
+function splitDisplay(
+  classesList: {
+    drivers: any
+    carClass: { classIndex: number; class: string }
+  }[]
+) {
+  // Calculate ClassesList for each screen
+  // Max 20 elements per screen
+
+  let classesListScreen01: { carClass: any; drivers: any }[] = []
+  let classesListScreen02: { carClass: any; drivers: any }[] = []
+  let classesListScreen03: { carClass: any; drivers: any }[] = []
+  let classesListScreen04: { carClass: any; drivers: any }[] = []
+
+  let screenLength = 0
+  const targetScreenLength = 24
+  if (window.location.pathname !== '/display') {
+    classesList.forEach((currentClass) => {
+      screenLength = screenLength + Object.keys(currentClass.drivers).length + 1
+      if (screenLength <= targetScreenLength) {
+        classesListScreen01.push(currentClass)
+      } else if (
+        screenLength > targetScreenLength &&
+        screenLength <= targetScreenLength * 2
+      ) {
+        classesListScreen02.push(currentClass)
+      }
+      if (
+        screenLength > targetScreenLength * 2 &&
+        screenLength <= targetScreenLength * 3
+      ) {
+        classesListScreen03.push(currentClass)
+      } else if (screenLength > targetScreenLength * 3) {
+        classesListScreen04.push(currentClass)
+      }
+    })
+  }
+
+  if (window.location.pathname !== '/display') {
+    if (window.location.pathname === '/display/1') {
+      return classesListScreen01
+    } else if (window.location.pathname === '/display/2') {
+      return classesListScreen02
+    } else if (window.location.pathname === '/display/3') {
+      return classesListScreen03
+    } else if (window.location.pathname === '/display/4') {
+      return classesListScreen04
+    }
+  } else {
+    return classesList
+  }
+}
+
 export const Display = () => {
   const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
   const allRuns = trpc.useQuery(['competitors.list'])
@@ -46,15 +99,13 @@ export const Display = () => {
   const requestErrors = requestWrapper(currentCompetitor, allRuns, runCount)
   if (requestErrors) return requestErrors
 
-  if (!currentCompetitor.data || !allRuns.data || !runCount.data) {
+  if (!allRuns.data) {
     console.warn('A function was called that should not be called')
-    return null
+    if (!allRuns.data) {
+      console.warn('Missing allRuns data')
+      return null
+    }
   } // This will never be called, but it is needed to make typescript happy
-
-  const currentRunArray = allRuns.data.filter(
-    (a) => a.number === currentCompetitor.data
-  )
-  const currentRun = currentRunArray[0]
 
   // Sort classes in class order as per the index value
   // in the timing software
@@ -87,6 +138,55 @@ export const Display = () => {
       (data) => data.classIndex === carClass.classIndex
     ),
   }))
+
+  // If there are no runs, just print out competitors
+
+  if (!currentCompetitor.data || !runCount.data) {
+    console.warn('Missing currentCompetitor or runCount data')
+    let printClassesList = splitDisplay(classesList)
+    if (printClassesList) {
+      return (
+        <Container>
+          {printClassesList.map((eventClass) => (
+            <div key={eventClass.carClass.class}>
+              <Typography component="div">
+                <Box
+                  fontWeight="fontWeightMedium"
+                  display="inline"
+                  lineHeight="2"
+                >
+                  {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
+                </Box>
+                <Chip
+                  label={'Class Record: ' + eventClass.drivers[0].classRecord}
+                  variant="outlined"
+                  color="info"
+                  size="small"
+                  icon={<Timer />}
+                />
+              </Typography>
+              <ResultsTable
+                data={eventClass.drivers.sort(
+                  (a: { times: any[] }, b: { times: any[] }) =>
+                    Math.min(...a.times.map((time) => time?.time || 10000000)) -
+                    Math.min(...b.times.map((time) => time?.time || 10000000))
+                )}
+                keyKey={'number'}
+                runCount={runCount.data as number}
+              />
+            </div>
+          ))}
+        </Container>
+      )
+    } else {
+      return null
+    }
+  } // This will never be called, but it is needed to make typescript happy
+
+  const currentRunArray = allRuns.data.filter(
+    (a) => a.number === currentCompetitor.data
+  )
+  const currentRun = currentRunArray[0]
 
   // Calculate best times of day
   //
@@ -389,111 +489,74 @@ export const Display = () => {
     }
   }
 
-  // Calculate ClassesList for each screen
-  // Max 20 elements per screen
-
-  let classesListScreen01: { carClass: any; drivers: any }[] = []
-  let classesListScreen02: { carClass: any; drivers: any }[] = []
-  let classesListScreen03: { carClass: any; drivers: any }[] = []
-  let classesListScreen04: { carClass: any; drivers: any }[] = []
-
-  let screenLength = 0
-  const targetScreenLength = 24
-  if (window.location.pathname !== '/display') {
-    classesList.forEach((currentClass) => {
-      screenLength = screenLength + Object.keys(currentClass.drivers).length + 1
-      if (screenLength <= targetScreenLength) {
-        classesListScreen01.push(currentClass)
-      } else if (
-        screenLength > targetScreenLength &&
-        screenLength <= targetScreenLength * 2
-      ) {
-        classesListScreen02.push(currentClass)
-      }
-      if (
-        screenLength > targetScreenLength * 2 &&
-        screenLength <= targetScreenLength * 3
-      ) {
-        classesListScreen03.push(currentClass)
-      } else if (screenLength > targetScreenLength * 3) {
-        classesListScreen04.push(currentClass)
-      }
-    })
-  }
-
-  let printClassesList: { carClass: any; drivers: any }[] = []
-  if (window.location.pathname !== '/display') {
-    if (window.location.pathname === '/display/1') {
-      printClassesList = classesListScreen01
-    } else if (window.location.pathname === '/display/2') {
-      printClassesList = classesListScreen02
-    } else if (window.location.pathname === '/display/3') {
-      printClassesList = classesListScreen03
-    } else if (window.location.pathname === '/display/4') {
-      printClassesList = classesListScreen04
-    }
-  } else {
-    printClassesList = classesList
-  }
-
-  return (
-    <Container>
-      {printClassesList.map((eventClass) => (
-        <div key={eventClass.carClass.class}>
-          <Typography component="div">
-            <Box fontWeight="fontWeightMedium" display="inline" lineHeight="2">
-              {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
-            </Box>
-            <Chip
-              label={'Class Record: ' + eventClass.drivers[0].classRecord}
-              variant="outlined"
-              color="info"
-              size="small"
-              icon={<Timer />}
+  let printClassesList = splitDisplay(classesList)
+  if (printClassesList) {
+    return (
+      <Container>
+        {printClassesList.map((eventClass) => (
+          <div key={eventClass.carClass.class}>
+            <Typography component="div">
+              <Box
+                fontWeight="fontWeightMedium"
+                display="inline"
+                lineHeight="2"
+              >
+                {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
+              </Box>
+              <Chip
+                label={'Class Record: ' + eventClass.drivers[0].classRecord}
+                variant="outlined"
+                color="info"
+                size="small"
+                icon={<Timer />}
+              />
+            </Typography>
+            <ResultsTable
+              data={eventClass.drivers.sort(
+                (a: { times: any[] }, b: { times: any[] }) =>
+                  Math.min(...a.times.map((time) => time?.time || 10000000)) -
+                  Math.min(...b.times.map((time) => time?.time || 10000000))
+              )}
+              keyKey={'number'}
+              runCount={runCount.data as number}
             />
-          </Typography>
-          <ResultsTable
-            data={eventClass.drivers.sort(
-              (a: { times: any[] }, b: { times: any[] }) =>
-                Math.min(...a.times.map((time) => time?.time || 10000000)) -
-                Math.min(...b.times.map((time) => time?.time || 10000000))
-            )}
-            keyKey={'number'}
-            runCount={runCount.data as number}
-          />
-        </div>
-      ))}
-      {window.location.pathname === '/display/4' ? (
-        <Grid>
-          <Grid
-            sx={{
-              height: 6,
-            }}
-          ></Grid>
-          <Grid
-            sx={{
-              fontSize: 24,
-              height: 130,
-            }}
-          >
-            <PrimaryPaper>
-              ON TRACK
-              <br />
-              {currentRun.number}: {currentRun.lastName} {currentRun.firstName}
-              {', '}
-              {currentRun.vehicle}
-              <br></br>
-              {currentRun.class}
-            </PrimaryPaper>
-          </Grid>
+          </div>
+        ))}
+        {window.location.pathname === '/display/4' ? (
+          <Grid>
+            <Grid
+              sx={{
+                height: 6,
+              }}
+            ></Grid>
+            <Grid
+              sx={{
+                fontSize: 24,
+                height: 130,
+              }}
+            >
+              <PrimaryPaper>
+                ON TRACK
+                <br />
+                {currentRun.number}: {currentRun.lastName}{' '}
+                {currentRun.firstName}
+                {', '}
+                {currentRun.vehicle}
+                <br></br>
+                {currentRun.class}
+              </PrimaryPaper>
+            </Grid>
 
-          <Grid item xs={4}>
-            {renderInfos()}
+            <Grid item xs={4}>
+              {renderInfos()}
+            </Grid>
           </Grid>
-        </Grid>
-      ) : (
-        ''
-      )}
-    </Container>
-  )
+        ) : (
+          ''
+        )}
+      </Container>
+    )
+  } else {
+    return null
+  }
 }
