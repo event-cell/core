@@ -598,19 +598,35 @@ export const Display = () => {
           <div key={eventClass.carClass.class}>
             <Typography component="div">
               <Box
-                fontWeight="fontWeightMedium"
-                display="inline"
-                lineHeight="2"
+                sx={{
+                  display: 'grid',
+                  gridAutoColumns: '1fr',
+                }}
               >
-                {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
+                <Box
+                  fontWeight="fontWeightMedium"
+                  sx={{
+                    gridColumn: '1 / 3',
+                    m: 1,
+                  }}
+                >
+                  {eventClass.carClass.class}
+                </Box>
+                <Box
+                  sx={{
+                    gridColumn: '3 / 4',
+                    m: 1,
+                  }}
+                >
+                  <Chip
+                    label={'Class Record: ' + eventClass.drivers[0].classRecord}
+                    variant="outlined"
+                    color="info"
+                    size="small"
+                    icon={<Timer />}
+                  />
+                </Box>
               </Box>
-              <Chip
-                label={'Class Record: ' + eventClass.drivers[0].classRecord}
-                variant="outlined"
-                color="info"
-                size="small"
-                icon={<Timer />}
-              />
             </Typography>
             <ResultsTable
               data={eventClass.drivers.sort(
