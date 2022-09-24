@@ -42,7 +42,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
   let sector1
   let launch
 
-  let mainFontSize = '0.6rem'
+  let mainFontSize = '0.8rem'
   let mainWidth = 65
 
   finishTime = (run.time / 1000).toFixed(2)
@@ -153,7 +153,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
           alignItems="center"
           border="1px"
           color="gold"
-          sx={{ fontSize: '0.7rem', fontWeight: 700 }}
+          sx={{ fontSize: '0.9rem', fontWeight: 700 }}
         >
           {finishTime}
         </Grid2>
@@ -186,7 +186,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
         alignItems="center"
         border="1px"
         color="primary.dark"
-        sx={{ fontSize: '0.7rem', fontWeight: 700 }}
+        sx={{ fontSize: '0.9rem', fontWeight: 700 }}
       >
         {finishTime}
       </Grid2>
@@ -234,7 +234,7 @@ export const ResultsTable: FC<{
                 >
                   <Box
                     sx={{
-                      fontSize: '0.875rem',
+                      fontSize: '1rem',
                       fontWeight: '700',
                       textAlign: 'center',
                       gridRow: '1',
@@ -246,7 +246,7 @@ export const ResultsTable: FC<{
                   <Box
                     sx={{
                       textAlign: 'left',
-                      fontSize: '0.8rem',
+                      fontSize: '1rem',
                       gridRow: '1',
                       gridColumn: '2/5',
                     }}
@@ -260,7 +260,7 @@ export const ResultsTable: FC<{
                         borderColor: 'primary.dark',
                         color: 'primary.dark',
                         borderRadius: 1,
-                        fontSize: '0.6rem',
+                        fontSize: '0.8rem',
                         fontWeight: '500',
                         textAlign: 'center',
                         gridRow: '2',
@@ -274,7 +274,7 @@ export const ResultsTable: FC<{
                   <Box
                     sx={{
                       textAlign: 'left',
-                      fontSize: '0.7rem',
+                      fontSize: '0.9rem',
                       gridRow: '2',
                       gridColumn: '2/5',
                     }}
