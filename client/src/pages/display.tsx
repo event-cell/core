@@ -21,6 +21,8 @@ import { requestWrapper } from '../components/requestWrapper'
 import { useEffect } from 'react'
 import { RankTimes, TimeDeltas } from '../components/functions'
 
+import Image2 from '../img/image2.jpeg'
+
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'left',
@@ -493,6 +495,105 @@ export const Display = () => {
   if (printClassesList) {
     return (
       <Container>
+        {window.location.pathname === '/display/1' ? (
+          <Box
+            sx={{
+              display: 'grid',
+              gridAutoColumns: '1fr',
+            }}
+          >
+            <Box
+              sx={{
+                gridColumn: '3 / 5',
+                height: 75,
+                borderTop: 3,
+                borderLeft: 3,
+                borderBottom: 3,
+                borderColor: 'primary.main',
+                textAlign: 'center',
+                fontSize: '2rem',
+                fontWeight: '700',
+                m: 1,
+              }}
+            >
+              Southern District
+            </Box>
+          </Box>
+        ) : (
+          ''
+        )}
+        {window.location.pathname === '/display/2' ? (
+          <Box
+            sx={{
+              display: 'grid',
+              gridAutoColumns: '1fr',
+            }}
+          >
+            <Box
+              sx={{
+                gridColumn: '1 / 3',
+                height: 75,
+                borderTop: 3,
+                borderRight: 3,
+                borderBottom: 3,
+                borderColor: 'primary.main',
+                textAlign: 'center',
+                fontSize: '2rem',
+                fontWeight: '700',
+                m: 1,
+              }}
+            >
+              Motorsport Association
+            </Box>
+            <Box
+              sx={{
+                gridColumn: '4 / 5',
+              }}
+            ></Box>
+          </Box>
+        ) : (
+          ''
+        )}
+        {window.location.pathname === '/display/3' ? (
+          <Box
+            sx={{
+              display: 'grid',
+              gridAutoColumns: '1fr',
+            }}
+          >
+            <Box
+              component="img"
+              sx={{
+                gridColumn: '3 / 5',
+                height: 75,
+                m: 1,
+              }}
+              alt="image"
+              src={String(Image2)}
+            ></Box>
+          </Box>
+        ) : (
+          ''
+        )}
+        {window.location.pathname === '/display/4' ? (
+          <Box
+            sx={{
+              display: 'grid',
+              gridAutoColumns: '1fr',
+            }}
+          >
+            <Box
+              sx={{
+                gridColumn: '3 / 5',
+                height: 75,
+                m: 1,
+              }}
+            ></Box>
+          </Box>
+        ) : (
+          ''
+        )}
+
         {printClassesList.map((eventClass) => (
           <div key={eventClass.carClass.class}>
             <Typography component="div">
