@@ -8,7 +8,7 @@ export const competitors = router().query('list', {
   output: CompetitorList,
   resolve: async function () {
     let tCOMPETITORSTable
-    let heats = []
+    const heats = []
 
     if (!event || !eventData) {
       throw new TRPCError({
@@ -40,11 +40,11 @@ export const competitors = router().query('list', {
       heats.push(await eventData.tTIMEINFOS_HEAT9.findMany())
     } catch (e) {}
 
-    let competitors: CompetitorList = tCOMPETITORSTable.map((competitor) => ({
+    const competitors: CompetitorList = tCOMPETITORSTable.map((competitor) => ({
       number: competitor.C_NUM || -1,
       firstName: competitor.C_FIRST_NAME || 'N/A',
       lastName: competitor.C_LAST_NAME || 'N/A',
-      class: competitor.C_SERIE || 'N/A',
+      class: competitor.C_SERIE || competitor.C_I29 || 'N/A',
       classIndex: competitor.C_I21 || 0,
       vehicle: competitor.C_COMMITTEE || 'N/A',
       classRecord: competitor.C_TEAM || '0.00',
