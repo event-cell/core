@@ -107,25 +107,34 @@ export const TrackDisplay = () => {
     const idx = currentRun.times.length - 1
     const times = currentRun.times[idx]
 
+    console.log(launch, sector1, sector2, finishTime)
+
     if (typeof times !== 'undefined') {
       if (times.status === 2) {
         return (
           <Grid sx={{ color: 'white' }}>
-            <CarCrash color="error" sx={{ fontSize: 200 }} />
+            <CarCrash color="error" />
             DNF
           </Grid>
         )
       } else if (times.status === 3) {
         return (
           <Grid sx={{ color: 'white' }}>
-            <CarCrash color="error" sx={{ fontSize: 200 }} />
+            <CarCrash color="error" />
             DSQ
           </Grid>
         )
-      } else if (finishTime !== 0) {
-        if (finishTime > 0) {
-          return (finishTime / 1000).toFixed(2)
-        }
+      } else if (
+        finishTime <= 0 &&
+        sector2 <= 0 &&
+        sector1 <= 0 &&
+        launch > 0
+      ) {
+        return (launch / 1000).toFixed(2)
+      } else if (finishTime <= 0 && sector2 <= 0 && sector1 > 0 && launch > 0) {
+        return (sector1 / 1000).toFixed(2)
+      } else if (finishTime > 0 && sector2 > 0 && sector1 > 0 && launch > 0) {
+        return (finishTime / 1000).toFixed(2)
       } else {
         return ''
       }
@@ -161,7 +170,9 @@ export const TrackDisplay = () => {
           <Grid item xs={4}>
             <Box
               sx={{
-                fontSize: 144,
+                fontSize: 130,
+                fontWeight: '700',
+                fontFamily: 'Roboto',
                 borderRadius: '4px',
                 display: 'block',
                 textAlign: 'center',
@@ -179,7 +190,9 @@ export const TrackDisplay = () => {
           <Grid item xs={4}>
             <Box
               sx={{
-                fontSize: 144,
+                fontSize: 130,
+                fontWeight: '700',
+                fontFamily: 'Roboto',
                 borderRadius: '4px',
                 display: 'block',
                 textAlign: 'center',
@@ -197,7 +210,9 @@ export const TrackDisplay = () => {
           <Grid item xs={4}>
             <Box
               sx={{
-                fontSize: 144,
+                fontSize: 130,
+                fontWeight: '700',
+                fontFamily: 'Roboto',
                 borderRadius: '4px',
                 display: 'block',
                 textAlign: 'center',
@@ -214,7 +229,7 @@ export const TrackDisplay = () => {
           </Grid>
           <Grid item xs={12}>
             <Box
-              sx={{ height: 48, borderRadius: '4px', display: 'block' }}
+              sx={{ height: 72, borderRadius: '4px', display: 'block' }}
               bgcolor={finishColour}
             />
           </Grid>
@@ -222,6 +237,8 @@ export const TrackDisplay = () => {
             <Box
               sx={{
                 fontSize: 320,
+                fontWeight: '700',
+                fontFamily: 'Roboto',
                 borderRadius: '4px',
                 display: 'block',
                 textAlign: 'center',
