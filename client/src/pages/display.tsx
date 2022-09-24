@@ -543,7 +543,7 @@ export const Display = () => {
                 m: 1,
               }}
             >
-              Motorsport Association
+              Motorsports Association
             </Box>
             <Box
               sx={{
