@@ -207,6 +207,15 @@ export function RankTimes(
   } else if (time > 0) {
     finishColour = 'yellow'
   }
+
+  if (finishColour === 'background.default') {
+    if (sector1Colour === 'background.default') {
+      finishColour = launchColour
+    } else {
+      finishColour = sector1Colour
+    }
+  }
+
   return {
     launchColour,
     sector1Colour,
