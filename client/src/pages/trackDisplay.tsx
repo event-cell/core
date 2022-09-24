@@ -18,7 +18,7 @@ export const TrackDisplay = () => {
     displayInterval = setTimeout(() => {
       currentCompetitor.refetch()
       allRuns.refetch()
-    }, 1000 * 5)
+    }, 1000 * 4)
   }, [currentCompetitor, allRuns])
 
   const requestErrors = requestWrapper(currentCompetitor, allRuns)
