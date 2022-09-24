@@ -232,32 +232,6 @@ export const TrackDisplay = () => {
               {renderTime()}
             </Box>
           </Grid>
-          <Grid item xs={6}>
-            <Box
-              sx={{
-                fontSize: 72,
-                borderRadius: '4px',
-                display: 'block',
-                textAlign: 'left',
-                bgcolor: 'background.default',
-              }}
-            >
-              {currentRun.number}
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box
-              sx={{
-                fontSize: 72,
-                borderRadius: '4px',
-                display: 'block',
-                textAlign: 'right',
-                bgcolor: 'background.default',
-              }}
-            >
-              {currentRun.lastName} {currentRun.firstName}
-            </Box>
-          </Grid>
         </Grid>
       </Typography>
     </Container>
