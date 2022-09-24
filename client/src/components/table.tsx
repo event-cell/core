@@ -209,16 +209,16 @@ export const ResultsTable: FC<{
     <TableContainer component={Paper}>
       <MUITable sx={{ minWidth: 640 }} size="small">
         <TableHead>
-          {/*<TableRow sx={{ height: 10, m: 0, p: 0 }}>*/}
-          {/*  <TableCell width={200} sx={{ fontSize: '0.8rem' }}>*/}
-          {/*    Competitor*/}
-          {/*  </TableCell>*/}
-          {/*  {Array.apply(null, Array(runCount)).map((_, index) => (*/}
-          {/*    <TableCell key={index} sx={{ fontSize: '0.8rem' }}>*/}
-          {/*      Run {index + 1}*/}
-          {/*    </TableCell>*/}
-          {/*  ))}*/}
-          {/*</TableRow>*/}
+          <TableRow sx={{ height: 10, m: 0, p: 0 }}>
+            <TableCell width={200} sx={{ fontSize: '0.8rem' }}>
+              Competitor
+            </TableCell>
+            {Array.apply(null, Array(runCount)).map((_, index) => (
+              <TableCell key={index} sx={{ fontSize: '0.8rem' }}>
+                Run {index + 1}
+              </TableCell>
+            ))}
+          </TableRow>
         </TableHead>
         <TableBody>
           {data.map((row) => (
