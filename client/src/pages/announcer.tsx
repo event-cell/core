@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { Timer } from '@mui/icons-material'
 import {
   Box,
   Chip,
@@ -14,9 +16,7 @@ import {
 } from '@mui/material'
 
 import { trpc } from '../App'
-import { Timer } from '@mui/icons-material'
 import { ResultsTable } from '../shared/components/table'
-import { useEffect } from 'react'
 import { requestWrapper } from '../components/requestWrapper'
 import { RankTimes, TimeDeltas } from '../shared/logic/functions'
 
@@ -64,7 +64,7 @@ export const Announcer = () => {
   // Sort classes in class order as per the index value
   // in the timing software
 
-  let classes: { classIndex: number; class: string }[] = []
+  const classes: { classIndex: number; class: string }[] = []
   let maxClassIndex = 0
 
   allRuns.data.forEach((a) => {
@@ -96,7 +96,7 @@ export const Announcer = () => {
   const currentClassList = classesList.filter(
     (a) => a.carClass.classIndex === currentRun.classIndex
   )
-  let {
+  const {
     sector1Colour,
     sector2Colour,
     sector3Colour,
@@ -161,7 +161,7 @@ export const Announcer = () => {
     const times = currentRun.times[idx]
 
     if (typeof times !== 'undefined') {
-      let {
+      const {
         sector1,
         sector2,
         sector3,

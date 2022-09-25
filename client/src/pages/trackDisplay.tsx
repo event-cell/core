@@ -33,7 +33,7 @@ export const TrackDisplay = () => {
   )
   const currentRun = currentRunArray[0]
 
-  let {
+  const {
     sector1Colour,
     sector2Colour,
     sector3Colour,
@@ -61,7 +61,7 @@ export const TrackDisplay = () => {
 
   if (typeof times === 'undefined') return null
 
-  let {
+  const {
     sector1,
     sector2,
     sector3,

@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import {
   Box,
+  Chip,
   Paper,
   Table as MUITable,
   TableBody,
@@ -49,32 +50,31 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
   classRecord,
 }) => {
   if (run.status === 1) return <DNS />
+  if (run.status === 3) return <Disqualified />
 
-  const launch = (run.split1 / 1000).toFixed(2)
-  const sector1 = ((run.split2 - run.split1) / 1000).toFixed(2)
+  const sector1 = (run.split1 / 1000).toFixed(2)
+  const sector2 = ((run.split2 - run.split1) / 1000).toFixed(2)
 
-  if (run.status === 2) return <DNF launch={launch} sector1={sector1} />
+  if (run.status === 2) return <DNF launch={sector1} sector1={sector2} />
 
   const finishTime = (run.time / 1000).toFixed(2)
-  const sector2 = ((run.time - run.split2) / 1000).toFixed(2)
-
-  if (run.status === 3) return <Disqualified />
+  const sector3 = ((run.time - run.split2) / 1000).toFixed(2)
 
   if (run.status === 0 && run.time / 1000 < classRecord)
     return (
       <ClassRecord
-        launch={launch}
-        sector1={sector1}
-        sector2={sector2}
+        launch={sector1}
+        sector1={sector2}
+        sector2={sector3}
         finishTime={finishTime}
       />
     )
 
   return (
     <Regular
-      launch={launch}
-      sector1={sector1}
-      sector2={sector2}
+      launch={sector1}
+      sector1={sector2}
+      sector2={sector3}
       finishTime={finishTime}
     />
   )
@@ -100,7 +100,6 @@ export const ResultsTable: FC<{
             ))}
           </TableRow>
         </TableHead>
-
         <TableBody>
           {data.map((row) => (
             <TableRow key={row[keyKey]}>
