@@ -15,10 +15,10 @@ import {
 
 import { trpc } from '../App'
 import { Timer } from '@mui/icons-material'
-import { ResultsTable } from '../../../shared/components/table'
+import { ResultsTable } from '../shared/components/table'
 import { useEffect } from 'react'
 import { requestWrapper } from '../components/requestWrapper'
-import { RankTimes, TimeDeltas } from '../../../shared/logic/functions'
+import { RankTimes, TimeDeltas } from '../shared/logic/functions'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),

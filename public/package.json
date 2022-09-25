@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "setup": "rm -rf shared && cp -r ../shared shared",
+    "dev": "yarn setup && next dev",
+    "build": "yarn setup && next build",
+    "start": "yarn setup && next start",
+    "lint": "yarn setup && next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@mui/icons-material": "^5.10.6",
+    "@mui/material": "^5.10.6",
+    "@mui/x-data-grid": "^5.17.4",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
