@@ -34,24 +34,24 @@ export const TrackDisplay = () => {
   const currentRun = currentRunArray[0]
 
   let {
-    launchColour,
     sector1Colour,
     sector2Colour,
+    sector3Colour,
     finishColour,
-    bestLaunch,
-    previousBestLaunch,
     bestSector1,
     previousBestSector1,
     bestSector2,
     previousBestSector2,
+    bestSector3,
+    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestLaunch,
-    previousPersonalBestLaunch,
     personalBestSector1,
     previousPersonalBestSector1,
     personalBestSector2,
     previousPersonalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector3,
     personalBestFinishTime,
     previousPersonalBestFinishTime,
   } = RankTimes(currentRun, allRuns.data)
@@ -62,14 +62,10 @@ export const TrackDisplay = () => {
   if (typeof times === 'undefined') return null
 
   let {
-    launch,
     sector1,
     sector2,
+    sector3,
     finishTime,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    launchDeltaPB,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    launchDeltaLeader,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector1DeltaPB,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -79,15 +75,15 @@ export const TrackDisplay = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector2DeltaLeader,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    sector3DeltaPB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    sector3DeltaLeader,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     finishDeltaPB,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     finishDeltaLeader,
   } = TimeDeltas(
     times,
-    personalBestLaunch,
-    previousPersonalBestLaunch,
-    bestLaunch,
-    previousBestLaunch,
     personalBestSector1,
     previousPersonalBestSector1,
     bestSector1,
@@ -96,6 +92,10 @@ export const TrackDisplay = () => {
     previousPersonalBestSector2,
     bestSector2,
     previousBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector3,
+    bestSector3,
+    previousBestSector3,
     personalBestFinishTime,
     previousPersonalBestFinishTime,
     bestFinishTime,
@@ -107,7 +107,7 @@ export const TrackDisplay = () => {
     const idx = currentRun.times.length - 1
     const times = currentRun.times[idx]
 
-    console.log(launch, sector1, sector2, finishTime)
+    console.log(sector1, sector2, sector3, finishTime)
 
     if (typeof times !== 'undefined') {
       if (times.status === 2) {
@@ -126,14 +126,19 @@ export const TrackDisplay = () => {
         )
       } else if (
         finishTime <= 0 &&
+        sector3 <= 0 &&
         sector2 <= 0 &&
-        sector1 <= 0 &&
-        launch > 0
+        sector1 > 0
       ) {
-        return (launch / 1000).toFixed(2)
-      } else if (finishTime <= 0 && sector2 <= 0 && sector1 > 0 && launch > 0) {
         return (sector1 / 1000).toFixed(2)
-      } else if (finishTime > 0 && sector2 > 0 && sector1 > 0 && launch > 0) {
+      } else if (
+        finishTime <= 0 &&
+        sector3 <= 0 &&
+        sector2 > 0 &&
+        sector1 > 0
+      ) {
+        return (sector2 / 1000).toFixed(2)
+      } else if (finishTime > 0 && sector3 > 0 && sector2 > 0 && sector1 > 0) {
         return (finishTime / 1000).toFixed(2)
       } else {
         return ''
@@ -152,12 +157,6 @@ export const TrackDisplay = () => {
           <Grid item xs={4}>
             <Box
               sx={{ height: 48, borderRadius: '4px', display: 'block' }}
-              bgcolor={launchColour}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Box
-              sx={{ height: 48, borderRadius: '4px', display: 'block' }}
               bgcolor={sector1Colour}
             />
           </Grid>
@@ -169,23 +168,9 @@ export const TrackDisplay = () => {
           </Grid>
           <Grid item xs={4}>
             <Box
-              sx={{
-                fontSize: 130,
-                fontWeight: '700',
-                fontFamily: 'Roboto',
-                borderRadius: '4px',
-                display: 'block',
-                textAlign: 'center',
-                bgcolor: 'background.default',
-                height: 200,
-              }}
-            >
-              {launch !== 0
-                ? launch > 0
-                  ? (launch / 1000).toFixed(2)
-                  : ''
-                : ''}{' '}
-            </Box>
+              sx={{ height: 48, borderRadius: '4px', display: 'block' }}
+              bgcolor={sector3Colour}
+            />
           </Grid>
           <Grid item xs={4}>
             <Box
@@ -223,6 +208,26 @@ export const TrackDisplay = () => {
               {sector2 !== 0
                 ? sector2 > 0
                   ? (sector2 / 1000).toFixed(2)
+                  : ''
+                : ''}{' '}
+            </Box>
+          </Grid>
+          <Grid item xs={4}>
+            <Box
+              sx={{
+                fontSize: 130,
+                fontWeight: '700',
+                fontFamily: 'Roboto',
+                borderRadius: '4px',
+                display: 'block',
+                textAlign: 'center',
+                bgcolor: 'background.default',
+                height: 200,
+              }}
+            >
+              {sector3 !== 0
+                ? sector3 > 0
+                  ? (sector3 / 1000).toFixed(2)
                   : ''
                 : ''}{' '}
             </Box>

@@ -5,25 +5,25 @@ import {
 } from 'server/src/router/objects'
 
 interface BestTimeProps {
+  previousPersonalBestSector3: number
   previousPersonalBestSector2: number
-  previousPersonalBestSector1: number
-  personalBestSector2: number
-  bestLaunch: number
-  sector1Colour: string
+  personalBestSector3: number
+  bestSector1: number
+  sector2Colour: string
   previousBestFinishTime: number
   previousPersonalBestFinishTime: number
-  previousBestSector1: number
-  personalBestFinishTime: number
   previousBestSector2: number
-  previousPersonalBestLaunch: number
-  previousBestLaunch: number
-  launchColour: string
+  personalBestFinishTime: number
+  previousBestSector3: number
+  previousPersonalBestSector1: number
+  previousBestSector1: number
+  sector1Colour: string
+  personalBestSector2: number
+  sector3Colour: string
   personalBestSector1: number
-  sector2Colour: string
-  personalBestLaunch: number
-  bestSector1: number
-  finishColour: string
   bestSector2: number
+  finishColour: string
+  bestSector3: number
   bestFinishTime: number
   defaultBest: number
   bestFinishTimeOfTheDay: number
@@ -44,27 +44,27 @@ export function RankTimes(
   let split1 = 0.0
   let split2 = 0.0
   let time = 0.0
-  let launchColour = 'background.default'
   let sector1Colour = 'background.default'
   let sector2Colour = 'background.default'
+  let sector3Colour = 'background.default'
   let finishColour = 'background.default'
 
   const defaultBest = 9999999
 
-  let bestLaunch = defaultBest
-  let previousBestLaunch = defaultBest
   let bestSector1 = defaultBest
   let previousBestSector1 = defaultBest
   let bestSector2 = defaultBest
   let previousBestSector2 = defaultBest
+  let bestSector3 = defaultBest
+  let previousBestSector3 = defaultBest
   let bestFinishTime = defaultBest
   let previousBestFinishTime = defaultBest
-  let personalBestLaunch = defaultBest
-  let previousPersonalBestLaunch = defaultBest
   let personalBestSector1 = defaultBest
   let previousPersonalBestSector1 = defaultBest
   let personalBestSector2 = defaultBest
   let previousPersonalBestSector2 = defaultBest
+  let personalBestSector3 = defaultBest
+  let previousPersonalBestSector3 = defaultBest
   let personalBestFinishTime = defaultBest
   let previousPersonalBestFinishTime = defaultBest
   let bestFinishTimeOfTheDay = defaultBest
@@ -84,17 +84,17 @@ export function RankTimes(
       split1 = run.split1
       split2 = run.split2
       time = run.time
-      if (run.split1 < personalBestLaunch && run.split1 > 0) {
-        previousPersonalBestLaunch = personalBestLaunch
-        personalBestLaunch = run.split1
-      }
-      if (run.split2 - run.split1 < personalBestSector1 && run.split2 > 0) {
+      if (run.split1 < personalBestSector1 && run.split1 > 0) {
         previousPersonalBestSector1 = personalBestSector1
-        personalBestSector1 = run.split2 - run.split1
+        personalBestSector1 = run.split1
       }
-      if (run.time - run.split2 < personalBestSector2 && run.time > 0) {
+      if (run.split2 - run.split1 < personalBestSector2 && run.split2 > 0) {
         previousPersonalBestSector2 = personalBestSector2
-        personalBestSector2 = run.time - run.split2
+        personalBestSector2 = run.split2 - run.split1
+      }
+      if (run.time - run.split2 < personalBestSector3 && run.time > 0) {
+        previousPersonalBestSector3 = personalBestSector3
+        personalBestSector3 = run.time - run.split2
       }
       if (run.time < personalBestFinishTime && run.time > 0) {
         previousPersonalBestFinishTime = personalBestFinishTime
@@ -112,17 +112,17 @@ export function RankTimes(
     if (person.classIndex === currentRun.classIndex) {
       for (const run of person.times) {
         if (typeof run !== 'undefined' && run.status === 0) {
-          if (run.split1 < bestLaunch) {
-            previousBestLaunch = bestLaunch
-            bestLaunch = run.split1
-          }
-          if (run.split2 - run.split1 < bestSector1) {
+          if (run.split1 < bestSector1) {
             previousBestSector1 = bestSector1
-            bestSector1 = run.split2 - run.split1
+            bestSector1 = run.split1
           }
-          if (run.time - run.split2 < bestSector2) {
+          if (run.split2 - run.split1 < bestSector2) {
             previousBestSector2 = bestSector2
-            bestSector2 = run.time - run.split2
+            bestSector2 = run.split2 - run.split1
+          }
+          if (run.time - run.split2 < bestSector3) {
+            previousBestSector3 = bestSector3
+            bestSector3 = run.time - run.split2
           }
           if (run.time < bestFinishTime) {
             previousBestFinishTime = bestFinishTime
@@ -176,28 +176,28 @@ export function RankTimes(
     }
   }
 
-  if (split1 <= bestLaunch && split1 > 0) {
-    launchColour = 'purple'
-  } else if (split1 <= personalBestLaunch && split1 > 0) {
-    launchColour = 'green'
-  } else if (split1 > 0) {
-    launchColour = 'yellow'
-  }
-
-  if (split2 - split1 <= bestSector1 && split2 > 0) {
+  if (split1 <= bestSector1 && split1 > 0) {
     sector1Colour = 'purple'
-  } else if (split2 - split1 <= personalBestSector1 && split2 > 0) {
+  } else if (split1 <= personalBestSector1 && split1 > 0) {
     sector1Colour = 'green'
-  } else if (split2 > 0) {
+  } else if (split1 > 0) {
     sector1Colour = 'yellow'
   }
 
-  if (time - split2 <= bestSector2 && time > 0) {
+  if (split2 - split1 <= bestSector2 && split2 > 0) {
     sector2Colour = 'purple'
-  } else if (time - split2 <= personalBestSector2 && time > 0) {
+  } else if (split2 - split1 <= personalBestSector2 && split2 > 0) {
     sector2Colour = 'green'
-  } else if (time > 0) {
+  } else if (split2 > 0) {
     sector2Colour = 'yellow'
+  }
+
+  if (time - split2 <= bestSector3 && time > 0) {
+    sector3Colour = 'purple'
+  } else if (time - split2 <= personalBestSector3 && time > 0) {
+    sector3Colour = 'green'
+  } else if (time > 0) {
+    sector3Colour = 'yellow'
   }
 
   if (time <= bestFinishTime && time > 0) {
@@ -209,32 +209,32 @@ export function RankTimes(
   }
 
   if (finishColour === 'background.default') {
-    if (sector1Colour === 'background.default') {
-      finishColour = launchColour
-    } else {
+    if (sector2Colour === 'background.default') {
       finishColour = sector1Colour
+    } else {
+      finishColour = sector2Colour
     }
   }
 
   return {
-    launchColour,
     sector1Colour,
     sector2Colour,
+    sector3Colour,
     finishColour,
-    bestLaunch,
-    previousBestLaunch,
     bestSector1,
     previousBestSector1,
     bestSector2,
     previousBestSector2,
+    bestSector3,
+    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestLaunch,
-    previousPersonalBestLaunch,
     personalBestSector1,
     previousPersonalBestSector1,
     personalBestSector2,
     previousPersonalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector3,
     personalBestFinishTime,
     previousPersonalBestFinishTime,
     defaultBest,
@@ -252,10 +252,6 @@ export function RankTimes(
 
 export function TimeDeltas(
   times: TimeInfoManditory,
-  personalBestLaunch: number,
-  previousPersonalBestLaunch: number,
-  bestLaunch: number,
-  previousBestLaunch: number,
   personalBestSector1: number,
   previousPersonalBestSector1: number,
   bestSector1: number,
@@ -264,38 +260,30 @@ export function TimeDeltas(
   previousPersonalBestSector2: number,
   bestSector2: number,
   previousBestSector2: number,
+  personalBestSector3: number,
+  previousPersonalBestSector3: number,
+  bestSector3: number,
+  previousBestSector3: number,
   personalBestFinishTime: number,
   previousPersonalBestFinishTime: number,
   bestFinishTime: number,
   previousBestFinishTime: number
 ) {
-  let launchDeltaPB = 0
-  let launchDeltaLeader = 0
   let sector1DeltaPB = 0
   let sector1DeltaLeader = 0
   let sector2DeltaPB = 0
   let sector2DeltaLeader = 0
+  let sector3DeltaPB = 0
+  let sector3DeltaLeader = 0
   let finishDeltaPB = 0
   let finishDeltaLeader = 0
 
-  const launch = times.split1
-  const sector1 = times.split2 - times.split1
-  const sector2 = times.time - times.split2
+  const sector1 = times.split1
+  const sector2 = times.split2 - times.split1
+  const sector3 = times.time - times.split2
   const finishTime = times.time
 
   if (times.split1 > 0) {
-    if (launch === personalBestLaunch) {
-      launchDeltaPB = launch - previousPersonalBestLaunch
-    } else {
-      launchDeltaPB = launch - personalBestLaunch
-    }
-    if (launch === bestLaunch) {
-      launchDeltaLeader = launch - previousBestLaunch
-    } else {
-      launchDeltaLeader = launch - bestLaunch
-    }
-  }
-  if (times.split2 > 0) {
     if (sector1 === personalBestSector1) {
       sector1DeltaPB = sector1 - previousPersonalBestSector1
     } else {
@@ -307,7 +295,7 @@ export function TimeDeltas(
       sector1DeltaLeader = sector1 - bestSector1
     }
   }
-  if (times.time > 0) {
+  if (times.split2 > 0) {
     if (sector2 === personalBestSector2) {
       sector2DeltaPB = sector2 - previousPersonalBestSector2
     } else {
@@ -317,6 +305,18 @@ export function TimeDeltas(
       sector2DeltaLeader = sector2 - previousBestSector2
     } else {
       sector2DeltaLeader = sector2 - bestSector2
+    }
+  }
+  if (times.time > 0) {
+    if (sector3 === personalBestSector3) {
+      sector3DeltaPB = sector3 - previousPersonalBestSector3
+    } else {
+      sector3DeltaPB = sector3 - personalBestSector3
+    }
+    if (sector3 === bestSector3) {
+      sector3DeltaLeader = sector3 - previousBestSector3
+    } else {
+      sector3DeltaLeader = sector3 - bestSector3
     }
     if (finishTime === personalBestFinishTime) {
       finishDeltaPB = finishTime - previousPersonalBestFinishTime
@@ -330,16 +330,16 @@ export function TimeDeltas(
     }
   }
   return {
-    launch,
     sector1,
     sector2,
+    sector3,
     finishTime,
-    launchDeltaPB,
-    launchDeltaLeader,
     sector1DeltaPB,
     sector1DeltaLeader,
     sector2DeltaPB,
     sector2DeltaLeader,
+    sector3DeltaPB,
+    sector3DeltaLeader,
     finishDeltaPB,
     finishDeltaLeader,
   }

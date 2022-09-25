@@ -10,6 +10,8 @@ export const DisplayPage = () => {
   const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
+  console.log(JSON.stringify({ currentCompetitor, allRuns, runCount }))
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await Promise.all([
