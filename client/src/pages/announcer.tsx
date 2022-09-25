@@ -97,24 +97,24 @@ export const Announcer = () => {
     (a) => a.carClass.classIndex === currentRun.classIndex
   )
   let {
-    launchColour,
     sector1Colour,
     sector2Colour,
+    sector3Colour,
     finishColour,
-    bestLaunch,
-    previousBestLaunch,
     bestSector1,
     previousBestSector1,
     bestSector2,
     previousBestSector2,
+    bestSector3,
+    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestLaunch,
-    previousPersonalBestLaunch,
     personalBestSector1,
     previousPersonalBestSector1,
     personalBestSector2,
     previousPersonalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector3,
     personalBestFinishTime,
     previousPersonalBestFinishTime,
     defaultBest,
@@ -162,24 +162,20 @@ export const Announcer = () => {
 
     if (typeof times !== 'undefined') {
       let {
-        launch,
         sector1,
         sector2,
+        sector3,
         finishTime,
-        launchDeltaPB,
-        launchDeltaLeader,
         sector1DeltaPB,
         sector1DeltaLeader,
         sector2DeltaPB,
         sector2DeltaLeader,
+        sector3DeltaPB,
+        sector3DeltaLeader,
         finishDeltaPB,
         finishDeltaLeader,
       } = TimeDeltas(
         times,
-        personalBestLaunch,
-        previousPersonalBestLaunch,
-        bestLaunch,
-        previousBestLaunch,
         personalBestSector1,
         previousPersonalBestSector1,
         bestSector1,
@@ -188,6 +184,10 @@ export const Announcer = () => {
         previousPersonalBestSector2,
         bestSector2,
         previousBestSector2,
+        personalBestSector3,
+        previousPersonalBestSector3,
+        bestSector3,
+        previousBestSector3,
         personalBestFinishTime,
         previousPersonalBestFinishTime,
         bestFinishTime,
@@ -208,44 +208,6 @@ export const Announcer = () => {
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell>Launch</TableCell>
-                <TableCell>
-                  <Box
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: launchColour,
-                      borderRadius: '4px',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  {launch !== 0
-                    ? launch > 0
-                      ? (launch / 1000).toFixed(2)
-                      : ''
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {launch !== 0 &&
-                  personalBestLaunch !== defaultBest &&
-                  personalBestLaunch - defaultBest !== launchDeltaPB
-                    ? launchDeltaPB > 0
-                      ? '+' + (launchDeltaPB / 1000).toFixed(2)
-                      : (launchDeltaPB / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {launch !== 0 &&
-                  bestLaunch !== defaultBest &&
-                  bestLaunch - defaultBest !== launchDeltaLeader
-                    ? launchDeltaLeader > 0
-                      ? '+' + (launchDeltaLeader / 1000).toFixed(2)
-                      : (launchDeltaLeader / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-              </TableRow>
-              <TableRow>
                 <TableCell>Sector 1</TableCell>
                 <TableCell>
                   <Box
@@ -258,14 +220,14 @@ export const Announcer = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {sector1 > 0
+                  {sector1 !== 0
                     ? sector1 > 0
                       ? (sector1 / 1000).toFixed(2)
                       : ''
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {sector1 > 0 &&
+                  {sector1 !== 0 &&
                   personalBestSector1 !== defaultBest &&
                   personalBestSector1 - defaultBest !== sector1DeltaPB
                     ? sector1DeltaPB > 0
@@ -274,7 +236,7 @@ export const Announcer = () => {
                     : ''}
                 </TableCell>
                 <TableCell>
-                  {sector1 > 0 &&
+                  {sector1 !== 0 &&
                   bestSector1 !== defaultBest &&
                   bestSector1 - defaultBest !== sector1DeltaLeader
                     ? sector1DeltaLeader > 0
@@ -304,7 +266,6 @@ export const Announcer = () => {
                 </TableCell>
                 <TableCell>
                   {sector2 > 0 &&
-                  sector2DeltaPB !== 0 &&
                   personalBestSector2 !== defaultBest &&
                   personalBestSector2 - defaultBest !== sector2DeltaPB
                     ? sector2DeltaPB > 0
@@ -314,12 +275,51 @@ export const Announcer = () => {
                 </TableCell>
                 <TableCell>
                   {sector2 > 0 &&
-                  sector2DeltaLeader !== 0 &&
                   bestSector2 !== defaultBest &&
                   bestSector2 - defaultBest !== sector2DeltaLeader
                     ? sector2DeltaLeader > 0
                       ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
                       : (sector2DeltaLeader / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Sector 3</TableCell>
+                <TableCell>
+                  <Box
+                    sx={{
+                      width: 20,
+                      height: 20,
+                      backgroundColor: sector3Colour,
+                      borderRadius: '4px',
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  {sector3 > 0
+                    ? sector3 > 0
+                      ? (sector3 / 1000).toFixed(2)
+                      : ''
+                    : ''}
+                </TableCell>
+                <TableCell>
+                  {sector3 > 0 &&
+                  sector3DeltaPB !== 0 &&
+                  personalBestSector3 !== defaultBest &&
+                  personalBestSector3 - defaultBest !== sector3DeltaPB
+                    ? sector3DeltaPB > 0
+                      ? '+' + (sector3DeltaPB / 1000).toFixed(2)
+                      : (sector3DeltaPB / 1000).toFixed(2)
+                    : ''}
+                </TableCell>
+                <TableCell>
+                  {sector3 > 0 &&
+                  sector3DeltaLeader !== 0 &&
+                  bestSector3 !== defaultBest &&
+                  bestSector3 - defaultBest !== sector3DeltaLeader
+                    ? sector3DeltaLeader > 0
+                      ? '+' + (sector3DeltaLeader / 1000).toFixed(2)
+                      : (sector3DeltaLeader / 1000).toFixed(2)
                     : ''}
                 </TableCell>
               </TableRow>

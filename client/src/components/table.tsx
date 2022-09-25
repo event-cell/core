@@ -38,17 +38,17 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
   classRecord,
 }) => {
   let finishTime
+  let sector3
   let sector2
   let sector1
-  let launch
 
   let mainFontSize = '0.8rem'
   let mainWidth = 80
 
   finishTime = (run.time / 1000).toFixed(2)
-  sector2 = ((run.time - run.split2) / 1000).toFixed(2)
-  sector1 = ((run.split2 - run.split1) / 1000).toFixed(2)
-  launch = (run.split1 / 1000).toFixed(2)
+  sector3 = ((run.time - run.split2) / 1000).toFixed(2)
+  sector2 = ((run.split2 - run.split1) / 1000).toFixed(2)
+  sector1 = (run.split1 / 1000).toFixed(2)
 
   // if run did not start
   if (run.status === 1) {
@@ -100,10 +100,10 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
           />
         </Grid2>
         <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-          {launch}
+          {sector1}
         </Grid2>
         <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-          {sector1}
+          {sector2}
         </Grid2>
       </Grid2>
     )
@@ -144,7 +144,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
         }}
       >
         <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-          {sector2}
+          {sector3}
         </Grid2>
         <Grid2
           xs={6}
@@ -158,10 +158,10 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
           {finishTime}
         </Grid2>
         <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-          {launch}
+          {sector1}
         </Grid2>
         <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-          {sector1}
+          {sector2}
         </Grid2>
       </Grid2>
     )
@@ -177,7 +177,7 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
       }}
     >
       <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-        {sector2}
+        {sector3}
       </Grid2>
       <Grid2
         xs={6}
@@ -191,10 +191,10 @@ const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
         {finishTime}
       </Grid2>
       <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-        {launch}
+        {sector1}
       </Grid2>
       <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-        {sector1}
+        {sector2}
       </Grid2>
     </Grid2>
   )
