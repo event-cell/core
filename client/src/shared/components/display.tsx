@@ -20,7 +20,7 @@ import { Timer } from '@mui/icons-material'
 import { RankTimes, TimeDeltas } from '../logic/functions'
 
 import Image2 from '../assets/image2.jpeg'
-import { CompetitorList } from '../../src/router/objects'
+import { CompetitorList } from '../../../../server/src/router/objects'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -28,12 +28,12 @@ const PrimaryPaper = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }))
 
-function splitDisplay(
-  classesList: {
-    drivers: any
-    carClass: { classIndex: number; class: string }
-  }[]
-) {
+interface ClassType {
+  drivers: any
+  carClass: { classIndex: number; class: string }
+}
+
+function splitDisplay(classesList: ClassType[]) {
   // Calculate ClassesList for each screen
   // Max 20 elements per screen
 
