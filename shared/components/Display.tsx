@@ -12,16 +12,15 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+import React, { FC } from 'react'
 
-import { trpc } from '../App'
-import { ResultsTable } from '../../../shared/components/table'
+import { ResultsTable } from './table'
 import { Timer } from '@mui/icons-material'
 
-import { requestWrapper } from '../components/requestWrapper'
-import { useEffect } from 'react'
-import { RankTimes, TimeDeltas } from '../../../shared/logic/functions'
+import { RankTimes, TimeDeltas } from '../logic/functions'
 
-import Image2 from '../img/image2.jpeg'
+import Image2 from '../assets/image2.jpeg'
+import { CompetitorList } from '../../src/router/objects'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -82,40 +81,18 @@ function splitDisplay(
   }
 }
 
-export const Display = () => {
-  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
-  const allRuns = trpc.useQuery(['competitors.list'])
-  const runCount = trpc.useQuery(['runs.count'])
-
-  useEffect(() => {
-    const timeout = setTimeout(async () => {
-      await Promise.all([
-        currentCompetitor.refetch(),
-        allRuns.refetch(),
-        runCount.refetch(),
-      ])
-    }, 1000 * 4)
-    return () => clearTimeout(timeout)
-  }, [currentCompetitor, allRuns, runCount])
-
-  const requestErrors = requestWrapper(currentCompetitor, allRuns, runCount)
-  if (requestErrors) return requestErrors
-
-  if (!allRuns.data) {
-    console.warn('A function was called that should not be called')
-    if (!allRuns.data) {
-      console.warn('Missing allRuns data')
-      return null
-    }
-  } // This will never be called, but it is needed to make typescript happy
-
+export const Display: FC<{
+  currentCompetitor: number
+  allRuns: CompetitorList
+  runCount: number
+}> = ({ currentCompetitor, allRuns, runCount }) => {
   // Sort classes in class order as per the index value
   // in the timing software
 
   let classes: { classIndex: number; class: string }[] = []
   let maxClassIndex = 0
 
-  allRuns.data.forEach((a) => {
+  allRuns.forEach((a) => {
     if (a.classIndex > maxClassIndex) {
       maxClassIndex = a.classIndex
     }
@@ -123,7 +100,7 @@ export const Display = () => {
 
   for (let i = 1; i < maxClassIndex + 1; i++) {
     let shouldSkip = false
-    allRuns.data.forEach((row) => {
+    allRuns.forEach((row) => {
       if (shouldSkip) {
         return
       }
@@ -136,14 +113,12 @@ export const Display = () => {
 
   const classesList = classes.map((carClass) => ({
     carClass,
-    drivers: allRuns.data.filter(
-      (data) => data.classIndex === carClass.classIndex
-    ),
+    drivers: allRuns.filter((data) => data.classIndex === carClass.classIndex),
   }))
 
   // If there are no runs, just print out competitors
 
-  if (!currentCompetitor.data || !runCount.data) {
+  if (!currentCompetitor || !runCount) {
     console.warn('Missing currentCompetitor or runCount data')
     let printClassesList = splitDisplay(classesList)
     if (printClassesList) {
@@ -174,7 +149,7 @@ export const Display = () => {
                     Math.min(...b.times.map((time) => time?.time || 10000000))
                 )}
                 keyKey={'number'}
-                runCount={runCount.data as number}
+                runCount={runCount as number}
               />
             </div>
           ))}
@@ -185,9 +160,7 @@ export const Display = () => {
     }
   } // This will never be called, but it is needed to make typescript happy
 
-  const currentRunArray = allRuns.data.filter(
-    (a) => a.number === currentCompetitor.data
-  )
+  const currentRunArray = allRuns.filter((a) => a.number === currentCompetitor)
   const currentRun = currentRunArray[0]
 
   // Calculate best times of day
@@ -224,7 +197,7 @@ export const Display = () => {
     bestFinishTimeOfTheDayJunior,
     bestFinishTimeOfTheDayJuniorName,
     bestFinishTimeOfTheDayJuniorCar,
-  } = RankTimes(currentRun, allRuns.data)
+  } = RankTimes(currentRun, allRuns)
 
   const renderInfos = () => {
     const idx = currentRun.times.length - 1
@@ -635,7 +608,7 @@ export const Display = () => {
                   Math.min(...b.times.map((time) => time?.time || 10000000))
               )}
               keyKey={'number'}
-              runCount={runCount.data as number}
+              runCount={runCount as number}
             />
           </div>
         ))}

@@ -4,7 +4,7 @@ import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
 import { useEffect } from 'react'
-import { RankTimes, TimeDeltas } from '../components/functions'
+import { RankTimes, TimeDeltas } from '../../../shared/logic/functions'
 import { CarCrash } from '@mui/icons-material'
 
 let displayInterval: any
