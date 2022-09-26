@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { CssBaseline } from '@mui/material'
 import { createReactQueryHooks } from '@trpc/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -17,13 +15,7 @@ import { config } from '.'
 import { Admin } from './pages/admin'
 import { TrackDisplay } from './pages/trackDisplay'
 import { Announcer } from './pages/announcer'
-
-// MUI theme is here so we can modify it later. Currently, it is just stock
-export const theme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-})
+import { Theme } from './shared/components/Theme'
 
 // The tRPC hook. Will be used to make requests to the server
 export const trpc = createReactQueryHooks<TRPCRouter>()
@@ -37,8 +29,7 @@ function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+        <Theme>
           <Router>
             <Routes>
               <Route path="/admin/" element={<Admin />} />
@@ -51,7 +42,7 @@ function App() {
               <Route path="/announcer" element={<Announcer />} />
             </Routes>
           </Router>
-        </ThemeProvider>
+        </Theme>
       </QueryClientProvider>
     </trpc.Provider>
   )

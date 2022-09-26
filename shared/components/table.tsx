@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import {
   Box,
-  Chip,
   Paper,
   Table as MUITable,
   TableBody,
@@ -10,10 +9,8 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2'
-import { Cancel, CarCrash, MeetingRoom } from '@mui/icons-material'
 
-type Optional<T> = T | undefined
+import { DNS, DNF, Disqualified, ClassRecord, Regular } from './table/index'
 
 type RunTime = {
   run: number
@@ -23,180 +20,63 @@ type RunTime = {
   split2: number
 }
 
-function ensureData(data: RunTime[]): Optional<RunTime>[] {
-  let max_run = Math.max(...data.map((data) => data.run), 0)
+function range(upperBound: number): number[] {
+  const range = []
+
+  for (let i = 0; i < upperBound; i++) {
+    range.push(i)
+  }
+
+  return range
+}
+
+function ensureData(data: RunTime[]): (RunTime | undefined)[] {
+  const max_run = Math.max(...data.map((data) => data.run), 0)
 
   if (max_run <= 0) return []
 
-  return Array.apply(null, Array(max_run)).map((_, index) =>
-    data.find((data) => data.run === index + 1)
-  )
+  const out = []
+
+  for (let index = 0; index < max_run; index++) {
+    out.push(data.find((data) => data.run === index + 1))
+  }
+
+  return out
 }
 
-const TimeTag: FC<{ run: RunTime; classRecord: number }> = ({
+const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
   run,
   classRecord,
 }) => {
-  let finishTime
-  let sector2
-  let sector1
-  let launch
+  if (run.status === 1) return <DNS />
 
-  let mainFontSize = '0.8rem'
-  let mainWidth = 80
+  const launch = (run.split1 / 1000).toFixed(2)
+  const sector1 = ((run.split2 - run.split1) / 1000).toFixed(2)
 
-  finishTime = (run.time / 1000).toFixed(2)
-  sector2 = ((run.time - run.split2) / 1000).toFixed(2)
-  sector1 = ((run.split2 - run.split1) / 1000).toFixed(2)
-  launch = (run.split1 / 1000).toFixed(2)
+  if (run.status === 2) return <DNF launch={launch} sector1={sector1} />
 
-  // if run did not start
-  if (run.status === 1) {
+  const finishTime = (run.time / 1000).toFixed(2)
+  const sector2 = ((run.time - run.split2) / 1000).toFixed(2)
+
+  if (run.status === 3) return <Disqualified />
+
+  if (run.status === 0 && run.time / 1000 < classRecord)
     return (
-      <Grid2
-        container
-        spacing={0.25}
-        sx={{
-          fontSize: mainFontSize,
-          width: mainWidth,
-        }}
-      >
-        <Grid2 xs={12} display="flex" justifyContent="left" alignItems="center">
-          <Chip
-            label="DNS"
-            variant="outlined"
-            color="info"
-            size="small"
-            icon={<MeetingRoom />}
-          />
-        </Grid2>
-      </Grid2>
+      <ClassRecord
+        launch={launch}
+        sector1={sector1}
+        sector2={sector2}
+        finishTime={finishTime}
+      />
     )
-  }
-
-  // if run DNF
-  if (run.status === 2) {
-    return (
-      <Grid2
-        container
-        spacing={0.25}
-        sx={{
-          fontSize: mainFontSize,
-          width: mainWidth,
-        }}
-      >
-        <Grid2
-          xs={12}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Chip
-            label="DNF"
-            variant="outlined"
-            color="error"
-            size="small"
-            icon={<CarCrash />}
-          />
-        </Grid2>
-        <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-          {launch}
-        </Grid2>
-        <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-          {sector1}
-        </Grid2>
-      </Grid2>
-    )
-  }
-
-  // if run disqualified
-  if (run.status === 3) {
-    return (
-      <Grid2
-        container
-        spacing={0.25}
-        sx={{
-          fontSize: mainFontSize,
-          width: mainWidth,
-        }}
-      >
-        <Grid2 xs={12} display="flex" justifyContent="left" alignItems="center">
-          <Chip
-            label="DSQ"
-            variant="outlined"
-            color="error"
-            size="small"
-            icon={<Cancel />}
-          />
-        </Grid2>
-      </Grid2>
-    )
-  }
-
-  if (run.status === 0 && run.time / 1000 < classRecord) {
-    return (
-      <Grid2
-        container
-        spacing={0.25}
-        sx={{
-          fontSize: mainFontSize,
-          width: mainWidth,
-        }}
-      >
-        <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-          {sector2}
-        </Grid2>
-        <Grid2
-          xs={6}
-          display="flex"
-          justifyContent="right"
-          alignItems="center"
-          border="1px"
-          color="gold"
-          sx={{ fontSize: '0.9rem', fontWeight: 700 }}
-        >
-          {finishTime}
-        </Grid2>
-        <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-          {launch}
-        </Grid2>
-        <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-          {sector1}
-        </Grid2>
-      </Grid2>
-    )
-  }
 
   return (
-    <Grid2
-      container
-      spacing={0.25}
-      sx={{
-        fontSize: mainFontSize,
-        width: mainWidth,
-      }}
-    >
-      <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-        {sector2}
-      </Grid2>
-      <Grid2
-        xs={6}
-        display="flex"
-        justifyContent="right"
-        alignItems="center"
-        border="1px"
-        color="primary.dark"
-        sx={{ fontSize: '0.9rem', fontWeight: 700 }}
-      >
-        {finishTime}
-      </Grid2>
-      <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-        {launch}
-      </Grid2>
-      <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-        {sector1}
-      </Grid2>
-    </Grid2>
+    <Regular
+      launch={launch}
+      sector1={sector1}
+      sector2={sector2}
+      finishTime={finishTime}
+    />
   )
 }
 
@@ -213,13 +93,14 @@ export const ResultsTable: FC<{
             <TableCell width={200} sx={{ fontSize: '0.8rem' }}>
               Competitor
             </TableCell>
-            {Array.apply(null, Array(runCount)).map((_, index) => (
+            {range(runCount).map((_, index) => (
               <TableCell key={index} sx={{ fontSize: '0.8rem' }}>
                 Run {index + 1}
               </TableCell>
             ))}
           </TableRow>
         </TableHead>
+
         <TableBody>
           {data.map((row) => (
             <TableRow key={row[keyKey]}>
@@ -293,7 +174,7 @@ export const ResultsTable: FC<{
                   <TableCell key={index}></TableCell>
                 ) : (
                   <TableCell key={index}>
-                    <TimeTag run={run} classRecord={row.classRecord} />
+                    <DataRowContents run={run} classRecord={row.classRecord} />
                   </TableCell>
                 )
               )}
