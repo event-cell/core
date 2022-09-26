@@ -7,9 +7,9 @@ import { CarCrash } from '@mui/icons-material'
 import { MAIN_FONT_SIZE, MAIN_WIDTH } from '.'
 
 export const DNF: FC<{
-  launch: string
   sector1: string
-}> = ({ launch, sector1 }) => (
+  sector2: string
+}> = ({ sector1, sector2 }) => (
   <Grid2
     container
     spacing={0.25}
@@ -28,10 +28,10 @@ export const DNF: FC<{
       />
     </Grid2>
     <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
-      {launch}
+      {sector1}
     </Grid2>
     <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
-      {sector1}
+      {sector2}
     </Grid2>
   </Grid2>
 )

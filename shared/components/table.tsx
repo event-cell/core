@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import {
   Box,
-  Chip,
   Paper,
   Table as MUITable,
   TableBody,
@@ -100,6 +99,7 @@ export const ResultsTable: FC<{
             ))}
           </TableRow>
         </TableHead>
+
         <TableBody>
           {data.map((row) => (
             <TableRow key={row[keyKey]}>
