@@ -3,7 +3,7 @@ import { router, TRPCError } from '@trpc/server'
 import { event, eventData } from './shared'
 import { z } from 'zod'
 
-export const currentcompetitor = router().query('number', {
+export const currentCompetitor = router().query('number', {
   output: z.number(),
   resolve: async function () {
     let lastStartQuery

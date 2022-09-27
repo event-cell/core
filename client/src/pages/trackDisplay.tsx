@@ -1,11 +1,11 @@
 import { Box, Container, Grid, Typography } from '@mui/material'
+import { CarCrash } from '@mui/icons-material'
+import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
-import { useEffect } from 'react'
-import { RankTimes, TimeDeltas } from '../components/functions'
-import { CarCrash } from '@mui/icons-material'
+import { RankTimes, TimeDeltas } from '../shared/logic/functions'
 
 let displayInterval: any
 
@@ -33,7 +33,7 @@ export const TrackDisplay = () => {
   )
   const currentRun = currentRunArray[0]
 
-  let {
+  const {
     sector1Colour,
     sector2Colour,
     sector3Colour,
@@ -61,11 +61,12 @@ export const TrackDisplay = () => {
 
   if (typeof times === 'undefined') return null
 
-  let {
+  const {
     sector1,
     sector2,
     sector3,
     finishTime,
+    // Why are we just ignoring eslint's warnings if these variables are unused?
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector1DeltaPB,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

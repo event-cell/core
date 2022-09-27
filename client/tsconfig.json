@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-  ]
+, "../shared/components/table.tsx", "../shared/components/functions.tsx", "../shared/components/requestWrapper.tsx"  ]
 }

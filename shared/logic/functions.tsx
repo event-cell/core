@@ -49,7 +49,7 @@ export function RankTimes(
   let sector3Colour = 'background.default'
   let finishColour = 'background.default'
 
-  let defaultBest = 9999999
+  const defaultBest = 9999999
 
   let bestSector1 = defaultBest
   let previousBestSector1 = defaultBest
@@ -269,19 +269,19 @@ export function TimeDeltas(
   bestFinishTime: number,
   previousBestFinishTime: number
 ) {
-  let sector1DeltaPB: number = 0
-  let sector1DeltaLeader: number = 0
-  let sector2DeltaPB: number = 0
-  let sector2DeltaLeader: number = 0
-  let sector3DeltaPB: number = 0
-  let sector3DeltaLeader: number = 0
-  let finishDeltaPB: number = 0
-  let finishDeltaLeader: number = 0
+  let sector1DeltaPB = 0
+  let sector1DeltaLeader = 0
+  let sector2DeltaPB = 0
+  let sector2DeltaLeader = 0
+  let sector3DeltaPB = 0
+  let sector3DeltaLeader = 0
+  let finishDeltaPB = 0
+  let finishDeltaLeader = 0
 
-  let sector1 = times.split1
-  let sector2 = times.split2 - times.split1
-  let sector3 = times.time - times.split2
-  let finishTime = times.time
+  const sector1 = times.split1
+  const sector2 = times.split2 - times.split1
+  const sector3 = times.time - times.split2
+  const finishTime = times.time
 
   if (times.split1 > 0) {
     if (sector1 === personalBestSector1) {

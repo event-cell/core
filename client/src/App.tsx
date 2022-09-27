@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { CssBaseline } from '@mui/material'
 import { createReactQueryHooks } from '@trpc/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -11,19 +9,13 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
-import { Display } from './pages/display'
+import { DisplayPage } from './pages/display'
 import { TRPCRouter } from 'server/src/router'
 import { config } from '.'
 import { Admin } from './pages/admin'
 import { TrackDisplay } from './pages/trackDisplay'
 import { Announcer } from './pages/announcer'
-
-// MUI theme is here so we can modify it later. Currently, it is just stock
-export const theme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-})
+import { Theme } from './shared/components/Theme'
 
 // The tRPC hook. Will be used to make requests to the server
 export const trpc = createReactQueryHooks<TRPCRouter>()
@@ -37,21 +29,20 @@ function App() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+        <Theme>
           <Router>
             <Routes>
               <Route path="/admin/" element={<Admin />} />
-              <Route path="/display/" element={<Display />} />
-              <Route path="/display/1" element={<Display />} />
-              <Route path="/display/2" element={<Display />} />
-              <Route path="/display/3" element={<Display />} />
-              <Route path="/display/4" element={<Display />} />
+              <Route path="/display/" element={<DisplayPage />} />
+              <Route path="/display/1" element={<DisplayPage />} />
+              <Route path="/display/2" element={<DisplayPage />} />
+              <Route path="/display/3" element={<DisplayPage />} />
+              <Route path="/display/4" element={<DisplayPage />} />
               <Route path="/trackdisplay" element={<TrackDisplay />} />
               <Route path="/announcer" element={<Announcer />} />
             </Routes>
           </Router>
-        </ThemeProvider>
+        </Theme>
       </QueryClientProvider>
     </trpc.Provider>
   )
