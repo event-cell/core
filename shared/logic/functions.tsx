@@ -2,7 +2,7 @@ import {
   Competitor,
   CompetitorList,
   TimeInfoManditory,
-} from 'server/src/router/objects'
+} from '../../../../server/src/router/objects'
 
 interface BestTimeProps {
   previousPersonalBestSector3: number
