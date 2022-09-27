@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "server",
-    "client"
+    "client",
+    "public"
   ],
   "scripts": {
     "server:dev": "cd server && yarn dev",
