@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { Theme } from '../shared/components/Theme'
+import { Theme } from '../src/shared/components/Theme'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
