@@ -4,7 +4,7 @@ import { Chip } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import { CarCrash } from '@mui/icons-material'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from '.'
+import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
 
 export const DNF: FC<{
   sector1: string

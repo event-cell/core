@@ -1,5 +1,5 @@
 import { CompetitorList } from '../../server/src/router/objects'
-import { Display } from '../shared/components/display'
+import { Display } from '../src/shared/components/display'
 
 const Home = ({
   data,

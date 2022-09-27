@@ -19,7 +19,7 @@ import { Timer } from '@mui/icons-material'
 
 import { RankTimes, TimeDeltas } from '../logic/functions'
 
-import { CompetitorList } from '../../../server/src/router/objects'
+import { CompetitorList } from '../../../../server/src/router/objects'
 import { DisplayHeader } from './display/header'
 import { Competitor } from 'server/src/router/objects'
 
