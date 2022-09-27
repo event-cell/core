@@ -32,14 +32,14 @@ function range(upperBound: number): number[] {
 }
 
 function ensureData(data: (RunTime | undefined)[]): (RunTime | undefined)[] {
-  const max_run = Math.max(...data.map((data) => data.run), 0)
+  const max_run = Math.max(...data.map((data) => data?.run || 0), 0)
 
   if (max_run <= 0) return []
 
   const out: (RunTime | undefined)[] = []
 
   for (let index = 0; index < max_run; index++) {
-    out.push(data.find((data) => data.run === index + 1))
+    out.push(data.find((data) => data?.run === index + 1))
   }
 
   return out
