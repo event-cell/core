@@ -21,7 +21,7 @@ import { RankTimes, TimeDeltas } from '../logic/functions'
 
 import { CompetitorList } from '../../../../server/src/router/objects'
 import { DisplayHeader } from './display/header'
-import { Competitor } from 'server/src/router/objects'
+import { Competitor } from '../../../../server/src/router/objects'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
