@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
 import { Display } from '../shared/components/display'
@@ -10,7 +10,7 @@ export const DisplayPage = () => {
   const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
-  console.log(JSON.stringify({ currentCompetitor, allRuns, runCount }))
+  // console.log(JSON.stringify({ currentCompetitor, allRuns, runCount }))
 
   useEffect(() => {
     const timeout = setTimeout(async () => {

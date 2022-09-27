@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Timer } from '@mui/icons-material'
 import {
   Box,

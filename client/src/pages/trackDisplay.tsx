@@ -1,11 +1,11 @@
 import { Box, Container, Grid, Typography } from '@mui/material'
+import { CarCrash } from '@mui/icons-material'
+import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
-import { useEffect } from 'react'
 import { RankTimes, TimeDeltas } from '../shared/logic/functions'
-import { CarCrash } from '@mui/icons-material'
 
 let displayInterval: any
 
