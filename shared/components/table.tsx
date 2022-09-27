@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import React, { FC } from 'react'
 import {
   Box,
   Paper,
@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 
 import { DNS, DNF, Disqualified, ClassRecord, Regular } from './table/index'
+import { Competitor } from '../../../../server/src/router/objects'
 
 type RunTime = {
   run: number
@@ -21,7 +22,7 @@ type RunTime = {
 }
 
 function range(upperBound: number): number[] {
-  const range = []
+  const range: number[] = []
 
   for (let i = 0; i < upperBound; i++) {
     range.push(i)
@@ -35,7 +36,7 @@ function ensureData(data: RunTime[]): (RunTime | undefined)[] {
 
   if (max_run <= 0) return []
 
-  const out = []
+  const out: (RunTime | undefined)[] = []
 
   for (let index = 0; index < max_run; index++) {
     out.push(data.find((data) => data.run === index + 1))
@@ -80,7 +81,7 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
 }
 
 export const ResultsTable: FC<{
-  data: Record<string, string | number | any>[]
+  data: Competitor[]
   keyKey: string
   runCount: number
 }> = ({ data, keyKey, runCount }) => {

@@ -19,9 +19,8 @@ import { Timer } from '@mui/icons-material'
 
 import { RankTimes, TimeDeltas } from '../logic/functions'
 
-import { CompetitorList } from '../../../../server/src/router/objects'
+import { CompetitorList, Competitor } from '../../../../server/src/router/objects'
 import { DisplayHeader } from './display/header'
-import { Competitor } from '../../../../server/src/router/objects'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -30,7 +29,7 @@ const PrimaryPaper = styled(Paper)(({ theme }) => ({
 }))
 
 interface ClassType {
-  drivers: any
+  drivers: CompetitorList
   carClass: { classIndex: number; class: string }
 }
 
@@ -59,10 +58,10 @@ function splitDisplay(classesList: ClassType[]) {
   )
     return classesList
 
-  const classesListScreen01: { carClass: any; drivers: any }[] = []
-  const classesListScreen02: { carClass: any; drivers: any }[] = []
-  const classesListScreen03: { carClass: any; drivers: any }[] = []
-  const classesListScreen04: { carClass: any; drivers: any }[] = []
+  const classesListScreen01: ClassType[] = []
+  const classesListScreen02: ClassType[] = []
+  const classesListScreen03: ClassType[] = []
+  const classesListScreen04: ClassType[] = []
 
   let screenLength = 0
   const targetScreenLength = 24
@@ -160,7 +159,7 @@ export const Display: FC<{
               </Typography>
               <ResultsTable
                 data={eventClass.drivers.sort(
-                  (a: { times: any[] }, b: { times: any[] }) =>
+                  (a, b) =>
                     Math.min(...a.times.map((time) => time?.time || 10000000)) -
                     Math.min(...b.times.map((time) => time?.time || 10000000))
                 )}
@@ -223,7 +222,7 @@ export const Display: FC<{
             </Typography>
             <ResultsTable
               data={eventClass.drivers.sort(
-                (a: { times: any[] }, b: { times: any[] }) =>
+                (a, b) =>
                   Math.min(...a.times.map((time) => time?.time || 10000000)) -
                   Math.min(...b.times.map((time) => time?.time || 10000000))
               )}

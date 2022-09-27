@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React from 'react'
 
 import { Chip } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2'

@@ -10,6 +10,7 @@ export const theme = createTheme({
   },
 })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Theme: FC<Record<string, any>> = ({ children }) => (
   <ThemeProvider theme={theme}>
     <>
