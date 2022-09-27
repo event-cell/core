@@ -31,7 +31,7 @@ function range(upperBound: number): number[] {
   return range
 }
 
-function ensureData(data: RunTime[]): (RunTime | undefined)[] {
+function ensureData(data: (RunTime | undefined)[]): (RunTime | undefined)[] {
   const max_run = Math.max(...data.map((data) => data.run), 0)
 
   if (max_run <= 0) return []
@@ -102,7 +102,7 @@ export const ResultsTable: FC<{
         </TableHead>
 
         <TableBody>
-          {data.map((row) => (
+          {data.map((row: Competitor) => (
             <TableRow key={row[keyKey]}>
               <TableCell width={240}>
                 <Box
@@ -122,7 +122,7 @@ export const ResultsTable: FC<{
                       gridColumn: '1',
                     }}
                   >
-                    {row['number']}
+                    {row.number}
                   </Box>
                   <Box
                     sx={{
@@ -132,9 +132,9 @@ export const ResultsTable: FC<{
                       gridColumn: '2/5',
                     }}
                   >
-                    {row['firstName']} {row['lastName']}
+                    {row.firstName} {row.lastName}
                   </Box>
-                  {row['special'] ? (
+                  {row.special ? (
                     <Box
                       sx={{
                         border: '1px solid',
@@ -148,7 +148,7 @@ export const ResultsTable: FC<{
                         gridColumn: '1',
                       }}
                     >
-                      {row['special']}
+                      {row.special}
                     </Box>
                   ) : null}
 
@@ -160,21 +160,24 @@ export const ResultsTable: FC<{
                       gridColumn: '2/5',
                     }}
                   >
-                    {row['vehicle']}
+                    {row.vehicle}
                   </Box>
                 </Box>
               </TableCell>
 
               {ensureData(
-                row['times'].filter(
-                  (time: RunTime) => time.time !== 0 || time.status !== 0
+                row.times.filter(
+                  (time) => time?.time !== 0 || time?.status !== 0
                 )
               ).map((run, index) =>
                 !run ? (
                   <TableCell key={index}></TableCell>
                 ) : (
                   <TableCell key={index}>
-                    <DataRowContents run={run} classRecord={row.classRecord} />
+                    <DataRowContents
+                      run={run}
+                      classRecord={Number(row.classRecord)}
+                    />
                   </TableCell>
                 )
               )}
