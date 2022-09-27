@@ -66,6 +66,7 @@ export const TrackDisplay = () => {
     sector2,
     sector3,
     finishTime,
+    // Why are we just ignoring eslint's warnings if these variables are unused?
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     sector1DeltaPB,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
