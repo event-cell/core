@@ -5,12 +5,17 @@ import { Display } from '../shared/components/display'
 
 import { requestWrapper } from '../components/requestWrapper'
 
+let index = 1
+
 export const DisplayPage = () => {
   const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
   const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
   // console.log(JSON.stringify({ currentCompetitor, allRuns, runCount }))
+  console.log('-----> START <------')
+  console.time(`Render ${index}`)
+  performance.mark(`Render Start ${index}`)
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
@@ -41,11 +46,17 @@ export const DisplayPage = () => {
     return null
   }
 
-  return (
+  const ret = (
     <Display
       currentCompetitor={currentCompetitor.data}
       allRuns={allRuns.data}
       runCount={runCount.data}
     />
   )
+
+  console.timeEnd(`Render ${index}`)
+  performance.mark(`Render end ${index}`)
+  index += 1
+
+  return ret
 }

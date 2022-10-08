@@ -12,14 +12,17 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import React, { FC } from 'react'
+import React, { FC, useMemo } from 'react'
 
 import { ResultsTable } from './table'
 import { Timer } from '@mui/icons-material'
 
 import { RankTimes, TimeDeltas } from '../logic/functions'
 
-import { CompetitorList, Competitor } from '../../../../server/src/router/objects'
+import {
+  Competitor,
+  CompetitorList,
+} from '../../../../server/src/router/objects'
 import { DisplayHeader } from './display/header'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
@@ -126,16 +129,29 @@ export const Display: FC<{
     })
   }
 
-  const classesList = classes.map((carClass) => ({
-    carClass,
-    drivers: allRuns.filter((data) => data.classIndex === carClass.classIndex),
-  }))
+  const printClassesList = useMemo(() => {
+    const classesList = classes.map((carClass) => ({
+      carClass,
+      drivers: allRuns
+        .filter((data) => data.classIndex === carClass.classIndex)
+        .sort(
+          (a, b) =>
+            Math.min(...a.times.map((time) => time?.time || 10000000)) -
+            Math.min(...b.times.map((time) => time?.time || 10000000))
+        ),
+    }))
+
+    const displayContent = splitDisplay(classesList)
+
+    if (!displayContent) return
+
+    return displayContent
+  }, [classes])
 
   // If there are no runs, just print out competitors
 
   if (!currentCompetitor || !runCount) {
     console.warn('Missing currentCompetitor or runCount data')
-    const printClassesList = splitDisplay(classesList)
     if (printClassesList) {
       return (
         <Container>
@@ -158,11 +174,7 @@ export const Display: FC<{
                 />
               </Typography>
               <ResultsTable
-                data={eventClass.drivers.sort(
-                  (a, b) =>
-                    Math.min(...a.times.map((time) => time?.time || 10000000)) -
-                    Math.min(...b.times.map((time) => time?.time || 10000000))
-                )}
+                data={eventClass.drivers}
                 keyKey={'number'}
                 runCount={runCount as number}
               />
@@ -178,7 +190,6 @@ export const Display: FC<{
   const currentRunArray = allRuns.filter((a) => a.number === currentCompetitor)
   const currentRun = currentRunArray[0]
 
-  const printClassesList = splitDisplay(classesList)
   const displayNumber = getDisplayNumber()
 
   if (printClassesList) {
