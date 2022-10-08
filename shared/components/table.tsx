@@ -10,8 +10,8 @@ import {
   TableRow,
 } from '@mui/material'
 
-import { DNS, DNF, Disqualified, ClassRecord, Regular } from './table/index'
-import { Competitor } from '../../../../server/src/router/objects'
+import { ClassRecord, Disqualified, DNF, DNS, Regular } from './table/index'
+import { Competitor } from '../../server/src/router/objects'
 
 type RunTime = {
   run: number
@@ -82,7 +82,7 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
 
 export const ResultsTable: FC<{
   data: Competitor[]
-  keyKey: string
+  keyKey: keyof Competitor
   runCount: number
 }> = ({ data, keyKey, runCount }) => {
   return (
@@ -103,7 +103,7 @@ export const ResultsTable: FC<{
 
         <TableBody>
           {data.map((row: Competitor) => (
-            <TableRow key={row[keyKey]}>
+            <TableRow key={row.number}>
               <TableCell width={240}>
                 <Box
                   sx={{
