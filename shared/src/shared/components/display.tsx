@@ -154,7 +154,7 @@ export const Display: FC<{
   //console.log(runCount)
   //console.log(currentCompetitor)
 
-  if (!currentCompetitor) {
+  if (currentCompetitor === 99999 || runCount === 99999 ) {
     console.warn('Missing currentCompetitor or runCount data')
     if (printClassesList) {
       return (
