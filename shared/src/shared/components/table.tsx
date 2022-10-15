@@ -147,7 +147,7 @@ export const ResultsTable: FC<{
                         gridColumn: '1',
                       }}
                     >
-                      {row.special}
+                      {row.special.replace(/female/gim, 'Lady')}
                     </Box>
                   ) : null}
 
