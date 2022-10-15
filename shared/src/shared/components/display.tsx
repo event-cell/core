@@ -19,7 +19,10 @@ import { Timer } from '@mui/icons-material'
 
 import { RankTimes, TimeDeltas } from '../logic/functions'
 
-import { Competitor, CompetitorList } from '../../server/src/router/objects'
+import {
+  Competitor,
+  CompetitorList,
+} from '../../../../server/src/router/objects'
 import { DisplayHeader } from './display/header'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({

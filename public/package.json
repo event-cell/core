@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "setup": "rm -rf src/shared && mkdir -p src && cp -r ../shared src/shared",
+    "setup": "rm -rf src/shared && mkdir -p src && cp -r ../shared/src/shared src/shared",
     "dev": "yarn setup && next dev",
     "build": "yarn setup && next build",
     "start": "yarn setup && next start",

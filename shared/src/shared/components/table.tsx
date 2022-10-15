@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 
 import { ClassRecord, Disqualified, DNF, DNS, Regular } from './table/index'
-import { Competitor } from '../../server/src/router/objects'
+import { Competitor } from '../../../../server/src/router/objects'
 
 type RunTime = {
   run: number
