@@ -82,9 +82,8 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
 
 export const ResultsTable: FC<{
   data: Competitor[]
-  keyKey: keyof Competitor
   runCount: number
-}> = ({ data, keyKey, runCount }) => {
+}> = ({ data, runCount }) => {
   return (
     <TableContainer component={Paper}>
       <MUITable sx={{ minWidth: 640 }} size="small">

@@ -4,7 +4,7 @@ import { UseQueryResult } from 'react-query'
 import React from 'react'
 
 export function requestWrapper(
-  ...requests: UseQueryResult<unknown, TRPCClientErrorLike<any>>[]
+  ...requests: UseQueryResult<unknown, TRPCClientErrorLike<never>>[]
 ) {
   for (const request of requests) {
     if (request.error) {

@@ -145,7 +145,7 @@ export const Announcer = () => {
         />
         <ResultsTable
           data={eventClass.drivers.sort(
-            (a: { times: any[] }, b: { times: any[] }) =>
+            (a, b) =>
               Math.min(...a.times.map((time) => time?.time || 10000000)) -
               Math.min(...b.times.map((time) => time?.time || 10000000))
           )}

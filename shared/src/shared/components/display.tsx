@@ -175,7 +175,6 @@ export const Display: FC<{
               </Typography>
               <ResultsTable
                 data={eventClass.drivers}
-                keyKey={'number'}
                 runCount={runCount as number}
               />
             </div>
@@ -237,7 +236,6 @@ export const Display: FC<{
                   Math.min(...a.times.map((time) => time?.time || 10000000)) -
                   Math.min(...b.times.map((time) => time?.time || 10000000))
               )}
-              keyKey={'number'}
               runCount={runCount as number}
             />
           </div>

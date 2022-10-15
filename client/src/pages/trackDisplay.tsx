@@ -7,7 +7,7 @@ import { trpc } from '../App'
 import { requestWrapper } from '../components/requestWrapper'
 import { RankTimes, TimeDeltas } from '../shared/logic/functions'
 
-let displayInterval: any
+let displayInterval: NodeJS.Timeout
 
 export const TrackDisplay = () => {
   const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])

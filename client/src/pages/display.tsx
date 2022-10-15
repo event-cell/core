@@ -5,8 +5,6 @@ import { Display } from '../shared/components/display'
 
 import { requestWrapper } from '../components/requestWrapper'
 
-const index = 1
-
 export const DisplayPage = () => {
   const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
   const allRuns = trpc.useQuery(['competitors.list'])
@@ -48,6 +46,6 @@ export const DisplayPage = () => {
       runCount={runCount.data}
     />
   )
-  
+
   return ret
 }
