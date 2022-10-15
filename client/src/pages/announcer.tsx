@@ -44,7 +44,7 @@ export const Announcer = () => {
         allRuns.refetch(),
         runCount.refetch(),
       ])
-    }, 1000 * 4)
+    }, 1000 * 2)
     return () => clearTimeout(timeout)
   }, [currentCompetitor, allRuns, runCount])
 
