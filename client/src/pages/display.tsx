@@ -31,12 +31,12 @@ export const DisplayPage = () => {
 
   if (!currentCompetitor.data) {
     console.warn('Missing currentCompetitor data')
-    return null
+    //return null
   }
 
   if (!runCount.data) {
     console.warn('Missing runCount data')
-    return null
+    //return null
   }
 
   const ret = (
