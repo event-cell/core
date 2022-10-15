@@ -150,6 +150,10 @@ export const Display: FC<{
 
   // If there are no runs, just print out competitors
 
+  
+  console.log(runCount)
+  console.log(currentCompetitor)
+
   if (!currentCompetitor || !runCount) {
     console.warn('Missing currentCompetitor or runCount data')
     if (printClassesList) {
