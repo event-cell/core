@@ -149,7 +149,6 @@ export const Announcer = () => {
               Math.min(...a.times.map((time) => time?.time || 10000000)) -
               Math.min(...b.times.map((time) => time?.time || 10000000))
           )}
-          keyKey={'number'}
           runCount={runCount.data as number}
         />
       </Box>
