@@ -18,7 +18,7 @@ export const TrackDisplay = () => {
     displayInterval = setTimeout(() => {
       currentCompetitor.refetch()
       allRuns.refetch()
-    }, 1000 * 4)
+    }, 1000 * 2)
   }, [currentCompetitor, allRuns])
 
   const requestErrors = requestWrapper(currentCompetitor, allRuns)
@@ -103,12 +103,27 @@ export const TrackDisplay = () => {
     previousBestFinishTime
   )
 
+  let finalFinishColour: string
+  if (
+    sector1Colour !== 'background.default' &&
+    sector2Colour === 'background.default' &&
+    sector3Colour === 'background.default'
+  ) {
+    finalFinishColour = sector1Colour
+  } else if (
+    sector1Colour !== 'background.default' &&
+    sector2Colour !== 'background.default' &&
+    sector3Colour === 'background.default'
+  ) {
+    finalFinishColour = sector2Colour
+  } else {
+    finalFinishColour = finishColour
+  }
+
   // Render functions
   const renderTime = () => {
     const idx = currentRun.times.length - 1
     const times = currentRun.times[idx]
-
-    console.log(sector1, sector2, sector3, finishTime)
 
     if (typeof times !== 'undefined') {
       if (times.status === 2) {
@@ -236,7 +251,7 @@ export const TrackDisplay = () => {
           <Grid item xs={12}>
             <Box
               sx={{ height: 72, borderRadius: '4px', display: 'block' }}
-              bgcolor={finishColour}
+              bgcolor={finalFinishColour}
             />
           </Grid>
           <Grid item xs={12}>

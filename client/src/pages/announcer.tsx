@@ -194,209 +194,219 @@ export const Announcer = () => {
       )
 
       return (
-        <PrimaryPaper>
-          <MUITable sx={{ minWidth: 200 }} size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell width={2}></TableCell>
-                <TableCell width={1}></TableCell>
-                <TableCell width={2}>Time</TableCell>
-                <TableCell width={2}>&Delta; PB</TableCell>
-                <TableCell width={2}>&Delta; #1</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>Sector 1</TableCell>
-                <TableCell>
-                  <Box
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: sector1Colour,
-                      borderRadius: '4px',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  {sector1 !== 0
-                    ? sector1 > 0
-                      ? (sector1 / 1000).toFixed(2)
-                      : ''
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {sector1 !== 0 &&
-                  personalBestSector1 !== defaultBest &&
-                  personalBestSector1 - defaultBest !== sector1DeltaPB
-                    ? sector1DeltaPB > 0
-                      ? '+' + (sector1DeltaPB / 1000).toFixed(2)
-                      : (sector1DeltaPB / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {sector1 !== 0 &&
-                  bestSector1 !== defaultBest &&
-                  bestSector1 - defaultBest !== sector1DeltaLeader
-                    ? sector1DeltaLeader > 0
-                      ? '+' + (sector1DeltaLeader / 1000).toFixed(2)
-                      : (sector1DeltaLeader / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Sector 2</TableCell>
-                <TableCell>
-                  <Box
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: sector2Colour,
-                      borderRadius: '4px',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  {sector2 > 0
-                    ? sector2 > 0
-                      ? (sector2 / 1000).toFixed(2)
-                      : ''
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {sector2 > 0 &&
-                  personalBestSector2 !== defaultBest &&
-                  personalBestSector2 - defaultBest !== sector2DeltaPB
-                    ? sector2DeltaPB > 0
-                      ? '+' + (sector2DeltaPB / 1000).toFixed(2)
-                      : (sector2DeltaPB / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {sector2 > 0 &&
-                  bestSector2 !== defaultBest &&
-                  bestSector2 - defaultBest !== sector2DeltaLeader
-                    ? sector2DeltaLeader > 0
-                      ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
-                      : (sector2DeltaLeader / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Sector 3</TableCell>
-                <TableCell>
-                  <Box
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: sector3Colour,
-                      borderRadius: '4px',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  {sector3 > 0
-                    ? sector3 > 0
-                      ? (sector3 / 1000).toFixed(2)
-                      : ''
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {sector3 > 0 &&
-                  sector3DeltaPB !== 0 &&
-                  personalBestSector3 !== defaultBest &&
-                  personalBestSector3 - defaultBest !== sector3DeltaPB
-                    ? sector3DeltaPB > 0
-                      ? '+' + (sector3DeltaPB / 1000).toFixed(2)
-                      : (sector3DeltaPB / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {sector3 > 0 &&
-                  sector3DeltaLeader !== 0 &&
-                  bestSector3 !== defaultBest &&
-                  bestSector3 - defaultBest !== sector3DeltaLeader
-                    ? sector3DeltaLeader > 0
-                      ? '+' + (sector3DeltaLeader / 1000).toFixed(2)
-                      : (sector3DeltaLeader / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Finish Time</TableCell>
-                <TableCell>
-                  <Box
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      backgroundColor: finishColour,
-                      borderRadius: '4px',
-                    }}
-                  />
-                </TableCell>
-                <TableCell>
-                  {finishTime > 0
-                    ? finishTime > 0
-                      ? (finishTime / 1000).toFixed(2)
-                      : ''
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {finishTime > 0 &&
-                  finishDeltaPB !== 0 &&
-                  personalBestFinishTime !== defaultBest &&
-                  personalBestFinishTime - defaultBest !== finishDeltaPB
-                    ? finishDeltaPB > 0
-                      ? '+' + (finishDeltaPB / 1000).toFixed(2)
-                      : (finishDeltaPB / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {finishTime > 0 &&
-                  finishDeltaLeader !== 0 &&
-                  bestFinishTime !== defaultBest &&
-                  bestFinishTime - defaultBest !== finishDeltaLeader
-                    ? finishDeltaLeader > 0
-                      ? '+' + (finishDeltaLeader / 1000).toFixed(2)
-                      : (finishDeltaLeader / 1000).toFixed(2)
-                    : ''}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </MUITable>
-          <p />
+        <Grid>
           <Grid>
-            Fastest finish times for the day
-            <br />
-            {bestFinishTimeOfTheDayName !== ''
-              ? 'Outright: ' +
-                (bestFinishTimeOfTheDay / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayName +
-                ' in the ' +
-                bestFinishTimeOfTheDayCar
-              : ''}
-            <br />
-            {bestFinishTimeOfTheDayLadyName !== ''
-              ? 'Lady: ' +
-                (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayLadyName +
-                ' in the ' +
-                bestFinishTimeOfTheDayLadyCar
-              : ''}
-            <br />
-            {bestFinishTimeOfTheDayJuniorName !== ''
-              ? 'Junior: ' +
-                (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayJuniorName +
-                ' in the ' +
-                bestFinishTimeOfTheDayJuniorCar
-              : ''}
-            <br />
+            <PrimaryPaper>
+              <MUITable sx={{ minWidth: 200 }} size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell width={2}></TableCell>
+                    <TableCell width={1}></TableCell>
+                    <TableCell width={2}>Time</TableCell>
+                    <TableCell width={2}>&Delta; PB today</TableCell>
+                    <TableCell width={2}>&Delta; #1 in class</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>Sector 1</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: sector1Colour,
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {sector1 !== 0
+                        ? sector1 > 0
+                          ? (sector1 / 1000).toFixed(2)
+                          : ''
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {sector1 !== 0 &&
+                      personalBestSector1 !== defaultBest &&
+                      personalBestSector1 - defaultBest !== sector1DeltaPB
+                        ? sector1DeltaPB > 0
+                          ? '+' + (sector1DeltaPB / 1000).toFixed(2)
+                          : (sector1DeltaPB / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {sector1 !== 0 &&
+                      bestSector1 !== defaultBest &&
+                      bestSector1 - defaultBest !== sector1DeltaLeader
+                        ? sector1DeltaLeader > 0
+                          ? '+' + (sector1DeltaLeader / 1000).toFixed(2)
+                          : (sector1DeltaLeader / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Sector 2</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: sector2Colour,
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {sector2 > 0
+                        ? sector2 > 0
+                          ? (sector2 / 1000).toFixed(2)
+                          : ''
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {sector2 > 0 &&
+                      personalBestSector2 !== defaultBest &&
+                      personalBestSector2 - defaultBest !== sector2DeltaPB
+                        ? sector2DeltaPB > 0
+                          ? '+' + (sector2DeltaPB / 1000).toFixed(2)
+                          : (sector2DeltaPB / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {sector2 > 0 &&
+                      bestSector2 !== defaultBest &&
+                      bestSector2 - defaultBest !== sector2DeltaLeader
+                        ? sector2DeltaLeader > 0
+                          ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
+                          : (sector2DeltaLeader / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Sector 3</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: sector3Colour,
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {sector3 > 0
+                        ? sector3 > 0
+                          ? (sector3 / 1000).toFixed(2)
+                          : ''
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {sector3 > 0 &&
+                      sector3DeltaPB !== 0 &&
+                      personalBestSector3 !== defaultBest &&
+                      personalBestSector3 - defaultBest !== sector3DeltaPB
+                        ? sector3DeltaPB > 0
+                          ? '+' + (sector3DeltaPB / 1000).toFixed(2)
+                          : (sector3DeltaPB / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {sector3 > 0 &&
+                      sector3DeltaLeader !== 0 &&
+                      bestSector3 !== defaultBest &&
+                      bestSector3 - defaultBest !== sector3DeltaLeader
+                        ? sector3DeltaLeader > 0
+                          ? '+' + (sector3DeltaLeader / 1000).toFixed(2)
+                          : (sector3DeltaLeader / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>Finish Time</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: finishColour,
+                          borderRadius: '4px',
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {finishTime > 0
+                        ? finishTime > 0
+                          ? (finishTime / 1000).toFixed(2)
+                          : ''
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {finishTime > 0 &&
+                      finishDeltaPB !== 0 &&
+                      personalBestFinishTime !== defaultBest &&
+                      personalBestFinishTime - defaultBest !== finishDeltaPB
+                        ? finishDeltaPB > 0
+                          ? '+' + (finishDeltaPB / 1000).toFixed(2)
+                          : (finishDeltaPB / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                    <TableCell>
+                      {finishTime > 0 &&
+                      finishDeltaLeader !== 0 &&
+                      bestFinishTime !== defaultBest &&
+                      bestFinishTime - defaultBest !== finishDeltaLeader
+                        ? finishDeltaLeader > 0
+                          ? '+' + (finishDeltaLeader / 1000).toFixed(2)
+                          : (finishDeltaLeader / 1000).toFixed(2)
+                        : ''}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </MUITable>
+            </PrimaryPaper>
           </Grid>
-        </PrimaryPaper>
+          <Grid
+            sx={{
+              height: 12,
+            }}
+          ></Grid>
+          <PrimaryPaper>
+            <Grid>
+              Fastest finish times for the day
+              <br />
+              {bestFinishTimeOfTheDayName !== ''
+                ? 'Outright: ' +
+                  (bestFinishTimeOfTheDay / 1000).toFixed(2) +
+                  ' by ' +
+                  bestFinishTimeOfTheDayName +
+                  ' in the ' +
+                  bestFinishTimeOfTheDayCar
+                : ''}
+              <br />
+              {bestFinishTimeOfTheDayLadyName !== ''
+                ? 'Lady: ' +
+                  (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
+                  ' by ' +
+                  bestFinishTimeOfTheDayLadyName +
+                  ' in the ' +
+                  bestFinishTimeOfTheDayLadyCar
+                : ''}
+              <br />
+              {bestFinishTimeOfTheDayJuniorName !== ''
+                ? 'Junior: ' +
+                  (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
+                  ' by ' +
+                  bestFinishTimeOfTheDayJuniorName +
+                  ' in the ' +
+                  bestFinishTimeOfTheDayJuniorCar
+                : ''}
+              <br />
+            </Grid>
+          </PrimaryPaper>
+        </Grid>
       )
     }
   }

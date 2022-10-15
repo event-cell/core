@@ -264,7 +264,6 @@ export const Display: FC<{
                 {currentRun.class}
               </PrimaryPaper>
             </Grid>
-
             <Grid item xs={4}>
               <RenderInfo currentRun={currentRun} allRuns={allRuns} />
             </Grid>
@@ -279,7 +278,6 @@ export const Display: FC<{
   }
 }
 
-const tableFontSizeSml = '1rem'
 const tableFontSizeMid = '1.2rem'
 const tableFontSizeLarge = '1.4rem'
 const blockSize = 30
@@ -417,104 +415,114 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
   )
 
   return (
-    <PrimaryPaper>
-      <MUITable sx={{ minWidth: 200 }} size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell width={2}></TableCell>
-            <TableCell width={1}></TableCell>
-            <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
-              Time
-            </TableCell>
-            <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
-              &Delta; PB
-            </TableCell>
-            <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
-              &Delta; #1
-            </TableCell>
-          </TableRow>
-        </TableHead>
+    <Grid>
+      <Grid>
+        <PrimaryPaper>
+          <MUITable sx={{ minWidth: 200 }} size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell width={2}></TableCell>
+                <TableCell width={1}></TableCell>
+                <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
+                  Time
+                </TableCell>
+                <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
+                  &Delta; PB today
+                </TableCell>
+                <TableCell width={2} sx={{ fontSize: tableFontSizeMid }}>
+                  &Delta; #1 in class
+                </TableCell>
+              </TableRow>
+            </TableHead>
 
-        <TableBody>
-          <RenderSector
-            sectorName={'Sector 1'}
-            time={sector1}
-            deltaPB={sector1DeltaPB}
-            deltaLeader={sector1DeltaLeader}
-            sectorPB={personalBestSector1}
-            bestSector={bestSector1}
-            sectorColor={sector1Colour}
-            defaultBest={defaultBest}
-          />
+            <TableBody>
+              <RenderSector
+                sectorName={'Sector 1'}
+                time={sector1}
+                deltaPB={sector1DeltaPB}
+                deltaLeader={sector1DeltaLeader}
+                sectorPB={personalBestSector1}
+                bestSector={bestSector1}
+                sectorColor={sector1Colour}
+                defaultBest={defaultBest}
+              />
 
-          <RenderSector
-            sectorName={'Sector 2'}
-            time={sector2}
-            deltaPB={sector2DeltaPB}
-            deltaLeader={sector2DeltaLeader}
-            sectorPB={personalBestSector2}
-            bestSector={bestSector2}
-            sectorColor={sector2Colour}
-            defaultBest={defaultBest}
-          />
+              <RenderSector
+                sectorName={'Sector 2'}
+                time={sector2}
+                deltaPB={sector2DeltaPB}
+                deltaLeader={sector2DeltaLeader}
+                sectorPB={personalBestSector2}
+                bestSector={bestSector2}
+                sectorColor={sector2Colour}
+                defaultBest={defaultBest}
+              />
 
-          <RenderSector
-            sectorName={'Sector 3'}
-            time={sector3}
-            deltaPB={sector3DeltaPB}
-            deltaLeader={sector3DeltaLeader}
-            sectorPB={personalBestSector3}
-            bestSector={bestSector3}
-            sectorColor={sector3Colour}
-            defaultBest={defaultBest}
-          />
+              <RenderSector
+                sectorName={'Sector 3'}
+                time={sector3}
+                deltaPB={sector3DeltaPB}
+                deltaLeader={sector3DeltaLeader}
+                sectorPB={personalBestSector3}
+                bestSector={bestSector3}
+                sectorColor={sector3Colour}
+                defaultBest={defaultBest}
+              />
 
-          <RenderSector
-            sectorName={'Finish'}
-            time={finishTime}
-            deltaPB={finishDeltaPB}
-            deltaLeader={finishDeltaLeader}
-            sectorPB={personalBestFinishTime}
-            bestSector={bestFinishTime}
-            sectorColor={finishColour}
-            defaultBest={defaultBest}
-          />
-        </TableBody>
-      </MUITable>
-
-      <p />
-
-      <Grid sx={{ fontSize: tableFontSizeSml }}>
-        Fastest finish times for the day
-        <br />
-        {bestFinishTimeOfTheDayName !== ''
-          ? 'Outright: ' +
-            (bestFinishTimeOfTheDay / 1000).toFixed(2) +
-            ' by ' +
-            bestFinishTimeOfTheDayName +
-            ' in the ' +
-            bestFinishTimeOfTheDayCar
-          : ''}
-        <br />
-        {bestFinishTimeOfTheDayLadyName !== ''
-          ? 'Lady: ' +
-            (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
-            ' by ' +
-            bestFinishTimeOfTheDayLadyName +
-            ' in the ' +
-            bestFinishTimeOfTheDayLadyCar
-          : ''}
-        <br />
-        {bestFinishTimeOfTheDayJuniorName !== ''
-          ? 'Junior: ' +
-            (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
-            ' by ' +
-            bestFinishTimeOfTheDayJuniorName +
-            ' in the ' +
-            bestFinishTimeOfTheDayJuniorCar
-          : ''}
-        <br />
+              <RenderSector
+                sectorName={'Finish'}
+                time={finishTime}
+                deltaPB={finishDeltaPB}
+                deltaLeader={finishDeltaLeader}
+                sectorPB={personalBestFinishTime}
+                bestSector={bestFinishTime}
+                sectorColor={finishColour}
+                defaultBest={defaultBest}
+              />
+            </TableBody>
+          </MUITable>
+        </PrimaryPaper>
       </Grid>
-    </PrimaryPaper>
+      <Grid
+        sx={{
+          height: 6,
+        }}
+      ></Grid>
+      <Grid>
+        <PrimaryPaper>
+          <Grid sx={{ fontSize: tableFontSizeLarge }}>
+            Fastest finish times for the day
+            <br />
+            {bestFinishTimeOfTheDayName !== ''
+              ? 'Outright: ' +
+                (bestFinishTimeOfTheDay / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayName +
+                ' in the ' +
+                bestFinishTimeOfTheDayCar
+              : ''}
+            <br />
+            {bestFinishTimeOfTheDayLadyName !== ''
+              ? 'Lady: ' +
+                (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayLadyName +
+                ' in the ' +
+                bestFinishTimeOfTheDayLadyCar
+              : ''}
+            <br />
+            {bestFinishTimeOfTheDayJuniorName !== ''
+              ? 'Junior: ' +
+                (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
+                ' by ' +
+                bestFinishTimeOfTheDayJuniorName +
+                ' in the ' +
+                bestFinishTimeOfTheDayJuniorCar
+              : ''}
+            <br />
+          </Grid>
+        </PrimaryPaper>
+      </Grid>
+    </Grid>
   )
 }

@@ -27,8 +27,11 @@ export const ClassRecord: FC<{
       justifyContent="right"
       alignItems="center"
       border="1px"
-      color="gold"
-      sx={{ fontSize: '0.9rem', fontWeight: 700 }}
+      color="darkorange"
+      sx={{
+        fontSize: '0.9rem',
+        fontWeight: 700,
+      }}
     >
       {finishTime}
     </Grid2>
