@@ -10,6 +10,12 @@ export const DisplayPage = () => {
   const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
+  let displayRefresh = 15
+
+  if (window.location.pathname === '/display/4') {
+    displayRefresh = 5
+  }
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await Promise.all([
@@ -17,7 +23,7 @@ export const DisplayPage = () => {
         allRuns.refetch(),
         runCount.refetch(),
       ])
-    }, 1000 * 4)
+    }, 1000 * displayRefresh)
     return () => clearTimeout(timeout)
   }, [currentCompetitor, allRuns, runCount])
 
