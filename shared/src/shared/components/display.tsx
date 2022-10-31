@@ -315,10 +315,10 @@ function RenderSector({
         />
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-        {time !== 0 ? (time > 0 ? (time / 1000).toFixed(2) : '') : ''}
+        {time > 0 ? (time > 0 ? (time / 1000).toFixed(2) : '') : ''}
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-        {time !== 0 &&
+        {time > 0 &&
         sectorPB !== defaultBest &&
         sectorPB - defaultBest !== deltaPB
           ? deltaPB > 0
@@ -327,7 +327,7 @@ function RenderSector({
           : ''}
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-        {time !== 0 &&
+        {time > 0 &&
         bestSector !== defaultBest &&
         bestSector - defaultBest !== deltaLeader
           ? deltaLeader > 0
