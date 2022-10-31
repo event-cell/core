@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
-import { Display } from '../shared/components/display'
+import { Display, DisplayCompetitorList } from '../shared/components/display'
 
 import { requestWrapper } from '../components/requestWrapper'
 
@@ -37,7 +37,7 @@ export const DisplayPage = () => {
 
   if (!currentCompetitor.data) {
     console.warn('Missing currentCompetitor data')
-    return null
+    return <DisplayCompetitorList allRuns={allRuns.data} />
   }
 
   if (!runCount.data) {
@@ -45,13 +45,11 @@ export const DisplayPage = () => {
     return null
   }
 
-  const ret = (
+  return (
     <Display
       currentCompetitor={currentCompetitor.data}
       allRuns={allRuns.data}
       runCount={runCount.data}
     />
   )
-
-  return ret
 }

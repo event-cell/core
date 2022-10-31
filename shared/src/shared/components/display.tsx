@@ -148,42 +148,9 @@ export const Display: FC<{
     return displayContent
   }, [classes])
 
-  // If there are no runs, just print out competitors
-
   if (!currentCompetitor || !runCount) {
     console.warn('Missing currentCompetitor or runCount data')
-    if (printClassesList) {
-      return (
-        <Container>
-          {printClassesList.map((eventClass) => (
-            <div key={eventClass.carClass.class}>
-              <Typography component="div">
-                <Box
-                  fontWeight="fontWeightMedium"
-                  display="inline"
-                  lineHeight="2"
-                >
-                  {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
-                </Box>
-                <Chip
-                  label={'Class Record: ' + eventClass.drivers[0].classRecord}
-                  variant="outlined"
-                  color="info"
-                  size="small"
-                  icon={<Timer />}
-                />
-              </Typography>
-              <ResultsTable
-                data={eventClass.drivers}
-                runCount={runCount as number}
-              />
-            </div>
-          ))}
-        </Container>
-      )
-    } else {
-      return <div />
-    }
+    return <div />
   } // This will never be called, but it is needed to make typescript happy
 
   const currentRunArray = allRuns.filter((a) => a.number === currentCompetitor)
@@ -275,6 +242,112 @@ export const Display: FC<{
     )
   } else {
     return null
+  }
+}
+
+export const DisplayCompetitorList: FC<{
+  allRuns: CompetitorList
+}> = ({ allRuns }) => {
+  // Sort classes in class order as per the index value
+  // in the timing software
+
+  const classes: { classIndex: number; class: string }[] = []
+  let maxClassIndex = 0
+
+  allRuns.forEach((a) => {
+    if (a.classIndex > maxClassIndex) {
+      maxClassIndex = a.classIndex
+    }
+  })
+
+  for (let i = 1; i < maxClassIndex + 1; i++) {
+    let shouldSkip = false
+    allRuns.forEach((row) => {
+      if (shouldSkip) {
+        return
+      }
+      if (row.classIndex === i) {
+        classes.push({ classIndex: row.classIndex, class: row.class })
+        shouldSkip = true
+      }
+    })
+  }
+
+  const printClassesList = useMemo(() => {
+    const classesList = classes.map((carClass) => ({
+      carClass,
+      drivers: allRuns
+        .filter((data) => data.classIndex === carClass.classIndex)
+        .sort(
+          (a, b) =>
+            Math.min(...a.times.map((time) => time?.time || 10000000)) -
+            Math.min(...b.times.map((time) => time?.time || 10000000))
+        ),
+    }))
+
+    const displayContent = splitDisplay(classesList)
+
+    if (!displayContent) return
+
+    return displayContent
+  }, [classes])
+
+  const displayNumber = getDisplayNumber()
+  const runCount = 1
+
+  if (printClassesList) {
+    return (
+      <Container>
+        <DisplayHeader display={displayNumber} />
+
+        {printClassesList.map((eventClass) => (
+          <div key={eventClass.carClass.class}>
+            <Typography component="div">
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridAutoColumns: '1fr',
+                }}
+              >
+                <Box
+                  fontWeight="fontWeightMedium"
+                  sx={{
+                    gridColumn: '1 / 3',
+                    m: 1,
+                  }}
+                >
+                  {eventClass.carClass.class}
+                </Box>
+                <Box
+                  sx={{
+                    gridColumn: '3 / 4',
+                    m: 1,
+                  }}
+                >
+                  <Chip
+                    label={'Class Record: ' + eventClass.drivers[0].classRecord}
+                    variant="outlined"
+                    color="info"
+                    size="small"
+                    icon={<Timer />}
+                  />
+                </Box>
+              </Box>
+            </Typography>
+            <ResultsTable
+              data={eventClass.drivers.sort(
+                (a, b) =>
+                  Math.min(...a.times.map((time) => time?.time || 10000000)) -
+                  Math.min(...b.times.map((time) => time?.time || 10000000))
+              )}
+              runCount={runCount as number}
+            />
+          </div>
+        ))}
+      </Container>
+    )
+  } else {
+    return <div />
   }
 }
 
