@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
-import { Display } from '../shared/components/display'
+import { Display, DisplayCompetitorList } from '../shared/components/display'
 
 import { requestWrapper } from '../components/requestWrapper'
 
@@ -10,6 +10,12 @@ export const DisplayPage = () => {
   const allRuns = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
+  let displayRefresh = 15
+
+  if (window.location.pathname === '/display/4') {
+    displayRefresh = 5
+  }
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await Promise.all([
@@ -17,7 +23,7 @@ export const DisplayPage = () => {
         allRuns.refetch(),
         runCount.refetch(),
       ])
-    }, 1000 * 4)
+    }, 1000 * displayRefresh)
     return () => clearTimeout(timeout)
   }, [currentCompetitor, allRuns, runCount])
 
@@ -31,7 +37,7 @@ export const DisplayPage = () => {
 
   if (!currentCompetitor.data) {
     console.warn('Missing currentCompetitor data')
-    return null
+    return <DisplayCompetitorList allRuns={allRuns.data} />
   }
 
   if (!runCount.data) {
@@ -39,13 +45,11 @@ export const DisplayPage = () => {
     return null
   }
 
-  const ret = (
+  return (
     <Display
       currentCompetitor={currentCompetitor.data}
       allRuns={allRuns.data}
       runCount={runCount.data}
     />
   )
-
-  return ret
 }
