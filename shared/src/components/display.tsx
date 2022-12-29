@@ -17,12 +17,15 @@ import React, { FC, useMemo } from 'react'
 import { ResultsTable } from './table'
 import { Timer } from '@mui/icons-material'
 
-import { RankTimes, TimeDeltas } from '../logic/functions'
-
 import {
-  Competitor,
-  CompetitorList,
-} from '../../../../server/src/router/objects'
+  getClassBestSectorTimes,
+  getPersonalBestSector,
+  getPersonalBestTotal,
+  RankTimes,
+  TimeDeltas,
+} from '../logic/functions'
+
+import { Competitor, CompetitorList } from 'server/src/router/objects'
 import { DisplayHeader } from './display/header'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
@@ -421,22 +424,8 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
     sector2Colour,
     sector3Colour,
     finishColour,
-    bestSector1,
-    previousBestSector1,
-    bestSector2,
-    previousBestSector2,
-    bestSector3,
-    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
     defaultBest,
     bestFinishTimeOfTheDay,
     bestFinishTimeOfTheDayName,
@@ -448,6 +437,41 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
     bestFinishTimeOfTheDayJuniorName,
     bestFinishTimeOfTheDayJuniorCar,
   } = RankTimes(currentRun, allRuns)
+
+  const { classIndex } = currentRun
+
+  const {
+    bestSector1,
+    bestSector2,
+    bestSector3,
+    previousBestSector1,
+    previousBestSector2,
+    previousBestSector3,
+  } = useMemo(
+    () => getClassBestSectorTimes(classIndex, allRuns),
+    [classIndex, allRuns]
+  ) || {
+    bestSector1: 0,
+    bestSector2: 0,
+    bestSector3: 0,
+    previousBestSector1: 0,
+    previousBestSector2: 0,
+    previousBestSector3: 0,
+  }
+
+  const { personalBestFinishTime, previousPersonalBestFinishTime } = useMemo(
+    () => getPersonalBestTotal(currentRun),
+    [currentRun]
+  )
+
+  const {
+    personalBestSector1,
+    personalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector1,
+    previousPersonalBestSector2,
+    previousPersonalBestSector3,
+  } = useMemo(() => getPersonalBestSector(currentRun), [currentRun])
 
   const idx = currentRun.times.length - 1
   const times = currentRun.times[idx]
