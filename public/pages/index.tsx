@@ -1,5 +1,5 @@
 import { CompetitorList } from '../../server/src/router/objects'
-import { Display } from '../src/shared/components/display'
+import { Display } from 'ui-shared/src/components/display'
 
 const Home = ({
   data,
@@ -25,7 +25,7 @@ export const getServerSideProps = async () => {
     'https://pub-b65729b12aa64dbf8a9a760e4909c5fb.r2.dev/display.json'
   )
   const data = await request.json()
-
+  
   return {
     props: { data },
   }

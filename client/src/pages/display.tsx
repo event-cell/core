@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
-import { Display, DisplayCompetitorList } from '../shared/components/display'
+import { Display, DisplayCompetitorList } from 'ui-shared'
 
 import { requestWrapper } from '../components/requestWrapper'
 

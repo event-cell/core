@@ -5,7 +5,13 @@ import React, { useEffect } from 'react'
 import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
-import { RankTimes, TimeDeltas } from '../shared/logic/functions'
+import {
+  getClassBestSectorTimes,
+  getPersonalBestSector,
+  getPersonalBestTotal,
+  RankTimes,
+  TimeDeltas,
+} from 'ui-shared'
 
 let displayInterval: NodeJS.Timeout
 
@@ -38,23 +44,37 @@ export const TrackDisplay = () => {
     sector2Colour,
     sector3Colour,
     finishColour,
-    bestSector1,
-    previousBestSector1,
-    bestSector2,
-    previousBestSector2,
-    bestSector3,
-    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
   } = RankTimes(currentRun, allRuns.data)
+
+  const { previousPersonalBestFinishTime, personalBestFinishTime } =
+    getPersonalBestTotal(currentRun)
+
+  const {
+    personalBestSector1,
+    personalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector1,
+    previousPersonalBestSector2,
+    previousPersonalBestSector3,
+  } = getPersonalBestSector(currentRun)
+
+  const {
+    bestSector1,
+    bestSector2,
+    bestSector3,
+    previousBestSector1,
+    previousBestSector2,
+    previousBestSector3,
+  } = getClassBestSectorTimes(currentRun.classIndex, allRuns.data) || {
+    bestSector1: 0,
+    bestSector2: 0,
+    bestSector3: 0,
+    previousBestSector1: 0,
+    previousBestSector2: 0,
+    previousBestSector3: 0,
+  }
 
   const idx = currentRun.times.length - 1
   const times = currentRun.times[idx]

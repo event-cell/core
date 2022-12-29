@@ -17,12 +17,15 @@ import React, { FC, useMemo } from 'react'
 import { ResultsTable } from './table'
 import { Timer } from '@mui/icons-material'
 
-import { RankTimes, TimeDeltas } from '../logic/functions'
-
 import {
-  Competitor,
-  CompetitorList,
-} from '../../../../server/src/router/objects'
+  getClassBestSectorTimes,
+  getPersonalBestSector,
+  getPersonalBestTotal,
+  RankTimes,
+  TimeDeltas,
+} from '../logic/functions'
+
+import { Competitor, CompetitorList } from 'server/src/router/objects'
 import { DisplayHeader } from './display/header'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
@@ -47,9 +50,31 @@ const getDisplayNumber = (): number => {
   return Number(window.location.pathname.replace('/display/', ''))
 }
 
+/**
+ * This is the internal logic of the {@link splitDisplay} function. It is here
+ * to make it easier to test
+ */
+export const splitDisplayLogic = ({
+  classesList,
+  screenIndex,
+  itemsPerScreen,
+}: {
+  classesList: ClassType[]
+  screenIndex: number
+  itemsPerScreen: number
+}): ClassType[] =>
+  classesList.filter(
+    (_class, index) =>
+      // If the class was not on the last screen
+      index >= (screenIndex - 1) * itemsPerScreen &&
+      // If the class is not large enough to be on the next screen
+      index < screenIndex * itemsPerScreen
+  )
+
 function splitDisplay(classesList: ClassType[]) {
-  // Calculate ClassesList for each screen
-  // Max 20 elements per screen
+  // Calculate ClassesList for each screen.
+  const numberOfScreens = 4 // TODO: This should be configurable
+  const itemsPerScreen = Math.ceil(classesList.length / numberOfScreens)
 
   // If we are in a NextJS server-side render, window will not be present. We
   // also want to exit out early if this page is `/display` on the client or
@@ -61,41 +86,19 @@ function splitDisplay(classesList: ClassType[]) {
   )
     return classesList
 
-  const classesListScreen01: ClassType[] = []
-  const classesListScreen02: ClassType[] = []
-  const classesListScreen03: ClassType[] = []
-  const classesListScreen04: ClassType[] = []
+  try {
+    const screenIndex = Number.parseInt(
+      window.location.pathname.replace('/display/', '')
+    )
 
-  let screenLength = 0
-  const targetScreenLength = 24
-  classesList.forEach((currentClass) => {
-    screenLength = screenLength + Object.keys(currentClass.drivers).length + 1
-    if (screenLength <= targetScreenLength) {
-      classesListScreen01.push(currentClass)
-    } else if (
-      screenLength > targetScreenLength &&
-      screenLength <= targetScreenLength * 2
-    ) {
-      classesListScreen02.push(currentClass)
-    }
-    if (
-      screenLength > targetScreenLength * 2 &&
-      screenLength <= targetScreenLength * 3
-    ) {
-      classesListScreen03.push(currentClass)
-    } else if (screenLength > targetScreenLength * 4) {
-      classesListScreen04.push(currentClass)
-    }
-  })
+    return splitDisplayLogic({ classesList, screenIndex, itemsPerScreen })
+  } catch (e) {
+    console.warn(
+      'Failed to generate classList for this display. Falling back to the full list'
+    )
+    console.warn(e)
 
-  if (window.location.pathname === '/display/1') {
-    return classesListScreen01
-  } else if (window.location.pathname === '/display/2') {
-    return classesListScreen02
-  } else if (window.location.pathname === '/display/3') {
-    return classesListScreen03
-  } else if (window.location.pathname === '/display/4') {
-    return classesListScreen04
+    return classesList
   }
 }
 
@@ -421,22 +424,8 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
     sector2Colour,
     sector3Colour,
     finishColour,
-    bestSector1,
-    previousBestSector1,
-    bestSector2,
-    previousBestSector2,
-    bestSector3,
-    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
     defaultBest,
     bestFinishTimeOfTheDay,
     bestFinishTimeOfTheDayName,
@@ -448,6 +437,41 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
     bestFinishTimeOfTheDayJuniorName,
     bestFinishTimeOfTheDayJuniorCar,
   } = RankTimes(currentRun, allRuns)
+
+  const { classIndex } = currentRun
+
+  const {
+    bestSector1,
+    bestSector2,
+    bestSector3,
+    previousBestSector1,
+    previousBestSector2,
+    previousBestSector3,
+  } = useMemo(
+    () => getClassBestSectorTimes(classIndex, allRuns),
+    [classIndex, allRuns]
+  ) || {
+    bestSector1: 0,
+    bestSector2: 0,
+    bestSector3: 0,
+    previousBestSector1: 0,
+    previousBestSector2: 0,
+    previousBestSector3: 0,
+  }
+
+  const { personalBestFinishTime, previousPersonalBestFinishTime } = useMemo(
+    () => getPersonalBestTotal(currentRun),
+    [currentRun]
+  )
+
+  const {
+    personalBestSector1,
+    personalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector1,
+    previousPersonalBestSector2,
+    previousPersonalBestSector3,
+  } = useMemo(() => getPersonalBestSector(currentRun), [currentRun])
 
   const idx = currentRun.times.length - 1
   const times = currentRun.times[idx]

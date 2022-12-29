@@ -3,7 +3,8 @@
   "workspaces": [
     "server",
     "client",
-    "public"
+    "public",
+    "shared"
   ],
   "scripts": {
     "server:dev": "cd server && yarn dev",

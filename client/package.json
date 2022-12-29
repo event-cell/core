@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.9.3",
-    "@emotion/styled": "^11.9.3",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "@fontsource/roboto": "^4.5.7",
-    "@mui/icons-material": "^5.8.4",
-    "@mui/material": "^5.8.4",
-    "@mui/x-data-grid": "^5.12.2",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.2",
+    "@mui/x-data-grid": "^5.17.17",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -25,15 +25,14 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.4.2",
+    "ui-shared": "*",
     "web-vitals": "^2.1.0",
     "zod": "^3.17.3"
   },
   "scripts": {
-    "setup": "rm -rf src/shared && cp -r ../shared/src/shared src/shared",
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "setup": "echo 'No setup tasks for client'",
+    "dev": "vite --port 3000",
+    "build": "tsc && vite build"
   },
   "eslintConfig": {
     "extends": [
@@ -52,5 +51,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^3.0.0",
+    "vite": "^4.0.3"
   }
 }

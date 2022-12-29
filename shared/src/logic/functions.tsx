@@ -2,28 +2,16 @@ import {
   Competitor,
   CompetitorList,
   TimeInfoManditory,
-} from '../../../../server/src/router/objects'
+} from 'server/src/router/objects'
+
+const REALLY_LARGE_NUMBER = Number.MAX_SAFE_INTEGER
 
 interface BestTimeProps {
-  previousPersonalBestSector3: number
-  previousPersonalBestSector2: number
-  personalBestSector3: number
-  bestSector1: number
   sector2Colour: string
   previousBestFinishTime: number
-  previousPersonalBestFinishTime: number
-  previousBestSector2: number
-  personalBestFinishTime: number
-  previousBestSector3: number
-  previousPersonalBestSector1: number
-  previousBestSector1: number
   sector1Colour: string
-  personalBestSector2: number
   sector3Colour: string
-  personalBestSector1: number
-  bestSector2: number
   finishColour: string
-  bestSector3: number
   bestFinishTime: number
   defaultBest: number
   bestFinishTimeOfTheDay: number
@@ -37,6 +25,154 @@ interface BestTimeProps {
   bestFinishTimeOfTheDayJuniorCar: string
 }
 
+export interface ClassBestSectorTimes {
+  bestSector1: number
+  bestSector2: number
+  bestSector3: number
+
+  previousBestSector1: number
+  previousBestSector2: number
+  previousBestSector3: number
+}
+
+export function getClassBestSectorTimes(
+  classIndex: number,
+  allRuns: CompetitorList
+): ClassBestSectorTimes | null {
+  const classInfo = allRuns.filter(
+    (compeditor) => compeditor.classIndex === classIndex
+  )
+
+  if (typeof classInfo === 'undefined') return null
+
+  const runs = classInfo.flatMap((compeditor) => compeditor.times)
+
+  let bestSector1 = REALLY_LARGE_NUMBER
+  let bestSector2 = REALLY_LARGE_NUMBER
+  let bestSector3 = REALLY_LARGE_NUMBER
+
+  let previousBestSector1 = REALLY_LARGE_NUMBER
+  let previousBestSector2 = REALLY_LARGE_NUMBER
+  let previousBestSector3 = REALLY_LARGE_NUMBER
+
+  for (const run of runs) {
+    if (typeof run == 'undefined' || run.status != 0) continue
+
+    const sector1Time = run.split1
+    const sector2Time = run.split2 - run.split1
+    const sector3Time = run.time - run.split2
+
+    if (sector1Time > 0 && sector1Time < bestSector1) {
+      previousBestSector1 = bestSector1
+      bestSector1 = sector1Time
+    }
+
+    if (sector2Time > 0 && sector2Time < bestSector2) {
+      previousBestSector2 = bestSector2
+      bestSector2 = sector2Time
+    }
+
+    if (sector3Time > 0 && sector3Time < bestSector3) {
+      previousBestSector3 = bestSector3
+      bestSector3 = sector3Time
+    }
+  }
+
+  return {
+    bestSector1,
+    bestSector2,
+    bestSector3,
+
+    previousBestSector1,
+    previousBestSector2,
+    previousBestSector3,
+  }
+}
+
+export interface PersonalBestTotal {
+  previousPersonalBestFinishTime: number
+  personalBestFinishTime: number
+}
+
+export function getPersonalBestTotal(
+  compeditor: Competitor
+): PersonalBestTotal {
+  let personalBestFinishTime = REALLY_LARGE_NUMBER
+  let previousPersonalBestFinishTime = REALLY_LARGE_NUMBER
+
+  for (const run of compeditor.times) {
+    if (typeof run == 'undefined' || run.status != 0) continue
+
+    const finishTime = run.time
+
+    if (finishTime > 0 && finishTime < personalBestFinishTime) {
+      previousPersonalBestFinishTime = personalBestFinishTime
+      personalBestFinishTime = finishTime
+    }
+  }
+
+  return {
+    previousPersonalBestFinishTime,
+    personalBestFinishTime,
+  }
+}
+
+export interface PersonalBestSector {
+  previousPersonalBestSector1: number
+  previousPersonalBestSector2: number
+  previousPersonalBestSector3: number
+
+  personalBestSector1: number
+  personalBestSector2: number
+  personalBestSector3: number
+}
+
+export function getPersonalBestSector(
+  compeditor: Competitor
+): PersonalBestSector {
+  let personalBestSector1 = REALLY_LARGE_NUMBER
+  let personalBestSector2 = REALLY_LARGE_NUMBER
+  let personalBestSector3 = REALLY_LARGE_NUMBER
+
+  let previousPersonalBestSector1 = REALLY_LARGE_NUMBER
+  let previousPersonalBestSector2 = REALLY_LARGE_NUMBER
+  let previousPersonalBestSector3 = REALLY_LARGE_NUMBER
+
+  for (const run of compeditor.times) {
+    if (typeof run == 'undefined' || run.status != 0) continue
+
+    const sector1Time = run.split1
+    const sector2Time = run.split2 - run.split1
+    const sector3Time = run.time - run.split2
+
+    if (sector1Time > 0 && sector1Time < personalBestSector1) {
+      previousPersonalBestSector1 = personalBestSector1
+      personalBestSector1 = sector1Time
+    }
+
+    if (sector2Time > 0 && sector2Time < personalBestSector2) {
+      previousPersonalBestSector2 = personalBestSector2
+      personalBestSector2 = sector2Time
+    }
+
+    if (sector3Time > 0 && sector3Time < personalBestSector3) {
+      previousPersonalBestSector3 = personalBestSector3
+      personalBestSector3 = sector3Time
+    }
+  }
+
+  return {
+    previousPersonalBestSector1,
+    previousPersonalBestSector2,
+    previousPersonalBestSector3,
+
+    personalBestSector1,
+    personalBestSector2,
+    personalBestSector3,
+  }
+}
+
+// eslint-disable-next-line complexity
 export function RankTimes(
   currentRun: Competitor,
   allRuns: CompetitorList
@@ -52,21 +188,14 @@ export function RankTimes(
   const defaultBest = 9999999
 
   let bestSector1 = defaultBest
-  let previousBestSector1 = defaultBest
   let bestSector2 = defaultBest
-  let previousBestSector2 = defaultBest
   let bestSector3 = defaultBest
-  let previousBestSector3 = defaultBest
   let bestFinishTime = defaultBest
   let previousBestFinishTime = defaultBest
   let personalBestSector1 = defaultBest
-  let previousPersonalBestSector1 = defaultBest
   let personalBestSector2 = defaultBest
-  let previousPersonalBestSector2 = defaultBest
   let personalBestSector3 = defaultBest
-  let previousPersonalBestSector3 = defaultBest
   let personalBestFinishTime = defaultBest
-  let previousPersonalBestFinishTime = defaultBest
   let bestFinishTimeOfTheDay = defaultBest
   let bestFinishTimeOfTheDayName = ''
   let bestFinishTimeOfTheDayCar = ''
@@ -85,19 +214,15 @@ export function RankTimes(
       split2 = run.split2
       time = run.time
       if (run.split1 < personalBestSector1 && run.split1 > 0) {
-        previousPersonalBestSector1 = personalBestSector1
         personalBestSector1 = run.split1
       }
       if (run.split2 - run.split1 < personalBestSector2 && run.split2 > 0) {
-        previousPersonalBestSector2 = personalBestSector2
         personalBestSector2 = run.split2 - run.split1
       }
       if (run.time - run.split2 < personalBestSector3 && run.time > 0) {
-        previousPersonalBestSector3 = personalBestSector3
         personalBestSector3 = run.time - run.split2
       }
       if (run.time < personalBestFinishTime && run.time > 0) {
-        previousPersonalBestFinishTime = personalBestFinishTime
         personalBestFinishTime = run.time
       }
     } else {
@@ -113,15 +238,12 @@ export function RankTimes(
       for (const run of person.times) {
         if (typeof run !== 'undefined' && run.status === 0) {
           if (run.split1 < bestSector1) {
-            previousBestSector1 = bestSector1
             bestSector1 = run.split1
           }
           if (run.split2 - run.split1 < bestSector2) {
-            previousBestSector2 = bestSector2
             bestSector2 = run.split2 - run.split1
           }
           if (run.time - run.split2 < bestSector3) {
-            previousBestSector3 = bestSector3
             bestSector3 = run.time - run.split2
           }
           if (run.time < bestFinishTime) {
@@ -213,22 +335,8 @@ export function RankTimes(
     sector2Colour,
     sector3Colour,
     finishColour,
-    bestSector1,
-    previousBestSector1,
-    bestSector2,
-    previousBestSector2,
-    bestSector3,
-    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
     defaultBest,
     bestFinishTimeOfTheDay,
     bestFinishTimeOfTheDayName,

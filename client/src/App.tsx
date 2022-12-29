@@ -15,7 +15,8 @@ import { config } from '.'
 import { Admin } from './pages/admin'
 import { TrackDisplay } from './pages/trackDisplay'
 import { Announcer } from './pages/announcer'
-import { Theme } from './shared/components/Theme'
+import { Theme } from 'ui-shared'
+
 
 // The tRPC hook. Will be used to make requests to the server
 export const trpc = createReactQueryHooks<TRPCRouter>()

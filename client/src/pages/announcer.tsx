@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Timer } from '@mui/icons-material'
 import {
   Box,
@@ -16,9 +16,14 @@ import {
 } from '@mui/material'
 
 import { trpc } from '../App'
-import { ResultsTable } from '../shared/components/table'
+import {
+  getClassBestSectorTimes,
+  getPersonalBestSector,
+  getPersonalBestTotal,
+  ResultsTable,
+} from 'ui-shared'
 import { requestWrapper } from '../components/requestWrapper'
-import { RankTimes, TimeDeltas } from '../shared/logic/functions'
+import { RankTimes, TimeDeltas } from 'ui-shared'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -101,22 +106,8 @@ export const Announcer = () => {
     sector2Colour,
     sector3Colour,
     finishColour,
-    bestSector1,
-    previousBestSector1,
-    bestSector2,
-    previousBestSector2,
-    bestSector3,
-    previousBestSector3,
     bestFinishTime,
     previousBestFinishTime,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
     defaultBest,
     bestFinishTimeOfTheDay,
     bestFinishTimeOfTheDayName,
@@ -129,6 +120,16 @@ export const Announcer = () => {
     bestFinishTimeOfTheDayJuniorCar,
   } = RankTimes(currentRun, allRuns.data)
 
+  const { personalBestFinishTime, previousPersonalBestFinishTime } =
+    getPersonalBestTotal(currentRun)
+  const {
+    personalBestSector1,
+    personalBestSector2,
+    personalBestSector3,
+    previousPersonalBestSector1,
+    previousPersonalBestSector2,
+    previousPersonalBestSector3,
+  } = getPersonalBestSector(currentRun)
   // Render functions
   const renderClassList = () => {
     return currentClassList.map((eventClass) => (
@@ -160,6 +161,22 @@ export const Announcer = () => {
     const times = currentRun.times[idx]
 
     if (typeof times !== 'undefined') {
+      const {
+        bestSector1,
+        bestSector2,
+        bestSector3,
+        previousBestSector1,
+        previousBestSector2,
+        previousBestSector3,
+      } = getClassBestSectorTimes(currentRun.classIndex, allRuns.data) || {
+        bestSector1: 0,
+        bestSector2: 0,
+        bestSector3: 0,
+        previousBestSector1: 0,
+        previousBestSector2: 0,
+        previousBestSector3: 0,
+      }
+
       const {
         sector1,
         sector2,

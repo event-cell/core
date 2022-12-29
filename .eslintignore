@@ -1,1 +1,3 @@
 server/prisma
+node_modules/
+build/
