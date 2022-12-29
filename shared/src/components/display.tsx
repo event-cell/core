@@ -47,6 +47,27 @@ const getDisplayNumber = (): number => {
   return Number(window.location.pathname.replace('/display/', ''))
 }
 
+/**
+ * This is the internal logic of the {@link splitDisplay} function. It is here
+ * to make it easier to test
+ */
+export const splitDisplayLogic = ({
+  classesList,
+  screenIndex,
+  itemsPerScreen,
+}: {
+  classesList: ClassType[]
+  screenIndex: number
+  itemsPerScreen: number
+}): ClassType[] =>
+  classesList.filter(
+    (_class, index) =>
+      // If the class was not on the last screen
+      index >= (screenIndex - 1) * itemsPerScreen &&
+      // If the class is not large enough to be on the next screen
+      index < screenIndex * itemsPerScreen
+  )
+
 function splitDisplay(classesList: ClassType[]) {
   // Calculate ClassesList for each screen.
   const numberOfScreens = 4 // TODO: This should be configurable
@@ -67,13 +88,7 @@ function splitDisplay(classesList: ClassType[]) {
       window.location.pathname.replace('/display/', '')
     )
 
-    return classesList.filter(
-      (_class, index) =>
-        // If the class was not on the last screen
-        index > (screenIndex - 1) * itemsPerScreen &&
-        // If the class is not large enough to be on the next screen
-        index < screenIndex * itemsPerScreen
-    )
+    return splitDisplayLogic({ classesList, screenIndex, itemsPerScreen })
   } catch (e) {
     console.warn(
       'Failed to generate classList for this display. Falling back to the full list'
