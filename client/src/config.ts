@@ -15,6 +15,6 @@ export class Config {
    * development and `/api/v1/` in production.
    */
   public backendUrl = this.development
-    ? 'http://timingserver.local:8080/api/v1'
+    ? `http://${window?.location.hostname || 'timingserver.local'}:8080/api/v1`
     : '/api/v1'
 }
