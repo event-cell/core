@@ -16,9 +16,9 @@ import {
 } from '@mui/material'
 
 import { trpc } from '../App'
-import { ResultsTable } from '../shared/components/table'
+import { ResultsTable } from 'ui-shared'
 import { requestWrapper } from '../components/requestWrapper'
-import { RankTimes, TimeDeltas } from '../shared/logic/functions'
+import { RankTimes, TimeDeltas } from 'ui-shared'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),

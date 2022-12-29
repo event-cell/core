@@ -5,7 +5,7 @@ import React, { useEffect } from 'react'
 import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
-import { RankTimes, TimeDeltas } from '../shared/logic/functions'
+import { RankTimes, TimeDeltas } from 'ui-shared'
 
 let displayInterval: NodeJS.Timeout
 

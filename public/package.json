@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "setup": "rm -rf src/shared && mkdir -p src && cp -r ../shared/src/shared src/shared",
-    "dev": "yarn setup && next dev",
-    "build": "yarn setup && next build",
-    "start": "yarn setup && next start",
-    "lint": "yarn setup && next lint"
+    "setup": "echo 'No setup for public'",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -15,9 +15,10 @@
     "@mui/icons-material": "^5.10.6",
     "@mui/material": "^5.10.6",
     "@mui/x-data-grid": "^5.17.4",
-    "next": "12.3.1",
+    "next": "13.1.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "ui-shared":"*"
   },
   "devDependencies": {
     "@types/node": "18.7.20",
