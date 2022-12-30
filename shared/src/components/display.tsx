@@ -23,7 +23,7 @@ import {
   getPersonalBestTotal,
   RankTimes,
   TimeDeltas,
-} from '../logic/functions'
+} from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
 import { DisplayHeader } from './display/header'
@@ -106,7 +106,8 @@ export const Display: FC<{
   currentCompetitor: number
   allRuns: CompetitorList
   runCount: number
-}> = ({ currentCompetitor, allRuns, runCount }) => {
+  renderOnTrack: boolean
+}> = ({ currentCompetitor, allRuns, runCount, renderOnTrack }) => {
   // Sort classes in class order as per the index value
   // in the timing software
 
@@ -210,7 +211,8 @@ export const Display: FC<{
             />
           </div>
         ))}
-        {displayNumber === 4 || displayNumber === 0 ? (
+        {(displayNumber === 4 || displayNumber === 0) &&
+        renderOnTrack === true ? (
           <Grid>
             <Grid
               sx={{
