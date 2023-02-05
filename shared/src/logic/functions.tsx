@@ -40,12 +40,12 @@ export function getClassBestSectorTimes(
   allRuns: CompetitorList
 ): ClassBestSectorTimes | null {
   const classInfo = allRuns.filter(
-    (compeditor) => compeditor.classIndex === classIndex
+    (competitor) => competitor.classIndex === classIndex
   )
 
   if (typeof classInfo === 'undefined') return null
 
-  const runs = classInfo.flatMap((compeditor) => compeditor.times)
+  const runs = classInfo.flatMap((competitor) => competitor.times)
 
   let bestSector1 = REALLY_LARGE_NUMBER
   let bestSector2 = REALLY_LARGE_NUMBER
@@ -95,12 +95,12 @@ export interface PersonalBestTotal {
 }
 
 export function getPersonalBestTotal(
-  compeditor: Competitor
+  competitor: Competitor
 ): PersonalBestTotal {
   let personalBestFinishTime = REALLY_LARGE_NUMBER
   let previousPersonalBestFinishTime = REALLY_LARGE_NUMBER
 
-  for (const run of compeditor.times) {
+  for (const run of competitor.times) {
     if (typeof run == 'undefined' || run.status != 0) continue
 
     const finishTime = run.time
@@ -128,7 +128,7 @@ export interface PersonalBestSector {
 }
 
 export function getPersonalBestSector(
-  compeditor: Competitor
+  competitor: Competitor
 ): PersonalBestSector {
   let personalBestSector1 = REALLY_LARGE_NUMBER
   let personalBestSector2 = REALLY_LARGE_NUMBER
@@ -138,27 +138,31 @@ export function getPersonalBestSector(
   let previousPersonalBestSector2 = REALLY_LARGE_NUMBER
   let previousPersonalBestSector3 = REALLY_LARGE_NUMBER
 
-  for (const run of compeditor.times) {
+  for (const run of competitor.times) {
     if (typeof run == 'undefined' || run.status != 0) continue
 
     const sector1Time = run.split1
     const sector2Time = run.split2 - run.split1
     const sector3Time = run.time - run.split2
 
-    if (sector1Time > 0 && sector1Time < personalBestSector1) {
-      previousPersonalBestSector1 = personalBestSector1
-      personalBestSector1 = sector1Time
-    }
-
-    if (sector2Time > 0 && sector2Time < personalBestSector2) {
-      previousPersonalBestSector2 = personalBestSector2
-      personalBestSector2 = sector2Time
-    }
-
-    if (sector3Time > 0 && sector3Time < personalBestSector3) {
-      previousPersonalBestSector3 = personalBestSector3
-      personalBestSector3 = sector3Time
-    }
+    ;({ pb: personalBestSector1, prevPB: previousPersonalBestSector1 } =
+      determinePB(
+        sector1Time,
+        personalBestSector1,
+        previousPersonalBestSector1
+      ))
+    ;({ pb: personalBestSector2, prevPB: previousPersonalBestSector2 } =
+      determinePB(
+        sector2Time,
+        personalBestSector2,
+        previousPersonalBestSector2
+      ))
+    ;({ pb: personalBestSector3, prevPB: previousPersonalBestSector3 } =
+      determinePB(
+        sector3Time,
+        personalBestSector3,
+        previousPersonalBestSector3
+      ))
   }
 
   return {
@@ -170,6 +174,17 @@ export function getPersonalBestSector(
     personalBestSector2,
     personalBestSector3,
   }
+}
+
+function determinePB(time: number, pb: number, prevPB: number) {
+  if (time > 0 && time < pb) {
+    prevPB = pb
+    pb = time
+  } else if (prevPB == REALLY_LARGE_NUMBER) {
+    prevPB = pb
+  }
+
+  return { pb: pb, prevPB: prevPB }
 }
 
 // eslint-disable-next-line complexity
@@ -185,7 +200,7 @@ export function RankTimes(
   let sector3Colour = 'background.default'
   let finishColour = 'background.default'
 
-  const defaultBest = 9999999
+  const defaultBest = REALLY_LARGE_NUMBER
 
   let bestSector1 = defaultBest
   let bestSector2 = defaultBest
@@ -350,97 +365,36 @@ export function RankTimes(
   }
 }
 
-export function TimeDeltas(
-  times: TimeInfoManditory,
-  personalBestSector1: number,
-  previousPersonalBestSector1: number,
-  bestSector1: number,
-  previousBestSector1: number,
-  personalBestSector2: number,
-  previousPersonalBestSector2: number,
-  bestSector2: number,
-  previousBestSector2: number,
-  personalBestSector3: number,
-  previousPersonalBestSector3: number,
-  bestSector3: number,
-  previousBestSector3: number,
-  personalBestFinishTime: number,
-  previousPersonalBestFinishTime: number,
-  bestFinishTime: number,
-  previousBestFinishTime: number
-) {
-  let sector1DeltaPB = 0
-  let sector1DeltaLeader = 0
-  let sector2DeltaPB = 0
-  let sector2DeltaLeader = 0
-  let sector3DeltaPB = 0
-  let sector3DeltaLeader = 0
-  let finishDeltaPB = 0
-  let finishDeltaLeader = 0
-
-  const sector1 = times.split1
-  const sector2 = times.split2 - times.split1
-  const sector3 = times.time - times.split2
-  const finishTime = times.time
-
-  if (times.split1 > 0) {
-    if (sector1 === personalBestSector1) {
-      sector1DeltaPB = sector1 - previousPersonalBestSector1
-    } else {
-      sector1DeltaPB = sector1 - personalBestSector1
-    }
-    if (sector1 === bestSector1) {
-      sector1DeltaLeader = sector1 - previousBestSector1
-    } else {
-      sector1DeltaLeader = sector1 - bestSector1
-    }
-  }
-  if (times.split2 > 0) {
-    if (sector2 === personalBestSector2) {
-      sector2DeltaPB = sector2 - previousPersonalBestSector2
-    } else {
-      sector2DeltaPB = sector2 - personalBestSector2
-    }
-    if (sector2 === bestSector2) {
-      sector2DeltaLeader = sector2 - previousBestSector2
-    } else {
-      sector2DeltaLeader = sector2 - bestSector2
-    }
-  }
-  if (times.time > 0) {
-    if (sector3 === personalBestSector3) {
-      sector3DeltaPB = sector3 - previousPersonalBestSector3
-    } else {
-      sector3DeltaPB = sector3 - personalBestSector3
-    }
-    if (sector3 === bestSector3) {
-      sector3DeltaLeader = sector3 - previousBestSector3
-    } else {
-      sector3DeltaLeader = sector3 - bestSector3
-    }
-    if (finishTime === personalBestFinishTime) {
-      finishDeltaPB = finishTime - previousPersonalBestFinishTime
-    } else {
-      finishDeltaPB = finishTime - personalBestFinishTime
-    }
-    if (finishTime === bestFinishTime) {
-      finishDeltaLeader = finishTime - previousBestFinishTime
-    } else {
-      finishDeltaLeader = finishTime - bestFinishTime
-    }
-  }
+export function calculateTimes(times: TimeInfoManditory): {
+  sector1: number
+  sector2: number
+  sector3: number
+  finish: number
+} {
   return {
-    sector1,
-    sector2,
-    sector3,
-    finishTime,
-    sector1DeltaPB,
-    sector1DeltaLeader,
-    sector2DeltaPB,
-    sector2DeltaLeader,
-    sector3DeltaPB,
-    sector3DeltaLeader,
-    finishDeltaPB,
-    finishDeltaLeader,
+    sector1: times.split1,
+    sector2: times.split2 - times.split1,
+    sector3: times.time - times.split2,
+    finish: times.time,
+  }
+}
+
+export function calculateDeltas({
+  time,
+  pb,
+  previousPB,
+  globalBest,
+  previousGlobalBest,
+}: {
+  time: number
+  pb: number
+  previousPB: number
+  globalBest: number
+  previousGlobalBest: number
+}): { deltaPB: number; deltaLeader: number } {
+  return {
+    deltaPB: time == pb ? time - previousPB : time - pb,
+    deltaLeader:
+      time == globalBest ? time - previousGlobalBest : time - globalBest,
   }
 }

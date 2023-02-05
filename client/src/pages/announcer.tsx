@@ -1,29 +1,20 @@
 import React, { useEffect, useMemo } from 'react'
 import { Timer } from '@mui/icons-material'
 import {
+  Alert,
   Box,
   Chip,
   Container,
   Grid,
   Paper,
   styled,
-  Table as MUITable,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Typography,
 } from '@mui/material'
 
 import { trpc } from '../App'
-import {
-  getClassBestSectorTimes,
-  getPersonalBestSector,
-  getPersonalBestTotal,
-  ResultsTable,
-} from 'ui-shared'
+import { RenderInfo, ResultsTable } from 'ui-shared'
 import { requestWrapper } from '../components/requestWrapper'
-import { RankTimes, TimeDeltas } from 'ui-shared'
+import { CompetitorList } from 'server/src/router/objects'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -37,395 +28,117 @@ const PrimaryPaperCenter = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }))
 
+// Render functions
+const RenderClassList = ({
+  classes,
+  allRuns,
+  currentClassIndex,
+  runCount,
+}: {
+  classes: { classIndex: number; class: string }[]
+  allRuns: CompetitorList
+  currentClassIndex: number
+  runCount: number
+}) => {
+  const currentClassList = useMemo(() => {
+    const classesList = classes.map((carClass) => ({
+      carClass,
+      drivers: allRuns.filter(
+        (data) => data.classIndex === carClass.classIndex
+      ),
+    }))
+
+    return classesList.filter(
+      (a) => a.carClass.classIndex === currentClassIndex
+    )
+  }, [classes, allRuns, currentClassIndex])
+
+  return (
+    <PrimaryPaper>
+      {currentClassList.map((eventClass) => (
+        <Box key={eventClass.carClass.class} textAlign="left">
+          <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
+            {eventClass.carClass.class}
+          </Box>
+          <Chip
+            label={`Class Record: ${eventClass.drivers[0].classRecord}`}
+            variant="outlined"
+            color="info"
+            size="medium"
+            icon={<Timer />}
+            sx={{ ml: 1 }}
+          />
+          <ResultsTable
+            data={eventClass.drivers.sort(
+              (a, b) =>
+                Math.min(...a.times.map((time) => time?.time || 10000000)) -
+                Math.min(...b.times.map((time) => time?.time || 10000000))
+            )}
+            runCount={runCount}
+          />
+        </Box>
+      ))}
+    </PrimaryPaper>
+  )
+}
+
 export const Announcer = () => {
-  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
-  const allRuns = trpc.useQuery(['competitors.list'])
+  const currentCompetitorId = trpc.useQuery(['currentcompetitor.number'])
+  const competitorList = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
+  // Refresh the data every 2 seconds
   useEffect(() => {
     const timeout = setTimeout(async () => {
       await Promise.all([
-        currentCompetitor.refetch(),
-        allRuns.refetch(),
+        currentCompetitorId.refetch(),
+        competitorList.refetch(),
         runCount.refetch(),
       ])
     }, 1000 * 2)
     return () => clearTimeout(timeout)
-  }, [currentCompetitor, allRuns, runCount])
+  }, [currentCompetitorId, competitorList, runCount])
 
-  const requestErrors = requestWrapper(currentCompetitor, allRuns, runCount)
-  if (requestErrors) return requestErrors
+  {
+    const requestErrors = requestWrapper(
+      currentCompetitorId,
+      competitorList,
+      runCount
+    )
+    if (requestErrors) return requestErrors
+  }
 
-  if (!currentCompetitor.data || !allRuns.data || !runCount.data) {
+  if (!currentCompetitorId.data || !competitorList.data || !runCount.data) {
     console.warn('A function was called that should not be called')
     return null
   } // This will never be called, but it is needed to make typescript happy
 
-  const currentRunArray = allRuns.data.filter(
-    (a) => a.number === currentCompetitor.data
+  const currentCompetitor = competitorList.data.find(
+    (run) => run.number === currentCompetitorId.data
   )
-  const currentRun = currentRunArray[0]
 
   // Sort classes in class order as per the index value
   // in the timing software
-
-  const classes: { classIndex: number; class: string }[] = []
-  let maxClassIndex = 0
-
-  allRuns.data.forEach((a) => {
-    if (a.classIndex > maxClassIndex) {
-      maxClassIndex = a.classIndex
-    }
-  })
-
-  for (let i = 1; i < maxClassIndex + 1; i++) {
-    let shouldSkip = false
-    allRuns.data.forEach((row) => {
-      if (shouldSkip) {
-        return
-      }
-      if (row.classIndex === i) {
-        classes.push({ classIndex: row.classIndex, class: row.class })
-        shouldSkip = true
-      }
-    })
-  }
-
-  const classesList = classes.map((carClass) => ({
-    carClass,
-    drivers: allRuns.data.filter(
-      (data) => data.classIndex === carClass.classIndex
-    ),
+  let classes = competitorList.data.map((run) => ({
+    classIndex: run.classIndex,
+    class: run.class,
   }))
 
-  const currentClassList = classesList.filter(
-    (a) => a.carClass.classIndex === currentRun.classIndex
+  classes = classes.filter(
+    (classItem, index) =>
+      classes.findIndex(
+        (innerClass) => innerClass.classIndex == classItem.classIndex
+      ) === index
   )
-  const {
-    sector1Colour,
-    sector2Colour,
-    sector3Colour,
-    finishColour,
-    bestFinishTime,
-    previousBestFinishTime,
-    defaultBest,
-    bestFinishTimeOfTheDay,
-    bestFinishTimeOfTheDayName,
-    bestFinishTimeOfTheDayCar,
-    bestFinishTimeOfTheDayLady,
-    bestFinishTimeOfTheDayLadyName,
-    bestFinishTimeOfTheDayLadyCar,
-    bestFinishTimeOfTheDayJunior,
-    bestFinishTimeOfTheDayJuniorName,
-    bestFinishTimeOfTheDayJuniorCar,
-  } = RankTimes(currentRun, allRuns.data)
 
-  const { personalBestFinishTime, previousPersonalBestFinishTime } =
-    getPersonalBestTotal(currentRun)
-  const {
-    personalBestSector1,
-    personalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector1,
-    previousPersonalBestSector2,
-    previousPersonalBestSector3,
-  } = getPersonalBestSector(currentRun)
-  // Render functions
-  const renderClassList = () => {
-    return currentClassList.map((eventClass) => (
-      <Box key={eventClass.carClass.class} textAlign="left">
-        <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
-          {eventClass.carClass.class}&nbsp;&nbsp;&nbsp;&nbsp;
-        </Box>
-        <Chip
-          label={'Class Record: ' + eventClass.drivers[0].classRecord}
-          variant="outlined"
-          color="info"
-          size="medium"
-          icon={<Timer />}
-        />
-        <ResultsTable
-          data={eventClass.drivers.sort(
-            (a, b) =>
-              Math.min(...a.times.map((time) => time?.time || 10000000)) -
-              Math.min(...b.times.map((time) => time?.time || 10000000))
-          )}
-          runCount={runCount.data as number}
-        />
-      </Box>
-    ))
-  }
-
-  const renderInfos = () => {
-    const idx = currentRun.times.length - 1
-    const times = currentRun.times[idx]
-
-    if (typeof times !== 'undefined') {
-      const {
-        bestSector1,
-        bestSector2,
-        bestSector3,
-        previousBestSector1,
-        previousBestSector2,
-        previousBestSector3,
-      } = getClassBestSectorTimes(currentRun.classIndex, allRuns.data) || {
-        bestSector1: 0,
-        bestSector2: 0,
-        bestSector3: 0,
-        previousBestSector1: 0,
-        previousBestSector2: 0,
-        previousBestSector3: 0,
-      }
-
-      const {
-        sector1,
-        sector2,
-        sector3,
-        finishTime,
-        sector1DeltaPB,
-        sector1DeltaLeader,
-        sector2DeltaPB,
-        sector2DeltaLeader,
-        sector3DeltaPB,
-        sector3DeltaLeader,
-        finishDeltaPB,
-        finishDeltaLeader,
-      } = TimeDeltas(
-        times,
-        personalBestSector1,
-        previousPersonalBestSector1,
-        bestSector1,
-        previousBestSector1,
-        personalBestSector2,
-        previousPersonalBestSector2,
-        bestSector2,
-        previousBestSector2,
-        personalBestSector3,
-        previousPersonalBestSector3,
-        bestSector3,
-        previousBestSector3,
-        personalBestFinishTime,
-        previousPersonalBestFinishTime,
-        bestFinishTime,
-        previousBestFinishTime
-      )
-
-      return (
-        <Grid>
-          <Grid>
-            <PrimaryPaper>
-              <MUITable sx={{ minWidth: 200 }} size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell width={2}></TableCell>
-                    <TableCell width={1}></TableCell>
-                    <TableCell width={2}>Time</TableCell>
-                    <TableCell width={2}>&Delta; PB today</TableCell>
-                    <TableCell width={2}>&Delta; #1 in class</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>Sector 1</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          width: 20,
-                          height: 20,
-                          backgroundColor: sector1Colour,
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {sector1 !== 0
-                        ? sector1 > 0
-                          ? (sector1 / 1000).toFixed(2)
-                          : ''
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {sector1 !== 0 &&
-                      personalBestSector1 !== defaultBest &&
-                      personalBestSector1 - defaultBest !== sector1DeltaPB
-                        ? sector1DeltaPB > 0
-                          ? '+' + (sector1DeltaPB / 1000).toFixed(2)
-                          : (sector1DeltaPB / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {sector1 !== 0 &&
-                      bestSector1 !== defaultBest &&
-                      bestSector1 - defaultBest !== sector1DeltaLeader
-                        ? sector1DeltaLeader > 0
-                          ? '+' + (sector1DeltaLeader / 1000).toFixed(2)
-                          : (sector1DeltaLeader / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Sector 2</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          width: 20,
-                          height: 20,
-                          backgroundColor: sector2Colour,
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {sector2 > 0
-                        ? sector2 > 0
-                          ? (sector2 / 1000).toFixed(2)
-                          : ''
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {sector2 > 0 &&
-                      personalBestSector2 !== defaultBest &&
-                      personalBestSector2 - defaultBest !== sector2DeltaPB
-                        ? sector2DeltaPB > 0
-                          ? '+' + (sector2DeltaPB / 1000).toFixed(2)
-                          : (sector2DeltaPB / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {sector2 > 0 &&
-                      bestSector2 !== defaultBest &&
-                      bestSector2 - defaultBest !== sector2DeltaLeader
-                        ? sector2DeltaLeader > 0
-                          ? '+' + (sector2DeltaLeader / 1000).toFixed(2)
-                          : (sector2DeltaLeader / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Sector 3</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          width: 20,
-                          height: 20,
-                          backgroundColor: sector3Colour,
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {sector3 > 0
-                        ? sector3 > 0
-                          ? (sector3 / 1000).toFixed(2)
-                          : ''
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {sector3 > 0 &&
-                      sector3DeltaPB !== 0 &&
-                      personalBestSector3 !== defaultBest &&
-                      personalBestSector3 - defaultBest !== sector3DeltaPB
-                        ? sector3DeltaPB > 0
-                          ? '+' + (sector3DeltaPB / 1000).toFixed(2)
-                          : (sector3DeltaPB / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {sector3 > 0 &&
-                      sector3DeltaLeader !== 0 &&
-                      bestSector3 !== defaultBest &&
-                      bestSector3 - defaultBest !== sector3DeltaLeader
-                        ? sector3DeltaLeader > 0
-                          ? '+' + (sector3DeltaLeader / 1000).toFixed(2)
-                          : (sector3DeltaLeader / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Finish Time</TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          width: 20,
-                          height: 20,
-                          backgroundColor: finishColour,
-                          borderRadius: '4px',
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {finishTime > 0
-                        ? finishTime > 0
-                          ? (finishTime / 1000).toFixed(2)
-                          : ''
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {finishTime > 0 &&
-                      finishDeltaPB !== 0 &&
-                      personalBestFinishTime !== defaultBest &&
-                      personalBestFinishTime - defaultBest !== finishDeltaPB
-                        ? finishDeltaPB > 0
-                          ? '+' + (finishDeltaPB / 1000).toFixed(2)
-                          : (finishDeltaPB / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                    <TableCell>
-                      {finishTime > 0 &&
-                      finishDeltaLeader !== 0 &&
-                      bestFinishTime !== defaultBest &&
-                      bestFinishTime - defaultBest !== finishDeltaLeader
-                        ? finishDeltaLeader > 0
-                          ? '+' + (finishDeltaLeader / 1000).toFixed(2)
-                          : (finishDeltaLeader / 1000).toFixed(2)
-                        : ''}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </MUITable>
-            </PrimaryPaper>
-          </Grid>
-          <Grid
-            sx={{
-              height: 12,
-            }}
-          ></Grid>
-          <PrimaryPaper>
-            <Grid>
-              Fastest finish times for the day
-              <br />
-              {bestFinishTimeOfTheDayName !== ''
-                ? 'Outright: ' +
-                  (bestFinishTimeOfTheDay / 1000).toFixed(2) +
-                  ' by ' +
-                  bestFinishTimeOfTheDayName +
-                  ' in the ' +
-                  bestFinishTimeOfTheDayCar
-                : ''}
-              <br />
-              {bestFinishTimeOfTheDayLadyName !== ''
-                ? 'Lady: ' +
-                  (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
-                  ' by ' +
-                  bestFinishTimeOfTheDayLadyName +
-                  ' in the ' +
-                  bestFinishTimeOfTheDayLadyCar
-                : ''}
-              <br />
-              {bestFinishTimeOfTheDayJuniorName !== ''
-                ? 'Junior: ' +
-                  (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
-                  ' by ' +
-                  bestFinishTimeOfTheDayJuniorName +
-                  ' in the ' +
-                  bestFinishTimeOfTheDayJuniorCar
-                : ''}
-              <br />
-            </Grid>
-          </PrimaryPaper>
-        </Grid>
-      )
-    }
+  if (!currentCompetitor) {
+    return (
+      <Container maxWidth={false}>
+        <Alert severity="error">
+          Could not find a competitor that matches {currentCompetitorId.data}
+        </Alert>
+      </Container>
+    )
   }
 
   return (
@@ -443,11 +156,12 @@ export const Announcer = () => {
                 height: 96,
               }}
             >
-              {currentRun.number}: {currentRun.firstName} {currentRun.lastName}
+              {currentCompetitor.number}: {currentCompetitor.firstName}{' '}
+              {currentCompetitor.lastName}
               {', '}
-              {currentRun.vehicle}
-              <br></br>
-              {currentRun.class}
+              {currentCompetitor.vehicle}
+              <br />
+              {currentCompetitor.class}
             </PrimaryPaper>
           </Grid>
           <Grid item xs={4}>
@@ -458,11 +172,10 @@ export const Announcer = () => {
                 height: 96,
               }}
             >
-              {currentRun.special}
+              {currentCompetitor.special}
             </PrimaryPaperCenter>
           </Grid>
           <Grid item xs={4}>
-            {' '}
             <PrimaryPaperCenter
               sx={{
                 fontSize: 48,
@@ -470,14 +183,22 @@ export const Announcer = () => {
                 height: 96,
               }}
             >
-              Run {currentRun.times.length}
+              Run {currentCompetitor.times.length}
             </PrimaryPaperCenter>
           </Grid>
           <Grid item xs={4}>
-            {renderInfos()}
+            <RenderInfo
+              currentRun={currentCompetitor}
+              allRuns={competitorList.data}
+            />
           </Grid>
           <Grid item xs={8}>
-            <PrimaryPaper>{renderClassList()}</PrimaryPaper>
+            <RenderClassList
+              classes={classes}
+              allRuns={competitorList.data}
+              currentClassIndex={currentCompetitor.classIndex}
+              runCount={runCount.data}
+            />
           </Grid>
         </Grid>
       </Typography>

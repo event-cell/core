@@ -5,13 +5,7 @@ import React, { useEffect } from 'react'
 import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
-import {
-  getClassBestSectorTimes,
-  getPersonalBestSector,
-  getPersonalBestTotal,
-  RankTimes,
-  TimeDeltas,
-} from 'ui-shared'
+import { calculateTimes, RankTimes } from 'ui-shared'
 
 let displayInterval: NodeJS.Timeout
 
@@ -48,80 +42,12 @@ export const TrackDisplay = () => {
     previousBestFinishTime,
   } = RankTimes(currentRun, allRuns.data)
 
-  const { previousPersonalBestFinishTime, personalBestFinishTime } =
-    getPersonalBestTotal(currentRun)
-
-  const {
-    personalBestSector1,
-    personalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector1,
-    previousPersonalBestSector2,
-    previousPersonalBestSector3,
-  } = getPersonalBestSector(currentRun)
-
-  const {
-    bestSector1,
-    bestSector2,
-    bestSector3,
-    previousBestSector1,
-    previousBestSector2,
-    previousBestSector3,
-  } = getClassBestSectorTimes(currentRun.classIndex, allRuns.data) || {
-    bestSector1: 0,
-    bestSector2: 0,
-    bestSector3: 0,
-    previousBestSector1: 0,
-    previousBestSector2: 0,
-    previousBestSector3: 0,
-  }
-
   const idx = currentRun.times.length - 1
   const times = currentRun.times[idx]
 
   if (typeof times === 'undefined') return null
 
-  const {
-    sector1,
-    sector2,
-    sector3,
-    finishTime,
-    // Why are we just ignoring eslint's warnings if these variables are unused?
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sector1DeltaPB,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sector1DeltaLeader,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sector2DeltaPB,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sector2DeltaLeader,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sector3DeltaPB,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    sector3DeltaLeader,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    finishDeltaPB,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    finishDeltaLeader,
-  } = TimeDeltas(
-    times,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    bestSector1,
-    previousBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    bestSector2,
-    previousBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    bestSector3,
-    previousBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
-    bestFinishTime,
-    previousBestFinishTime
-  )
+  const { sector1, sector2, sector3, finish } = calculateTimes(times)
 
   let finalFinishColour: string
   if (
@@ -160,22 +86,12 @@ export const TrackDisplay = () => {
             DSQ
           </Grid>
         )
-      } else if (
-        finishTime <= 0 &&
-        sector3 <= 0 &&
-        sector2 <= 0 &&
-        sector1 > 0
-      ) {
+      } else if (finish <= 0 && sector3 <= 0 && sector2 <= 0 && sector1 > 0) {
         return (sector1 / 1000).toFixed(2)
-      } else if (
-        finishTime <= 0 &&
-        sector3 <= 0 &&
-        sector2 > 0 &&
-        sector1 > 0
-      ) {
+      } else if (finish <= 0 && sector3 <= 0 && sector2 > 0 && sector1 > 0) {
         return (sector2 / 1000).toFixed(2)
-      } else if (finishTime > 0 && sector3 > 0 && sector2 > 0 && sector1 > 0) {
-        return (finishTime / 1000).toFixed(2)
+      } else if (finish > 0 && sector3 > 0 && sector2 > 0 && sector1 > 0) {
+        return (finish / 1000).toFixed(2)
       } else {
         return ''
       }

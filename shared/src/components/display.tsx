@@ -18,11 +18,12 @@ import { ResultsTable } from './table'
 import { Timer } from '@mui/icons-material'
 
 import {
+  calculateDeltas,
+  calculateTimes,
   getClassBestSectorTimes,
   getPersonalBestSector,
   getPersonalBestTotal,
   RankTimes,
-  TimeDeltas,
 } from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
@@ -50,6 +51,8 @@ const getDisplayNumber = (): number => {
   return Number(window.location.pathname.replace('/display/', ''))
 }
 
+type ItemizedClassType = ClassType & { startItem: number }
+
 /**
  * This is the internal logic of the {@link splitDisplay} function. It is here
  * to make it easier to test
@@ -59,23 +62,19 @@ export const splitDisplayLogic = ({
   screenIndex,
   itemsPerScreen,
 }: {
-  classesList: ClassType[]
+  classesList: ItemizedClassType[]
   screenIndex: number
   itemsPerScreen: number
-}): ClassType[] =>
+}): ItemizedClassType[] =>
   classesList.filter(
-    (_class, index) =>
+    (classInfo) =>
       // If the class was not on the last screen
-      index >= (screenIndex - 1) * itemsPerScreen &&
+      classInfo.startItem >= (screenIndex - 1) * itemsPerScreen &&
       // If the class is not large enough to be on the next screen
-      index < screenIndex * itemsPerScreen
+      classInfo.startItem < screenIndex * itemsPerScreen
   )
 
 function splitDisplay(classesList: ClassType[]) {
-  // Calculate ClassesList for each screen.
-  const numberOfScreens = 4 // TODO: This should be configurable
-  const itemsPerScreen = Math.ceil(classesList.length / numberOfScreens)
-
   // If we are in a NextJS server-side render, window will not be present. We
   // also want to exit out early if this page is `/display` on the client or
   // does not include `/display/`
@@ -86,12 +85,33 @@ function splitDisplay(classesList: ClassType[]) {
   )
     return classesList
 
+  let items = 0
+  const itemizedClassesList: ItemizedClassType[] = classesList.map(
+    (classType) => {
+      const startItem = items
+      items += classType.drivers.length
+
+      return {
+        ...classType,
+        startItem,
+      } satisfies ItemizedClassType
+    }
+  )
+
+  // Calculate ClassesList for each screen.
+  const numberOfScreens = 4 // TODO: This should be configurable
+  const itemsPerScreen = Math.ceil(items / numberOfScreens)
+
   try {
     const screenIndex = Number.parseInt(
       window.location.pathname.replace('/display/', '')
     )
 
-    return splitDisplayLogic({ classesList, screenIndex, itemsPerScreen })
+    return splitDisplayLogic({
+      classesList: itemizedClassesList,
+      screenIndex,
+      itemsPerScreen,
+    })
   } catch (e) {
     console.warn(
       'Failed to generate classList for this display. Falling back to the full list'
@@ -363,22 +383,32 @@ const blockSize = 30
 function RenderSector({
   sectorName,
   time,
-  deltaPB,
-  deltaLeader,
   sectorPB,
   bestSector,
   sectorColor,
   defaultBest,
+
+  previousPB,
+  previousGlobalBest,
 }: {
   sectorName: string
   time: number
-  deltaPB: number
-  deltaLeader: number
   sectorPB: number
   bestSector: number
   sectorColor: string
   defaultBest: number
+
+  previousPB: number
+  previousGlobalBest: number
 }) {
+  const { deltaPB, deltaLeader } = calculateDeltas({
+    time,
+    pb: sectorPB,
+    previousPB,
+    globalBest: bestSector,
+    previousGlobalBest,
+  })
+
   return (
     <TableRow>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>{sectorName}</TableCell>
@@ -417,10 +447,10 @@ function RenderSector({
   )
 }
 
-const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
-  currentRun,
-  allRuns,
-}) => {
+export const RenderInfo: FC<{
+  currentRun: Competitor
+  allRuns: CompetitorList
+}> = ({ currentRun, allRuns }) => {
   const {
     sector1Colour,
     sector2Colour,
@@ -480,38 +510,7 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
 
   if (typeof times == 'undefined') return <div />
 
-  const {
-    sector1,
-    sector2,
-    sector3,
-    finishTime,
-    sector1DeltaPB,
-    sector1DeltaLeader,
-    sector2DeltaPB,
-    sector2DeltaLeader,
-    sector3DeltaPB,
-    sector3DeltaLeader,
-    finishDeltaPB,
-    finishDeltaLeader,
-  } = TimeDeltas(
-    times,
-    personalBestSector1,
-    previousPersonalBestSector1,
-    bestSector1,
-    previousBestSector1,
-    personalBestSector2,
-    previousPersonalBestSector2,
-    bestSector2,
-    previousBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector3,
-    bestSector3,
-    previousBestSector3,
-    personalBestFinishTime,
-    previousPersonalBestFinishTime,
-    bestFinishTime,
-    previousBestFinishTime
-  )
+  const { sector1, sector2, sector3, finish } = calculateTimes(times)
 
   return (
     <Grid>
@@ -538,45 +537,45 @@ const RenderInfo: FC<{ currentRun: Competitor; allRuns: CompetitorList }> = ({
               <RenderSector
                 sectorName={'Sector 1'}
                 time={sector1}
-                deltaPB={sector1DeltaPB}
-                deltaLeader={sector1DeltaLeader}
                 sectorPB={personalBestSector1}
                 bestSector={bestSector1}
                 sectorColor={sector1Colour}
                 defaultBest={defaultBest}
+                previousPB={previousPersonalBestSector1}
+                previousGlobalBest={previousBestSector1}
               />
 
               <RenderSector
                 sectorName={'Sector 2'}
                 time={sector2}
-                deltaPB={sector2DeltaPB}
-                deltaLeader={sector2DeltaLeader}
                 sectorPB={personalBestSector2}
                 bestSector={bestSector2}
                 sectorColor={sector2Colour}
                 defaultBest={defaultBest}
+                previousPB={previousPersonalBestSector2}
+                previousGlobalBest={previousBestSector2}
               />
 
               <RenderSector
                 sectorName={'Sector 3'}
                 time={sector3}
-                deltaPB={sector3DeltaPB}
-                deltaLeader={sector3DeltaLeader}
                 sectorPB={personalBestSector3}
                 bestSector={bestSector3}
                 sectorColor={sector3Colour}
                 defaultBest={defaultBest}
+                previousPB={previousPersonalBestSector3}
+                previousGlobalBest={previousBestSector3}
               />
 
               <RenderSector
                 sectorName={'Finish'}
-                time={finishTime}
-                deltaPB={finishDeltaPB}
-                deltaLeader={finishDeltaLeader}
+                time={finish}
                 sectorPB={personalBestFinishTime}
                 bestSector={bestFinishTime}
                 sectorColor={finishColour}
                 defaultBest={defaultBest}
+                previousPB={previousPersonalBestFinishTime}
+                previousGlobalBest={previousBestFinishTime}
               />
             </TableBody>
           </MUITable>

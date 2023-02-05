@@ -27,6 +27,9 @@ export const Competitor = z.object({
   lastName: z.string(),
   firstName: z.string(),
   class: z.string(),
+  /**
+   * The idenfier for a specific class
+   */
   classIndex: z.number(),
   vehicle: z.string(),
   classRecord: z.string(),
