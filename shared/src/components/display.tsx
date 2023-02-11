@@ -15,7 +15,7 @@ import {
 import React, { FC, useMemo } from 'react'
 
 import { ResultsTable } from './table'
-import { Timer } from '@mui/icons-material'
+import Timer from '@mui/icons-material/Timer'
 
 import {
   calculateDeltas,

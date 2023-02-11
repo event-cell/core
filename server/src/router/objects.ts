@@ -10,7 +10,7 @@ const TimeInfo = z
   })
   .optional()
 
-export const TimeInfoManditory = z.object({
+export const TimeInfoMandatory = z.object({
   run: z.number(),
   status: z.number(),
   time: z.number(),
@@ -19,7 +19,7 @@ export const TimeInfoManditory = z.object({
 })
 
 export const TimeInfoList = z.array(TimeInfo)
-export type TimeInfoManditory = z.infer<typeof TimeInfoManditory>
+export type TimeInfoMandatory = z.infer<typeof TimeInfoMandatory>
 export type TimeInfoList = z.infer<typeof TimeInfoList>
 
 export const Competitor = z.object({

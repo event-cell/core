@@ -18,3 +18,5 @@ export class Config {
     ? `http://${window?.location.hostname || 'timingserver.local'}:8080/api/v1`
     : '/api/v1'
 }
+
+export const config = new Config()
