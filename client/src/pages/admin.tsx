@@ -6,7 +6,7 @@ import {
   TextField,
 } from '@mui/material'
 import { green, red } from '@mui/material/colors'
-import React from 'react'
+import React, { useState } from 'react'
 import { trpc, useTrpcClient } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
@@ -41,6 +41,7 @@ export const Admin = () => {
   const config = trpc.useQuery(['config.get'])
   const setConfig = trpc.useMutation(['config.set'])
 
+  const [newConfig, setNewConfig] = useState(config.data || {})
   const loading = setConfig.status === 'loading'
 
   const requestErrors = requestWrapper(config)
