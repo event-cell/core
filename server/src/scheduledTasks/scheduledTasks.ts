@@ -1,6 +1,4 @@
 import { setupLogger } from './../utils'
-import { config } from '../config'
-import { getEventDatabases } from '../dbUtils'
 
 const logger = setupLogger('scheduledTasks/scheduledTasks')
 

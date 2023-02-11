@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
-import { Timer } from '@mui/icons-material'
+import Timer from '@mui/icons-material/Timer'
 import {
   Alert,
   Box,

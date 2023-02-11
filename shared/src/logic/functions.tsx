@@ -1,7 +1,7 @@
 import {
   Competitor,
   CompetitorList,
-  TimeInfoManditory,
+  TimeInfoMandatory,
 } from 'server/src/router/objects'
 
 const REALLY_LARGE_NUMBER = Number.MAX_SAFE_INTEGER
@@ -365,7 +365,7 @@ export function RankTimes(
   }
 }
 
-export function calculateTimes(times: TimeInfoManditory): {
+export function calculateTimes(times: TimeInfoMandatory): {
   sector1: number
   sector2: number
   sector3: number

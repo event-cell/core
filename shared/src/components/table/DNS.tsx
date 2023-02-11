@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 
 import { Chip } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2'
-import { MeetingRoom } from '@mui/icons-material'
+import MeetingRoom from '@mui/icons-material/MeetingRoom'
 
 import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
 

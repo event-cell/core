@@ -1,5 +1,5 @@
 import { Box, Container, Grid, Typography } from '@mui/material'
-import { CarCrash } from '@mui/icons-material'
+import CarCrash from '@mui/icons-material/CarCrash'
 import React, { useEffect } from 'react'
 
 import { trpc } from '../App'

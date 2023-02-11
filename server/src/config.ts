@@ -1,8 +1,9 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { setupLogger } from './utils'
-const logger = setupLogger('config')
 import { z } from 'zod'
+
+const logger = setupLogger('config')
 
 export const ConfigType = z.object({
   eventId: z.optional(z.string()),
@@ -22,6 +23,7 @@ class Config {
 
   public eventDatabasePath = join(__dirname, '..', 'prisma/Events')
   public recordsDatabasePath = '/data/records'
+  public resultsPath = '/data/results'
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
@@ -50,7 +52,7 @@ class Config {
   }
 
   /**
-   * Sets all of the local config variables to the contents of the file
+   * Sets all the local config variables to the contents of the file
    * @param config The new config
    */
   public set(config: ConfigType) {
