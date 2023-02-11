@@ -79,14 +79,13 @@ export const endOfDayResults = router().query('generate', {
       }
       lastClass = currentClass
       // logic for when to award a certificate
-      // 6 or more in a class, top 3
+      // 5 or more in a class, top 3
       // 4 or more in a class, top 2
       // 3 or less in a class, winner takes all
 
       if (
-        (currentClassCount >= 6 && classPosition < 4) ||
-        ((currentClassCount === 4 || currentClass === 5) &&
-          classPosition < 3) ||
+        (currentClassCount >= 5 && classPosition < 4) ||
+        (currentClassCount === 4 && classPosition < 3) ||
         (currentClassCount <= 3 && classPosition === 1)
       ) {
         return {
