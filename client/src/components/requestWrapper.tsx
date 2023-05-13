@@ -4,9 +4,11 @@ import { UseQueryResult } from 'react-query'
 import React from 'react'
 
 export function requestWrapper(
-  ...requests: UseQueryResult<unknown, TRPCClientErrorLike<never>>[]
+  requests: Record<string, UseQueryResult<unknown, TRPCClientErrorLike<never>>>,
+  ignoreLoadingKeys: string[] = []
 ) {
-  for (const request of requests) {
+  for (const requestName in requests) {
+    const request = requests[requestName]
     if (request.error) {
       return (
         <Container>
@@ -20,7 +22,10 @@ export function requestWrapper(
       )
     }
 
-    if (typeof request.data === 'undefined') {
+    if (
+      typeof request.data === 'undefined' &&
+      !ignoreLoadingKeys.includes(requestName)
+    ) {
       return (
         <div
           style={{
@@ -28,9 +33,14 @@ export function requestWrapper(
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
+            flexDirection: 'column',
+            gap: '1rem',
           }}
         >
           <CircularProgress />
+          <Typography variant="caption">
+            Waiting on <code>{requestName}</code>
+          </Typography>
         </div>
       )
     }

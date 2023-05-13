@@ -1,10 +1,13 @@
-import {
-  Competitor,
-  CompetitorList,
-  TimeInfoMandatory,
-} from 'server/src/router/objects'
+import { Competitor, CompetitorList, TimeInfo } from 'server/src/router/objects'
 
 const REALLY_LARGE_NUMBER = Number.MAX_SAFE_INTEGER
+
+export interface Times {
+  sector1: number
+  sector2: number
+  sector3: number
+  finsih: number
+}
 
 interface BestTimeProps {
   sector2Colour: string
@@ -187,7 +190,7 @@ function determinePB(time: number, pb: number, prevPB: number) {
   return { pb: pb, prevPB: prevPB }
 }
 
-// eslint-disable-next-line complexity
+/** @deprecated */
 export function RankTimes(
   currentRun: Competitor,
   allRuns: CompetitorList
@@ -365,7 +368,28 @@ export function RankTimes(
   }
 }
 
-export function calculateTimes(times: TimeInfoMandatory): {
+export type SectorColors = 'purple' | 'green' | 'yellow' | 'background.default'
+
+export function getColor(
+  classBest: number,
+  personalBest: number,
+  time: number
+): 'purple' | 'green' | 'yellow' | 'background.default' {
+  if (time <= 0) return 'background.default'
+
+  if (time <= classBest) return 'purple'
+  if (time <= personalBest) return 'green'
+  return 'yellow'
+}
+
+export function getSectorColors(classBest: ClassBestSectorTimes, pb: PersonalBestSector, currentTimes: ): Record<
+  'first' | 'second' | 'third' | 'finish',
+  SectorColors
+> {
+
+}
+
+export function calculateTimes(times: TimeInfo): {
   sector1: number
   sector2: number
   sector3: number

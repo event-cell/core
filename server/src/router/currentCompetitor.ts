@@ -2,13 +2,12 @@ import { router, TRPCError } from '@trpc/server'
 
 import { event, eventData } from './shared'
 import { z } from 'zod'
+import { getCurrentHeat, getHeatInterTableKey } from '../utils'
+import { warn } from 'winston'
 
 export const currentCompetitor = router().query('number', {
-  output: z.number(),
+  output: z.number().optional(),
   resolve: async function () {
-    let lastStartQuery
-    let currentCompetitorNumber: number = 0
-
     if (!event || !eventData) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
@@ -17,151 +16,25 @@ export const currentCompetitor = router().query('number', {
     }
 
     try {
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT1_START.findMany({
+      const currentHeat = await getCurrentHeat()
+      const heatInterTable = eventData[getHeatInterTableKey(currentHeat)]
+
+      // Find the competitor with the highest C_HOUR2
+      const competitorQuery = await heatInterTable.findMany({
         select: {
           C_NUM: true,
+          C_HOUR2: true,
+
         },
         orderBy: {
-          C_LINE: 'desc',
+          C_HOUR2: 'desc',
         },
         take: 1,
       })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT2_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT3_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT4_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT5_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT6_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT7_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT8_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-      lastStartQuery = await eventData.tTIMERECORDS_HEAT9_START.findMany({
-        select: {
-          C_NUM: true,
-        },
-        orderBy: {
-          C_LINE: 'desc',
-        },
-        take: 1,
-      })
-      if (lastStartQuery.length === 1) {
-        lastStartQuery.forEach((a) => {
-          if (a.C_NUM) {
-            currentCompetitorNumber = a.C_NUM
-          }
-        })
-      }
-    } catch (e) {}
-    return currentCompetitorNumber
+
+      return competitorQuery[0].C_NUM || undefined
+    } catch (e) {
+      warn(`Error getting current competitor: ${e}`)
+    }
   },
 })

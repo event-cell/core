@@ -1,16 +1,6 @@
 import { z } from 'zod'
 
-const TimeInfo = z
-  .object({
-    run: z.number(),
-    status: z.number(),
-    time: z.number(),
-    split1: z.number(),
-    split2: z.number(),
-  })
-  .optional()
-
-export const TimeInfoMandatory = z.object({
+export const TimeInfo = z.object({
   run: z.number(),
   status: z.number(),
   time: z.number(),
@@ -18,8 +8,8 @@ export const TimeInfoMandatory = z.object({
   split2: z.number(),
 })
 
-export const TimeInfoList = z.array(TimeInfo)
-export type TimeInfoMandatory = z.infer<typeof TimeInfoMandatory>
+export const TimeInfoList = z.array(TimeInfo.optional())
+export type TimeInfo = z.infer<typeof TimeInfo>
 export type TimeInfoList = z.infer<typeof TimeInfoList>
 
 export const Competitor = z.object({

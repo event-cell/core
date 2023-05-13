@@ -100,11 +100,11 @@ export const Announcer = () => {
   }, [currentCompetitorId, competitorList, runCount])
 
   {
-    const requestErrors = requestWrapper(
+    const requestErrors = requestWrapper({
       currentCompetitorId,
       competitorList,
-      runCount
-    )
+      runCount,
+    })
     if (requestErrors) return requestErrors
   }
 
@@ -183,7 +183,7 @@ export const Announcer = () => {
                 height: 96,
               }}
             >
-              Run {currentCompetitor.times.length}
+              Run {runCount.data}
             </PrimaryPaperCenter>
           </Grid>
           <Grid item xs={4}>

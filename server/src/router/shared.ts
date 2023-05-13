@@ -4,11 +4,12 @@ import { TRPCError } from '@trpc/server'
 import { CompetitorList, TimeInfoList } from './objects'
 import { nullToUndefined } from '../utils'
 
-export let { event, eventData } = getEventDatabases(config.eventId)
+export let { event, eventData , online} = getEventDatabases(config.eventId)
 
 export function setNewEvent(eventDB: EventDB) {
   event = eventDB.event
   eventData = eventDB.eventData
+  online = eventDB.online
 }
 
 export async function getCompetitorJSON() {

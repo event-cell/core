@@ -133,9 +133,7 @@ export const endOfDayResults = router().query('generate', {
     })
 
     const stream = fs.readFileSync('endofdayresult.xlsx')
-    console.log(stream)
     return { xlsx: stream.toString('base64') }
-    console.log(stream)
     // return toCSV(table)
   },
 })

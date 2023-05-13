@@ -1,11 +1,11 @@
 import { router } from '@trpc/server'
 import { z } from 'zod'
-import { setupLogger } from './../utils'
+import { setupLogger } from '../utils'
 const logger = setupLogger('router/config')
 
 import { config, ConfigType } from '../config'
 import { getEventDatabases } from '../dbUtils'
-import { event, eventData, setNewEvent } from './shared'
+import { setNewEvent } from './shared'
 
 export const configRoute = router()
   .query('eventName', { output: z.string(), resolve: () => config.eventName })

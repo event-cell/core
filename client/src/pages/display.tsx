@@ -27,7 +27,10 @@ export const DisplayPage = () => {
     return () => clearTimeout(timeout)
   }, [currentCompetitor, allRuns, runCount])
 
-  const requestErrors = requestWrapper(currentCompetitor, allRuns, runCount)
+  const requestErrors = requestWrapper(
+    { currentCompetitor, allRuns, runCount },
+    ['currentCompetitor']
+  )
   if (requestErrors) return requestErrors
 
   if (!allRuns.data) {
@@ -36,7 +39,6 @@ export const DisplayPage = () => {
   } // This will never be called, but it is needed to make typescript happy
 
   if (!currentCompetitor.data) {
-    console.warn('Missing currentCompetitor data')
     return <DisplayCompetitorList allRuns={allRuns.data} />
   }
 

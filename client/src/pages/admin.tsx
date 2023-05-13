@@ -11,30 +11,6 @@ import { trpc, useTrpcClient } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
 
-const toBase64 = (file: File): Promise<string | ArrayBuffer | null> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result)
-    reader.onerror = (error) => reject(error)
-  })
-
-async function downloadFile(file: File) {
-  const data = await toBase64(file)
-  if (typeof data !== 'string')
-    throw new Error(`Could not convert file into a valid data string`)
-
-  const element = document.createElement('a')
-  element.setAttribute('href', data)
-  element.setAttribute('download', file.name)
-
-  element.style.display = 'none'
-  document.body.append(element)
-  console.log(element)
-  element.click()
-  element.remove()
-}
-
 export const Admin = () => {
   const trpcClient = useTrpcClient()
 
@@ -44,7 +20,7 @@ export const Admin = () => {
   const [newConfig, setNewConfig] = useState(config.data || {})
   const loading = setConfig.status === 'loading'
 
-  const requestErrors = requestWrapper(config)
+  const requestErrors = requestWrapper({ config })
   if (requestErrors) return requestErrors
   if (!config.data) return null // This will never be called, but it is needed to make typescript happy
 
@@ -125,8 +101,6 @@ export const Admin = () => {
             const mediaType =
               'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
             window.location.href = `${mediaType}${data.xlsx}`
-            // const file = new File([fileBlob], 'endofdayresults.xlsx')
-            // await downloadFile(file)
           }}
         >
           End of Day Results

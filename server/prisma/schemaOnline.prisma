@@ -1,0 +1,25 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "./generated/online"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("ONLINE_DB")
+}
+
+model TKEYVALUES {
+  TABLENAME String @id
+  KEYVALUE  Int
+}
+
+model TPARAMETERS {
+  C_PARAM String  @id
+  C_VALUE String?
+}
+
+model TUPDATEVALUES {
+  TABLENAME   String @id
+  UPDATEVALUE Int
+}

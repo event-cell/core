@@ -6,8 +6,65 @@ import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
 import { calculateTimes, RankTimes } from 'ui-shared'
+import { TimeInfo } from 'server/src/router/objects'
 
 let displayInterval: NodeJS.Timeout
+
+function getLatestSector({
+  finish,
+  sector1,
+  sector2,
+  sector3,
+}: {
+  finish: number
+  sector1: number
+  sector2: number
+  sector3: number
+}): string {
+  const formatNumber = (num: number) => (num / 1000).toFixed(2)
+
+  if (finish > 0) return formatNumber(finish)
+  if (sector3 > 0) return formatNumber(sector3)
+  if (sector2 > 0) return formatNumber(sector2)
+  if (sector1 > 0) return formatNumber(sector1)
+
+  return ''
+}
+
+const RenderTime = ({
+  times,
+  time,
+}: {
+  times: {
+    sector1: number
+    sector2: number
+    sector3: number
+    finish: number
+  }
+  time: TimeInfo | undefined
+}) => {
+  if (typeof time === 'undefined') return null
+
+  if (time.status === 2) {
+    return (
+      <Grid sx={{ color: 'white' }}>
+        <CarCrash color="error" />
+        DNF
+      </Grid>
+    )
+  }
+
+  if (time.status === 3) {
+    return (
+      <Grid sx={{ color: 'white' }}>
+        <CarCrash color="error" />
+        DSQ
+      </Grid>
+    )
+  }
+
+  return <>{getLatestSector(times)}</>
+}
 
 export const TrackDisplay = () => {
   const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
@@ -21,7 +78,7 @@ export const TrackDisplay = () => {
     }, 1000 * 2)
   }, [currentCompetitor, allRuns])
 
-  const requestErrors = requestWrapper(currentCompetitor, allRuns)
+  const requestErrors = requestWrapper({ currentCompetitor, allRuns })
   if (requestErrors) return requestErrors
   if (!currentCompetitor.data || !allRuns.data) {
     console.warn('A function was called that should not be called')
@@ -33,70 +90,20 @@ export const TrackDisplay = () => {
   )
   const currentRun = currentRunArray[0]
 
-  const {
-    sector1Colour,
-    sector2Colour,
-    sector3Colour,
-    finishColour,
-    bestFinishTime,
-    previousBestFinishTime,
-  } = RankTimes(currentRun, allRuns.data)
+  const { sector1Colour, sector2Colour, sector3Colour, finishColour } =
+    RankTimes(currentRun, allRuns.data)
 
   const idx = currentRun.times.length - 1
   const times = currentRun.times[idx]
 
   if (typeof times === 'undefined') return null
 
-  const { sector1, sector2, sector3, finish } = calculateTimes(times)
+  const { sector1, sector2, sector3 } = calculateTimes(times)
 
-  let finalFinishColour: string
-  if (
-    sector1Colour !== 'background.default' &&
-    sector2Colour === 'background.default' &&
-    sector3Colour === 'background.default'
-  ) {
-    finalFinishColour = sector1Colour
-  } else if (
-    sector1Colour !== 'background.default' &&
-    sector2Colour !== 'background.default' &&
-    sector3Colour === 'background.default'
-  ) {
-    finalFinishColour = sector2Colour
-  } else {
-    finalFinishColour = finishColour
-  }
-
-  // Render functions
-  const renderTime = () => {
-    const idx = currentRun.times.length - 1
-    const times = currentRun.times[idx]
-
-    if (typeof times !== 'undefined') {
-      if (times.status === 2) {
-        return (
-          <Grid sx={{ color: 'white' }}>
-            <CarCrash color="error" />
-            DNF
-          </Grid>
-        )
-      } else if (times.status === 3) {
-        return (
-          <Grid sx={{ color: 'white' }}>
-            <CarCrash color="error" />
-            DSQ
-          </Grid>
-        )
-      } else if (finish <= 0 && sector3 <= 0 && sector2 <= 0 && sector1 > 0) {
-        return (sector1 / 1000).toFixed(2)
-      } else if (finish <= 0 && sector3 <= 0 && sector2 > 0 && sector1 > 0) {
-        return (sector2 / 1000).toFixed(2)
-      } else if (finish > 0 && sector3 > 0 && sector2 > 0 && sector1 > 0) {
-        return (finish / 1000).toFixed(2)
-      } else {
-        return ''
-      }
-    }
-  }
+  const finishColor = [sector1Colour, sector2Colour, sector3Colour].reduce(
+    (accum, current) => (current !== 'background.default' ? current : accum),
+    finishColour
+  )
 
   return (
     <Container maxWidth={false}>
@@ -187,7 +194,7 @@ export const TrackDisplay = () => {
           <Grid item xs={12}>
             <Box
               sx={{ height: 72, borderRadius: '4px', display: 'block' }}
-              bgcolor={finalFinishColour}
+              bgcolor={finishColor}
             />
           </Grid>
           <Grid item xs={12}>
@@ -203,7 +210,7 @@ export const TrackDisplay = () => {
                 height: 280,
               }}
             >
-              {renderTime()}
+              <RenderTime times={calculateTimes(times)} time={times} />
             </Box>
           </Grid>
         </Grid>

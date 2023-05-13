@@ -125,33 +125,32 @@ function splitDisplay(classesList: ClassType[]) {
 export const Display: FC<{
   currentCompetitor: number
   allRuns: CompetitorList
-  runCount: number
+  runCount: number | null
   renderOnTrack: boolean
 }> = ({ currentCompetitor, allRuns, runCount, renderOnTrack }) => {
   // Sort classes in class order as per the index value
   // in the timing software
 
-  const classes: { classIndex: number; class: string }[] = []
-  let maxClassIndex = 0
+  console.log({ currentCompetitor, allRuns, runCount, renderOnTrack })
 
-  allRuns.forEach((a) => {
-    if (a.classIndex > maxClassIndex) {
-      maxClassIndex = a.classIndex
-    }
-  })
+  const classes = useMemo(() => {
+    return allRuns.reduce(
+      (all: { classIndex: number; class: string }[], current) => {
+        const currentRunIncluded = all.some(
+          (cls) => cls.classIndex == current.classIndex
+        )
+        if (currentRunIncluded) return all
 
-  for (let i = 1; i < maxClassIndex + 1; i++) {
-    let shouldSkip = false
-    allRuns.forEach((row) => {
-      if (shouldSkip) {
-        return
-      }
-      if (row.classIndex === i) {
-        classes.push({ classIndex: row.classIndex, class: row.class })
-        shouldSkip = true
-      }
-    })
-  }
+        console.log(`"${current.class}"`)
+
+        return [
+          ...all,
+          { classIndex: current.classIndex, class: current.class },
+        ]
+      },
+      []
+    )
+  }, [allRuns])
 
   const printClassesList = useMemo(() => {
     const classesList = classes.map((carClass) => ({
@@ -182,92 +181,89 @@ export const Display: FC<{
 
   const displayNumber = getDisplayNumber()
 
-  if (printClassesList) {
-    return (
-      <Container>
-        <DisplayHeader display={displayNumber} />
+  if (!printClassesList) return null
 
-        {printClassesList.map((eventClass) => (
-          <div key={eventClass.carClass.class}>
-            <Typography component="div">
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridAutoColumns: '1fr',
-                }}
-              >
-                <Box
-                  fontWeight="fontWeightMedium"
-                  sx={{
-                    gridColumn: '1 / 3',
-                    m: 1,
-                  }}
-                >
-                  {eventClass.carClass.class}
-                </Box>
-                <Box
-                  sx={{
-                    gridColumn: '3 / 4',
-                    m: 1,
-                  }}
-                >
-                  <Chip
-                    label={'Class Record: ' + eventClass.drivers[0].classRecord}
-                    variant="outlined"
-                    color="info"
-                    size="small"
-                    icon={<Timer />}
-                  />
-                </Box>
-              </Box>
-            </Typography>
-            <ResultsTable
-              data={eventClass.drivers.sort(
-                (a, b) =>
-                  Math.min(...a.times.map((time) => time?.time || 10000000)) -
-                  Math.min(...b.times.map((time) => time?.time || 10000000))
-              )}
-              runCount={runCount as number}
-            />
-          </div>
-        ))}
-        {(displayNumber === 4 || displayNumber === 0) &&
-        renderOnTrack === true ? (
-          <Grid>
-            <Grid
+  return (
+    <Container>
+      <DisplayHeader display={displayNumber} />
+
+      {printClassesList.map((eventClass) => (
+        <div key={eventClass.carClass.class}>
+          <Typography component="div">
+            <Box
               sx={{
-                height: 6,
-              }}
-            ></Grid>
-            <Grid
-              sx={{
-                fontSize: 24,
-                height: 130,
+                display: 'grid',
+                gridAutoColumns: '1fr',
               }}
             >
-              <PrimaryPaper>
-                ON TRACK
-                <br />
-                {currentRun.number}: {currentRun.firstName}{' '}
-                {currentRun.lastName}
-                {', '}
-                {currentRun.vehicle}
-                <br></br>
-                {currentRun.class}
-              </PrimaryPaper>
-            </Grid>
-            <Grid item xs={4}>
-              <RenderInfo currentRun={currentRun} allRuns={allRuns} />
-            </Grid>
+              <Box
+                fontWeight="fontWeightMedium"
+                sx={{
+                  gridColumn: '1 / 3',
+                  m: 1,
+                }}
+              >
+                {eventClass.carClass.class}
+              </Box>
+              <Box
+                sx={{
+                  gridColumn: '3 / 4',
+                  m: 1,
+                }}
+              >
+                <Chip
+                  label={'Class Record: ' + eventClass.drivers[0].classRecord}
+                  variant="outlined"
+                  color="info"
+                  size="small"
+                  icon={<Timer />}
+                />
+              </Box>
+            </Box>
+          </Typography>
+          <ResultsTable
+            data={eventClass.drivers.sort(
+              (a, b) =>
+                Math.min(...a.times.map((time) => time?.time || 10000000)) -
+                Math.min(...b.times.map((time) => time?.time || 10000000))
+            )}
+            runCount={runCount as number}
+          />
+        </div>
+      ))}
+      {(displayNumber === 4 || displayNumber === 0) &&
+      renderOnTrack === true ? (
+        <Grid>
+          <Grid
+            sx={{
+              height: 6,
+            }}
+          ></Grid>
+          <Grid
+            sx={{
+              fontSize: 24,
+              height: 130,
+            }}
+          >
+            <PrimaryPaper>
+              ON TRACK
+              <br />
+              {currentRun.number}: {currentRun.firstName} {currentRun.lastName}
+              {', '}
+              {currentRun.vehicle}
+              <br></br>
+              {currentRun.class}
+            </PrimaryPaper>
           </Grid>
-        ) : (
-          ''
-        )}
-      </Container>
-    )
-  } else {
-    return null
-  }
+          <Grid item xs={4}>
+            <RenderInfo currentRun={currentRun} allRuns={allRuns} />
+          </Grid>
+        </Grid>
+      ) : (
+        ''
+      )}
+    </Container>
+  )
 }
 
 export const DisplayCompetitorList: FC<{
