@@ -3,11 +3,13 @@ import { Competitor, CompetitorList, TimeInfo } from 'server/src/router/objects'
 const REALLY_LARGE_NUMBER = Number.MAX_SAFE_INTEGER
 
 export interface Times {
-  sector1: number
-  sector2: number
-  sector3: number
-  finsih: number
+  split1: number
+  split2: number
+  split3: number
+  finish: number
 }
+
+
 
 interface BestTimeProps {
   sector2Colour: string
