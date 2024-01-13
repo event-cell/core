@@ -7,8 +7,8 @@ import { trpc } from '../App'
 import { requestWrapper } from '../components/requestWrapper'
 import {
   calculateTimes,
-  getGlobalBest,
-  getPersonalBest,
+  getGlobalBestSectors,
+  getPersonalBestSectors,
   getSectorColors,
 } from 'ui-shared'
 import { TimeInfo } from 'server/src/router/objects'
@@ -100,8 +100,8 @@ export const TrackDisplay = () => {
   const idx = currentCompetitor.times.length - 1
   const splits = currentCompetitor.times[idx]!
 
-  const globalBest = getGlobalBest(competitors.data)
-  const personalBest = getPersonalBest(currentCompetitor)
+  const globalBest = getGlobalBestSectors(competitors.data)
+  const personalBest = getPersonalBestSectors(currentCompetitor)
   const times = calculateTimes(splits)
   const {
     first: sector1Colour,

@@ -22,8 +22,6 @@ export type Times = {
 }
 
 interface BestTimeProps {
-  previousBestFinishTime: number
-  bestFinishTime: number
   defaultBest: number
   bestFinishTimeOfTheDay: number
   bestFinishTimeOfTheDayName: string
@@ -54,7 +52,7 @@ function getTopTimes(times: number[]): [number, number] {
   return [sortedTimes[0], sortedTimes[1]]
 }
 
-function getBest(competitors: CompetitorList): BestSectorTimes {
+function getBestSectors(competitors: CompetitorList): BestSectorTimes {
   const runs = competitors
     .flatMap((competitor) => competitor.times)
     .filter(Boolean)
@@ -80,11 +78,23 @@ function getBest(competitors: CompetitorList): BestSectorTimes {
   }
 }
 
-export const getGlobalBest = getBest
-export const getPersonalBest = (competitor: Competitor) => getBest([competitor])
-export const getClassBest = (classIndex: number, competitors: CompetitorList) =>
-  getBest(
+export const getGlobalBestSectors = getBestSectors
+export const getPersonalBestSectors = (competitor: Competitor) =>
+  getBestSectors([competitor])
+export const getClassBestSectors = (
+  classIndex: number,
+  competitors: CompetitorList
+) =>
+  getBestSectors(
     competitors.filter((competitors) => competitors.classIndex === classIndex)
+  )
+
+export const getBestFinishTheWorseVersion = (competitors: CompetitorList) =>
+  getTopTimes(
+    competitors
+      .flatMap((competitor) => competitor.times)
+      .filter(Boolean)
+      .map((run) => run.time)
   )
 
 export interface PersonalBestTotal {
@@ -129,8 +139,6 @@ export function RankTimes(
   let bestSector1 = defaultBest
   let bestSector2 = defaultBest
   let bestSector3 = defaultBest
-  let bestFinishTime = defaultBest
-  let previousBestFinishTime = defaultBest
   let personalBestSector1 = defaultBest
   let personalBestSector2 = defaultBest
   let personalBestSector3 = defaultBest
@@ -185,10 +193,6 @@ export function RankTimes(
           if (run.time - run.split2 < bestSector3) {
             bestSector3 = run.time - run.split2
           }
-          if (run.time < bestFinishTime) {
-            previousBestFinishTime = bestFinishTime
-            bestFinishTime = run.time
-          }
         }
       }
     }
@@ -238,8 +242,6 @@ export function RankTimes(
   }
 
   return {
-    bestFinishTime,
-    previousBestFinishTime,
     defaultBest,
     bestFinishTimeOfTheDay,
     bestFinishTimeOfTheDayName,

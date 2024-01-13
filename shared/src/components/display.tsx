@@ -20,11 +20,13 @@ import Timer from '@mui/icons-material/Timer'
 import {
   calculateDeltas,
   calculateTimes,
-  getClassBest,
-  getPersonalBest,
-  getPersonalBestSector,
+  getClassBestSectors,
+  getGlobalBestSectors,
+  getPersonalBestSectors,
   getPersonalBestTotal,
+  getSectorColors,
   RankTimes,
+  getBestFinishTheWorseVersion,
 } from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
@@ -436,12 +438,6 @@ export const RenderInfo: FC<{
   allRuns: CompetitorList
 }> = ({ currentRun, allRuns }) => {
   const {
-    sector1Colour,
-    sector2Colour,
-    sector3Colour,
-    finishColour,
-    bestFinishTime,
-    previousBestFinishTime,
     defaultBest,
     bestFinishTimeOfTheDay,
     bestFinishTimeOfTheDayName,
@@ -456,6 +452,26 @@ export const RenderInfo: FC<{
 
   const { classIndex } = currentRun
 
+  const idx = currentRun.times.length - 1
+  const splits = currentRun.times[idx]!
+
+  const times = calculateTimes(splits)
+  const globalBest = getGlobalBestSectors(allRuns)
+  const personalBest = getPersonalBestSectors(currentRun)
+  const classBest = getClassBestSectors(classIndex, allRuns)
+
+  const {
+    first: sector1Colour,
+    second: sector2Colour,
+    third: sector3Colour,
+    finish: finishColour,
+  } = getSectorColors(globalBest, personalBest, times)
+
+  const { personalBestFinishTime, previousPersonalBestFinishTime } =
+    getPersonalBestTotal(currentRun)
+  const [bestFinishTime, previousBestFinishTime] =
+    getBestFinishTheWorseVersion(allRuns)
+
   const {
     bestSector1,
     bestSector2,
@@ -463,12 +479,7 @@ export const RenderInfo: FC<{
     previousBestSector1,
     previousBestSector2,
     previousBestSector3,
-  } = useMemo(() => getClassBest(classIndex, allRuns), [classIndex, allRuns])
-
-  const { personalBestFinishTime, previousPersonalBestFinishTime } = useMemo(
-    () => getPersonalBestTotal(currentRun),
-    [currentRun]
-  )
+  } = classBest
 
   const {
     bestSector1: personalBestSector1,
@@ -477,14 +488,9 @@ export const RenderInfo: FC<{
     previousBestSector1: previousPersonalBestSector1,
     previousBestSector2: previousPersonalBestSector2,
     previousBestSector3: previousPersonalBestSector3,
-  } = useMemo(() => getPersonalBest(currentRun), [currentRun])
+  } = personalBest
 
-  const idx = currentRun.times.length - 1
-  const times = currentRun.times[idx]
-
-  if (typeof times == 'undefined') return <div />
-
-  const { sector1, sector2, sector3, finish } = calculateTimes(times)
+  const { sector1, sector2, sector3, finish } = times
 
   return (
     <Grid>
