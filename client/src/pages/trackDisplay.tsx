@@ -5,7 +5,12 @@ import React, { useEffect } from 'react'
 import { trpc } from '../App'
 
 import { requestWrapper } from '../components/requestWrapper'
-import { calculateTimes, RankTimes } from 'ui-shared'
+import {
+  calculateTimes,
+  getGlobalBestSectors,
+  getPersonalBestSectors,
+  getSectorColors,
+} from 'ui-shared'
 import { TimeInfo } from 'server/src/router/objects'
 
 let displayInterval: NodeJS.Timeout
@@ -67,42 +72,49 @@ const RenderTime = ({
 }
 
 export const TrackDisplay = () => {
-  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
-  const allRuns = trpc.useQuery(['competitors.list'])
+  const currentCompetitorId = trpc.useQuery(['currentcompetitor.number'])
+  const competitors = trpc.useQuery(['competitors.list'])
 
   useEffect(() => {
     if (displayInterval) clearTimeout(displayInterval)
     displayInterval = setTimeout(() => {
-      currentCompetitor.refetch()
-      allRuns.refetch()
+      currentCompetitorId.refetch()
+      competitors.refetch()
     }, 1000 * 2)
-  }, [currentCompetitor, allRuns])
+  }, [currentCompetitorId, competitors])
 
-  const requestErrors = requestWrapper({ currentCompetitor, allRuns })
+  const requestErrors = requestWrapper({
+    currentCompetitor: currentCompetitorId,
+    allRuns: competitors,
+  })
   if (requestErrors) return requestErrors
-  if (!currentCompetitor.data || !allRuns.data) {
+  if (!currentCompetitorId.data || !competitors.data) {
     console.warn('A function was called that should not be called')
     return null
   } // This will never be called, but it is needed to make typescript happy
 
-  const currentRunArray = allRuns.data.filter(
-    (a) => a.number === currentCompetitor.data
-  )
-  const currentRun = currentRunArray[0]
+  const currentCompetitor = competitors.data.find(
+    (a) => a.number === currentCompetitorId.data
+  )!
 
-  const { sector1Colour, sector2Colour, sector3Colour, finishColour } =
-    RankTimes(currentRun, allRuns.data)
+  const idx = currentCompetitor.times.length - 1
+  const splits = currentCompetitor.times[idx]!
 
-  const idx = currentRun.times.length - 1
-  const times = currentRun.times[idx]
+  const globalBest = getGlobalBestSectors(competitors.data)
+  const personalBest = getPersonalBestSectors(currentCompetitor)
+  const times = calculateTimes(splits)
+  const {
+    first: sector1Colour,
+    second: sector2Colour,
+    third: sector3Colour,
+    finish: finishPartial,
+  } = getSectorColors(globalBest, personalBest, times)
 
-  if (typeof times === 'undefined') return null
-
-  const { sector1, sector2, sector3 } = calculateTimes(times)
+  const { sector1, sector2, sector3 } = times
 
   const finishColor = [sector1Colour, sector2Colour, sector3Colour].reduce(
     (accum, current) => (current !== 'background.default' ? current : accum),
-    finishColour
+    finishPartial
   )
 
   return (
@@ -210,7 +222,7 @@ export const TrackDisplay = () => {
                 height: 280,
               }}
             >
-              <RenderTime times={calculateTimes(times)} time={times} />
+              <RenderTime times={calculateTimes(splits)} time={splits} />
             </Box>
           </Grid>
         </Grid>

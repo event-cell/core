@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 
 import { trpc } from '../App'
-import { RenderInfo, ResultsTable } from 'ui-shared'
+import { RenderInfo, CompetitorTable } from 'ui-shared'
 import { requestWrapper } from '../components/requestWrapper'
 import { CompetitorList } from 'server/src/router/objects'
 
@@ -68,7 +68,7 @@ const RenderClassList = ({
             icon={<Timer />}
             sx={{ ml: 1 }}
           />
-          <ResultsTable
+          <CompetitorTable
             data={eventClass.drivers.sort(
               (a, b) =>
                 Math.min(...a.times.map((time) => time?.time || 10000000)) -
