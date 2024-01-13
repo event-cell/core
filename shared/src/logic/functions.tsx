@@ -23,15 +23,6 @@ export type Times = {
 
 interface BestTimeProps {
   defaultBest: number
-  bestFinishTimeOfTheDay: number
-  bestFinishTimeOfTheDayName: string
-  bestFinishTimeOfTheDayCar: string
-  bestFinishTimeOfTheDayLady: number
-  bestFinishTimeOfTheDayLadyName: string
-  bestFinishTimeOfTheDayLadyCar: string
-  bestFinishTimeOfTheDayJunior: number
-  bestFinishTimeOfTheDayJuniorName: string
-  bestFinishTimeOfTheDayJuniorCar: string
 }
 
 export interface BestSectorTimes {
@@ -97,6 +88,43 @@ export const getBestFinishTheWorseVersion = (competitors: CompetitorList) =>
       .map((run) => run.time)
   )
 
+export type BestFinish = { name: string; car: string; time: number }
+
+function getBestFinish(competitors: CompetitorList): BestFinish {
+  const competitorBestRuns = competitors
+    .map((competitor) => ({
+      competitor,
+      best: competitor.times.filter(Boolean).sort((a, b) => a.time - b.time)[0],
+    }))
+    .filter(Boolean)
+
+  const bestRun = competitorBestRuns.sort(
+    (a, b) => a.best.time - b.best.time
+  )[0]
+
+  return {
+    name: bestRun.competitor.firstName + ' ' + bestRun.competitor.lastName,
+    car: bestRun.competitor.vehicle,
+    time: bestRun.best.time,
+  }
+}
+
+export const getGlobalBestFinish = getBestFinish
+export const getFemaleBestFinish = (competitors: CompetitorList) =>
+  getBestFinish(
+    competitors.filter((competitor) => {
+      const special = competitor.special?.toLowerCase()
+      return special?.includes('lady') || special?.includes('female')
+    })
+  )
+export const getJuniorBestFinish = (competitors: CompetitorList) =>
+  getBestFinish(
+    competitors.filter((competitor) => {
+      const special = competitor.special?.toLowerCase()
+      return special?.includes('junior')
+    })
+  )
+
 export interface PersonalBestTotal {
   previousPersonalBestFinishTime: number
   personalBestFinishTime: number
@@ -122,136 +150,6 @@ export function getPersonalBestTotal(
   return {
     previousPersonalBestFinishTime,
     personalBestFinishTime,
-  }
-}
-
-/** @deprecated */
-export function RankTimes(
-  currentRun: Competitor,
-  allRuns: CompetitorList
-): BestTimeProps {
-  let split1 = 0.0
-  let split2 = 0.0
-  let time = 0.0
-
-  const defaultBest = REALLY_LARGE_NUMBER
-
-  let bestSector1 = defaultBest
-  let bestSector2 = defaultBest
-  let bestSector3 = defaultBest
-  let personalBestSector1 = defaultBest
-  let personalBestSector2 = defaultBest
-  let personalBestSector3 = defaultBest
-  let personalBestFinishTime = defaultBest
-  let bestFinishTimeOfTheDay = defaultBest
-  let bestFinishTimeOfTheDayName = ''
-  let bestFinishTimeOfTheDayCar = ''
-  let bestFinishTimeOfTheDayLady = defaultBest
-  let bestFinishTimeOfTheDayLadyName = ''
-  let bestFinishTimeOfTheDayLadyCar = ''
-  let bestFinishTimeOfTheDayJunior = defaultBest
-  let bestFinishTimeOfTheDayJuniorName = ''
-  let bestFinishTimeOfTheDayJuniorCar = ''
-
-  // Personal Bests
-  //
-  for (const run of currentRun.times) {
-    if (typeof run !== 'undefined' && run.status === 0) {
-      split1 = run.split1
-      split2 = run.split2
-      time = run.time
-      if (run.split1 < personalBestSector1 && run.split1 > 0) {
-        personalBestSector1 = run.split1
-      }
-      if (run.split2 - run.split1 < personalBestSector2 && run.split2 > 0) {
-        personalBestSector2 = run.split2 - run.split1
-      }
-      if (run.time - run.split2 < personalBestSector3 && run.time > 0) {
-        personalBestSector3 = run.time - run.split2
-      }
-      if (run.time < personalBestFinishTime && run.time > 0) {
-        personalBestFinishTime = run.time
-      }
-    } else {
-      split1 = 0
-      split2 = 0
-      time = 0
-    }
-  }
-
-  for (const person of allRuns) {
-    // Class best times
-    if (person.classIndex === currentRun.classIndex) {
-      for (const run of person.times) {
-        if (typeof run !== 'undefined' && run.status === 0) {
-          if (run.split1 < bestSector1) {
-            bestSector1 = run.split1
-          }
-          if (run.split2 - run.split1 < bestSector2) {
-            bestSector2 = run.split2 - run.split1
-          }
-          if (run.time - run.split2 < bestSector3) {
-            bestSector3 = run.time - run.split2
-          }
-        }
-      }
-    }
-    // Best time of the day
-    for (const run of person.times) {
-      if (typeof run !== 'undefined' && run.status === 0) {
-        if (
-          run.status === 0 &&
-          run.time > 0 &&
-          run.time < bestFinishTimeOfTheDay
-        ) {
-          bestFinishTimeOfTheDay = run.time
-          bestFinishTimeOfTheDayName = person.firstName + ' ' + person.lastName
-          bestFinishTimeOfTheDayCar = person.vehicle
-        }
-      }
-      if (typeof run !== 'undefined' && typeof person.special !== 'undefined') {
-        if (
-          person.special.toString().toLowerCase().includes('lady') ||
-          person.special.toString().toLowerCase().includes('female')
-        ) {
-          if (
-            run.status === 0 &&
-            run.time > 0 &&
-            run.time < bestFinishTimeOfTheDayLady
-          ) {
-            bestFinishTimeOfTheDayLady = run.time
-            bestFinishTimeOfTheDayLadyName =
-              person.firstName + ' ' + person.lastName
-            bestFinishTimeOfTheDayLadyCar = person.vehicle
-          }
-        }
-        if (person.special.toString().toLowerCase().includes('junior')) {
-          if (
-            run.status === 0 &&
-            run.time > 0 &&
-            run.time < bestFinishTimeOfTheDayJunior
-          ) {
-            bestFinishTimeOfTheDayJunior = run.time
-            bestFinishTimeOfTheDayJuniorName =
-              person.firstName + ' ' + person.lastName
-            bestFinishTimeOfTheDayJuniorCar = person.vehicle
-          }
-        }
-      }
-    }
-  }
-
-  return {
-    defaultBest,
-    bestFinishTimeOfTheDay,
-    bestFinishTimeOfTheDayName,
-    bestFinishTimeOfTheDayCar,
-    bestFinishTimeOfTheDayLady,
-    bestFinishTimeOfTheDayLadyName,
-    bestFinishTimeOfTheDayLadyCar,
-    bestFinishTimeOfTheDayJunior,
-    bestFinishTimeOfTheDayJuniorName,
-    bestFinishTimeOfTheDayJuniorCar,
   }
 }
 

@@ -25,8 +25,8 @@ import {
   getPersonalBestSectors,
   getPersonalBestTotal,
   getSectorColors,
-  RankTimes,
   getBestFinishTheWorseVersion,
+  getGlobalBestFinish,
 } from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
@@ -437,18 +437,7 @@ export const RenderInfo: FC<{
   currentRun: Competitor
   allRuns: CompetitorList
 }> = ({ currentRun, allRuns }) => {
-  const {
-    defaultBest,
-    bestFinishTimeOfTheDay,
-    bestFinishTimeOfTheDayName,
-    bestFinishTimeOfTheDayCar,
-    bestFinishTimeOfTheDayLady,
-    bestFinishTimeOfTheDayLadyName,
-    bestFinishTimeOfTheDayLadyCar,
-    bestFinishTimeOfTheDayJunior,
-    bestFinishTimeOfTheDayJuniorName,
-    bestFinishTimeOfTheDayJuniorCar,
-  } = RankTimes(currentRun, allRuns)
+  const defaultBest = Number.MAX_SAFE_INTEGER
 
   const { classIndex } = currentRun
 
@@ -459,6 +448,10 @@ export const RenderInfo: FC<{
   const globalBest = getGlobalBestSectors(allRuns)
   const personalBest = getPersonalBestSectors(currentRun)
   const classBest = getClassBestSectors(classIndex, allRuns)
+
+  const bestFinish = getGlobalBestFinish(allRuns)
+  const bestFemaleFinish = getGlobalBestFinish(allRuns)
+  const bestJuniorFinish = getGlobalBestFinish(allRuns)
 
   const {
     first: sector1Colour,
@@ -491,6 +484,24 @@ export const RenderInfo: FC<{
   } = personalBest
 
   const { sector1, sector2, sector3, finish } = times
+
+  const {
+    time: bestFinishTimeOfTheDay,
+    name: bestFinishTimeOfTheDayName,
+    car: bestFinishTimeOfTheDayCar,
+  } = bestFinish
+
+  const {
+    time: bestFinishTimeOfTheDayLady,
+    name: bestFinishTimeOfTheDayLadyName,
+    car: bestFinishTimeOfTheDayLadyCar,
+  } = bestFemaleFinish
+
+  const {
+    time: bestFinishTimeOfTheDayJunior,
+    name: bestFinishTimeOfTheDayJuniorName,
+    car: bestFinishTimeOfTheDayJuniorCar,
+  } = bestJuniorFinish
 
   return (
     <Grid>
