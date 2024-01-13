@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react'
 
 import { trpc } from '../App'
-import { Display, DisplayCompetitorList } from 'ui-shared'
+import { DisplayCompetitorList, OnTrack } from 'ui-shared'
 
 import { requestWrapper } from '../components/requestWrapper'
+import { getDisplayNumber } from 'ui-shared/src/logic/displays'
+import { Container } from '@mui/material'
 
 export const DisplayPage = () => {
   const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
-  const allRuns = trpc.useQuery(['competitors.list'])
+  const competitors = trpc.useQuery(['competitors.list'])
   const runCount = trpc.useQuery(['runs.count'])
 
   let displayRefresh = 15
@@ -20,38 +22,41 @@ export const DisplayPage = () => {
     const timeout = setTimeout(async () => {
       await Promise.all([
         currentCompetitor.refetch(),
-        allRuns.refetch(),
+        competitors.refetch(),
         runCount.refetch(),
       ])
     }, 1000 * displayRefresh)
     return () => clearTimeout(timeout)
-  }, [currentCompetitor, allRuns, runCount])
+  }, [currentCompetitor, competitors, runCount])
 
   const requestErrors = requestWrapper(
-    { currentCompetitor, allRuns, runCount },
+    { currentCompetitor, allRuns: competitors, runCount },
     ['currentCompetitor']
   )
   if (requestErrors) return requestErrors
 
-  if (!allRuns.data) {
+  if (!competitors.data) {
     console.warn('Missing allRuns data')
     return null
   } // This will never be called, but it is needed to make typescript happy
 
-  if (!currentCompetitor.data) {
-    return <DisplayCompetitorList allRuns={allRuns.data} />
-  }
-
-  if (!runCount.data) {
-    console.warn('Missing runCount data')
-    return null
-  }
+  const currentDisplayNumber = getDisplayNumber()
+  const shouldDisplayCompetitorList =
+    currentDisplayNumber === 0 || currentDisplayNumber === 4
 
   return (
-    <Display
-      currentCompetitor={currentCompetitor.data}
-      allRuns={allRuns.data}
-      runCount={runCount.data}
-    />
+    <Container>
+      <DisplayCompetitorList
+        competitors={competitors.data}
+        runCount={runCount.data || 1}
+      />
+
+      {shouldDisplayCompetitorList && currentCompetitor.data && (
+        <OnTrack
+          currentCompetitorId={currentCompetitor.data}
+          competitors={competitors.data}
+        />
+      )}
+    </Container>
   )
 }
