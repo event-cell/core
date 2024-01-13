@@ -123,11 +123,6 @@ export const getJuniorBestFinish = (competitors: CompetitorList) =>
     })
   )
 
-export interface PersonalBestTotal {
-  previousPersonalBestFinishTime: number
-  personalBestFinishTime: number
-}
-
 export type SectorColors = 'purple' | 'green' | 'yellow' | 'background.default'
 
 export function getColor(

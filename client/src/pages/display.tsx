@@ -52,7 +52,6 @@ export const DisplayPage = () => {
       currentCompetitor={currentCompetitor.data}
       allRuns={allRuns.data}
       runCount={runCount.data}
-      renderOnTrack={true}
     />
   )
 }

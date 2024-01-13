@@ -1,17 +1,22 @@
+/// <reference types="@total-typescript/ts-reset" />
+
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { setupLogger } from './utils'
 import { z } from 'zod'
+
+import { setupLogger } from './utils'
 
 const logger = setupLogger('config')
 
-export const ConfigType = z.object({
-  eventId: z.optional(z.string()),
-  eventName: z.optional(z.string()),
+export const ConfigType = z
+  .object({
+    eventId: z.string(),
+    eventName: z.string(),
 
-  eventDatabasePath: z.optional(z.string()),
-  recordsDatabasePath: z.optional(z.string()),
-})
+    eventDatabasePath: z.string(),
+    recordsDatabasePath: z.string(),
+  })
+  .deepPartial()
 export type ConfigType = z.infer<typeof ConfigType>
 
 /**
@@ -27,7 +32,7 @@ class Config {
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
-    const config = JSON.parse(fileContents)
+    const config = ConfigType.parse(fileContents)
     this.set(config)
   }
 
