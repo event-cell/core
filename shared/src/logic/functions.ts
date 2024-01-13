@@ -6,8 +6,6 @@ import type {
   TimeInfo,
 } from 'server/src/router/objects'
 
-const REALLY_LARGE_NUMBER = Number.MAX_SAFE_INTEGER
-
 export interface Splits {
   split1: number
   split2: number
@@ -21,25 +19,23 @@ export type Times = {
   finish: number
 }
 
-interface BestTimeProps {
-  defaultBest: number
-}
-
 export interface BestSectorTimes {
   bestSector1: number
   bestSector2: number
   bestSector3: number
 
-  previousBestSector1: number
-  previousBestSector2: number
-  previousBestSector3: number
+  previousBestSector1: number | null
+  previousBestSector2: number | null
+  previousBestSector3: number | null
 }
 
 /**
  * Returns the two best times
  */
-function getTopTimes(times: number[]): [number, number] {
+function getTopTimes(times: number[]): [number, number | null] {
   const sortedTimes = times.filter((time) => time > 0).sort((a, b) => a - b)
+  if (sortedTimes.length === 0) return [0, null]
+  if (sortedTimes.length === 1) return [sortedTimes[0], null]
   return [sortedTimes[0], sortedTimes[1]]
 }
 
@@ -80,6 +76,8 @@ export const getClassBestSectors = (
     competitors.filter((competitors) => competitors.classIndex === classIndex)
   )
 
+export const getPersonalBestTotal = (competitor: Competitor) =>
+  getTopTimes(competitor.times.filter(Boolean).map((run) => run.time))
 export const getBestFinishTheWorseVersion = (competitors: CompetitorList) =>
   getTopTimes(
     competitors
@@ -130,36 +128,13 @@ export interface PersonalBestTotal {
   personalBestFinishTime: number
 }
 
-export function getPersonalBestTotal(
-  competitor: Competitor
-): PersonalBestTotal {
-  let personalBestFinishTime = REALLY_LARGE_NUMBER
-  let previousPersonalBestFinishTime = REALLY_LARGE_NUMBER
-
-  for (const run of competitor.times) {
-    if (typeof run == 'undefined' || run.status != 0) continue
-
-    const finishTime = run.time
-
-    if (finishTime > 0 && finishTime < personalBestFinishTime) {
-      previousPersonalBestFinishTime = personalBestFinishTime
-      personalBestFinishTime = finishTime
-    }
-  }
-
-  return {
-    previousPersonalBestFinishTime,
-    personalBestFinishTime,
-  }
-}
-
 export type SectorColors = 'purple' | 'green' | 'yellow' | 'background.default'
 
 export function getColor(
   classBest: number,
   personalBest: number,
   time: number
-): 'purple' | 'green' | 'yellow' | 'background.default' {
+): SectorColors {
   if (time <= 0) return 'background.default'
 
   if (time <= classBest) return 'purple'
@@ -214,10 +189,14 @@ export function calculateDeltas({
 }: {
   time: number
   pb: number
-  previousPB: number
+  previousPB: number | null
   globalBest: number
-  previousGlobalBest: number
+  previousGlobalBest: number | null
 }): { deltaPB: number; deltaLeader: number } {
+  if (!previousPB || !previousGlobalBest) {
+    return { deltaPB: 0, deltaLeader: 0 }
+  }
+
   return {
     deltaPB: time == pb ? time - previousPB : time - pb,
     deltaLeader:

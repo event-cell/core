@@ -384,8 +384,8 @@ function RenderSector({
   sectorColor: string
   defaultBest: number
 
-  previousPB: number
-  previousGlobalBest: number
+  previousPB: number | null
+  previousGlobalBest: number | null
 }) {
   const { deltaPB, deltaLeader } = calculateDeltas({
     time,
@@ -460,7 +460,7 @@ export const RenderInfo: FC<{
     finish: finishColour,
   } = getSectorColors(globalBest, personalBest, times)
 
-  const { personalBestFinishTime, previousPersonalBestFinishTime } =
+  const [personalBestFinishTime, previousPersonalBestFinishTime] =
     getPersonalBestTotal(currentRun)
   const [bestFinishTime, previousBestFinishTime] =
     getBestFinishTheWorseVersion(allRuns)
