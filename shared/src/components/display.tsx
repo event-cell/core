@@ -14,13 +14,14 @@ import {
 } from '@mui/material'
 import React, { FC, useMemo } from 'react'
 
-import { ResultsTable } from './table'
+import { CompetitorTable } from './table'
 import Timer from '@mui/icons-material/Timer'
 
 import {
   calculateDeltas,
   calculateTimes,
-  getClassBestSectorTimes,
+  getClassBest,
+  getPersonalBest,
   getPersonalBestSector,
   getPersonalBestTotal,
   RankTimes,
@@ -75,9 +76,6 @@ export const splitDisplayLogic = ({
   )
 
 function splitDisplay(classesList: ClassType[]) {
-  // If we are in a NextJS server-side render, window will not be present. We
-  // also want to exit out early if this page is `/display` on the client or
-  // does not include `/display/`
   if (
     typeof window == 'undefined' ||
     window.location.pathname === '/display' ||
@@ -126,33 +124,28 @@ export const Display: FC<{
   currentCompetitor: number
   allRuns: CompetitorList
   runCount: number | null
-  renderOnTrack: boolean
-}> = ({ currentCompetitor, allRuns, runCount, renderOnTrack }) => {
-  // Sort classes in class order as per the index value
-  // in the timing software
+}> = ({ currentCompetitor, allRuns, runCount }) => {
+  // Make sure there are no duplicate classes in the list
+  const classes = useMemo(
+    () =>
+      allRuns.reduce<{ classIndex: number; class: string }[]>(
+        (all, current) => {
+          const currentRunIncluded = all.some(
+            (cls) => cls.classIndex == current.classIndex
+          )
+          if (currentRunIncluded) return all
 
-  console.log({ currentCompetitor, allRuns, runCount, renderOnTrack })
+          return [
+            ...all,
+            { classIndex: current.classIndex, class: current.class },
+          ]
+        },
+        []
+      ),
+    [allRuns]
+  )
 
-  const classes = useMemo(() => {
-    return allRuns.reduce(
-      (all: { classIndex: number; class: string }[], current) => {
-        const currentRunIncluded = all.some(
-          (cls) => cls.classIndex == current.classIndex
-        )
-        if (currentRunIncluded) return all
-
-        console.log(`"${current.class}"`)
-
-        return [
-          ...all,
-          { classIndex: current.classIndex, class: current.class },
-        ]
-      },
-      []
-    )
-  }, [allRuns])
-
-  const printClassesList = useMemo(() => {
+  const classListForDisplay = useMemo(() => {
     const classesList = classes.map((carClass) => ({
       carClass,
       drivers: allRuns
@@ -165,9 +158,6 @@ export const Display: FC<{
     }))
 
     const displayContent = splitDisplay(classesList)
-
-    if (!displayContent) return
-
     return displayContent
   }, [classes])
 
@@ -176,18 +166,17 @@ export const Display: FC<{
     return <div />
   } // This will never be called, but it is needed to make typescript happy
 
-  const currentRunArray = allRuns.filter((a) => a.number === currentCompetitor)
-  const currentRun = currentRunArray[0]
+  const currentRun = allRuns.find((a) => a.number === currentCompetitor)
+  if (!currentRun) return null
 
   const displayNumber = getDisplayNumber()
-
-  if (!printClassesList) return null
+  if (!classListForDisplay) return null
 
   return (
     <Container>
       <DisplayHeader display={displayNumber} />
 
-      {printClassesList.map((eventClass) => (
+      {classListForDisplay.map((eventClass) => (
         <div key={eventClass.carClass.class}>
           <Typography component="div">
             <Box
@@ -221,7 +210,7 @@ export const Display: FC<{
               </Box>
             </Box>
           </Typography>
-          <ResultsTable
+          <CompetitorTable
             data={eventClass.drivers.sort(
               (a, b) =>
                 Math.min(...a.times.map((time) => time?.time || 10000000)) -
@@ -231,8 +220,7 @@ export const Display: FC<{
           />
         </div>
       ))}
-      {(displayNumber === 4 || displayNumber === 0) &&
-      renderOnTrack === true ? (
+      {displayNumber === 4 || displayNumber === 0 ? (
         <Grid>
           <Grid
             sx={{
@@ -355,7 +343,7 @@ export const DisplayCompetitorList: FC<{
                 </Box>
               </Box>
             </Typography>
-            <ResultsTable
+            <CompetitorTable
               data={eventClass.drivers.sort(
                 (a, b) =>
                   Math.min(...a.times.map((time) => time?.time || 10000000)) -
@@ -475,17 +463,7 @@ export const RenderInfo: FC<{
     previousBestSector1,
     previousBestSector2,
     previousBestSector3,
-  } = useMemo(
-    () => getClassBestSectorTimes(classIndex, allRuns),
-    [classIndex, allRuns]
-  ) || {
-    bestSector1: 0,
-    bestSector2: 0,
-    bestSector3: 0,
-    previousBestSector1: 0,
-    previousBestSector2: 0,
-    previousBestSector3: 0,
-  }
+  } = useMemo(() => getClassBest(classIndex, allRuns), [classIndex, allRuns])
 
   const { personalBestFinishTime, previousPersonalBestFinishTime } = useMemo(
     () => getPersonalBestTotal(currentRun),
@@ -493,13 +471,13 @@ export const RenderInfo: FC<{
   )
 
   const {
-    personalBestSector1,
-    personalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector1,
-    previousPersonalBestSector2,
-    previousPersonalBestSector3,
-  } = useMemo(() => getPersonalBestSector(currentRun), [currentRun])
+    bestSector1: personalBestSector1,
+    bestSector2: personalBestSector2,
+    bestSector3: personalBestSector3,
+    previousBestSector1: previousPersonalBestSector1,
+    previousBestSector2: previousPersonalBestSector2,
+    previousBestSector3: previousPersonalBestSector3,
+  } = useMemo(() => getPersonalBest(currentRun), [currentRun])
 
   const idx = currentRun.times.length - 1
   const times = currentRun.times[idx]
