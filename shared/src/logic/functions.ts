@@ -107,6 +107,7 @@ function getBestFinish(competitors: CompetitorList): BestFinish {
   }
 }
 
+export type GetBestFinish = typeof getBestFinish
 export const getGlobalBestFinish = getBestFinish
 export const getFemaleBestFinish = (competitors: CompetitorList) =>
   getBestFinish(

@@ -21,6 +21,9 @@ import {
   getSectorColors,
   getBestFinishTheWorseVersion,
   getGlobalBestFinish,
+  type GetBestFinish,
+  getFemaleBestFinish,
+  getJuniorBestFinish,
 } from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
@@ -81,7 +84,7 @@ function RenderSector({
         />
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-        {time > 0 ? (time > 0 ? (time / 1000).toFixed(2) : '') : ''}
+        {time > 0 ? (time / 1000).toFixed(2) : ''}
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
         {time > 0 &&
@@ -105,6 +108,16 @@ function RenderSector({
   )
 }
 
+const bestFinishTimeText = (
+  title: string,
+  processor: GetBestFinish,
+  competitors: CompetitorList
+) => {
+  const { time, name, car } = processor(competitors)
+  if (name === '') return ''
+  return `${title}: ${(time / 1000).toFixed(2)} by ${name} in the ${car}`
+}
+
 export const RenderInfo: FC<{
   currentRun: Competitor
   allRuns: CompetitorList
@@ -120,10 +133,6 @@ export const RenderInfo: FC<{
   const globalBest = getGlobalBestSectors(allRuns)
   const personalBest = getPersonalBestSectors(currentRun)
   const classBest = getClassBestSectors(classIndex, allRuns)
-
-  const bestFinish = getGlobalBestFinish(allRuns)
-  const bestFemaleFinish = getGlobalBestFinish(allRuns)
-  const bestJuniorFinish = getGlobalBestFinish(allRuns)
 
   const {
     first: sector1Colour,
@@ -156,24 +165,6 @@ export const RenderInfo: FC<{
   } = personalBest
 
   const { sector1, sector2, sector3, finish } = times
-
-  const {
-    time: bestFinishTimeOfTheDay,
-    name: bestFinishTimeOfTheDayName,
-    car: bestFinishTimeOfTheDayCar,
-  } = bestFinish
-
-  const {
-    time: bestFinishTimeOfTheDayLady,
-    name: bestFinishTimeOfTheDayLadyName,
-    car: bestFinishTimeOfTheDayLadyCar,
-  } = bestFemaleFinish
-
-  const {
-    time: bestFinishTimeOfTheDayJunior,
-    name: bestFinishTimeOfTheDayJuniorName,
-    car: bestFinishTimeOfTheDayJuniorCar,
-  } = bestJuniorFinish
 
   return (
     <Grid>
@@ -254,32 +245,11 @@ export const RenderInfo: FC<{
           <Grid sx={{ fontSize: tableFontSizeLarge }}>
             Fastest finish times for the day
             <br />
-            {bestFinishTimeOfTheDayName !== ''
-              ? 'Outright: ' +
-                (bestFinishTimeOfTheDay / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayName +
-                ' in the ' +
-                bestFinishTimeOfTheDayCar
-              : ''}
+            {bestFinishTimeText('Outright', getGlobalBestFinish, allRuns)}
             <br />
-            {bestFinishTimeOfTheDayLadyName !== ''
-              ? 'Lady: ' +
-                (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayLadyName +
-                ' in the ' +
-                bestFinishTimeOfTheDayLadyCar
-              : ''}
+            {bestFinishTimeText('Lady', getFemaleBestFinish, allRuns)}
             <br />
-            {bestFinishTimeOfTheDayJuniorName !== ''
-              ? 'Junior: ' +
-                (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayJuniorName +
-                ' in the ' +
-                bestFinishTimeOfTheDayJuniorCar
-              : ''}
+            {bestFinishTimeText('Junior', getJuniorBestFinish, allRuns)}
             <br />
           </Grid>
         </PrimaryPaper>
