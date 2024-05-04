@@ -21,12 +21,12 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@prisma/client": "^3.15.2",
+    "@prisma/client": "4",
     "@trpc/server": "^9.25.3",
     "cors": "^2.8.5",
     "exceljs": "^4.3.0",
     "express": "^4.18.1",
-    "prisma": "^3.15.2",
+    "prisma": "4",
     "sqlite3": "^5.0.11",
     "winston": "^3.7.2",
     "zod": "^3.17.3"
