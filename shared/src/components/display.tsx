@@ -1,7 +1,5 @@
 import {
   Box,
-  Chip,
-  Container,
   Grid,
   Paper,
   styled,
@@ -10,367 +8,34 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Typography,
 } from '@mui/material'
-import React, { FC, useMemo } from 'react'
-
-import { ResultsTable } from './table'
-import Timer from '@mui/icons-material/Timer'
+import React, { FC } from 'react'
 
 import {
   calculateDeltas,
   calculateTimes,
-  getClassBestSectorTimes,
-  getPersonalBestSector,
+  getClassBestSectors,
+  getGlobalBestSectors,
+  getPersonalBestSectors,
   getPersonalBestTotal,
-  RankTimes,
+  getSectorColors,
+  getBestFinishTheWorseVersion,
+  getGlobalBestFinish,
+  type GetBestFinish,
+  getFemaleBestFinish,
+  getJuniorBestFinish,
 } from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
-import { DisplayHeader } from './display/header'
+
+export * from './display/CompetitorList'
+export * from './display/OnTrack'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'left',
   color: theme.palette.text.secondary,
 }))
-
-interface ClassType {
-  drivers: CompetitorList
-  carClass: { classIndex: number; class: string }
-}
-
-const getDisplayNumber = (): number => {
-  if (
-    typeof window === 'undefined' ||
-    window.location.pathname === '/display' ||
-    !window.location.pathname.includes('/display/')
-  )
-    return 0
-
-  return Number(window.location.pathname.replace('/display/', ''))
-}
-
-type ItemizedClassType = ClassType & { startItem: number }
-
-/**
- * This is the internal logic of the {@link splitDisplay} function. It is here
- * to make it easier to test
- */
-export const splitDisplayLogic = ({
-  classesList,
-  screenIndex,
-  itemsPerScreen,
-}: {
-  classesList: ItemizedClassType[]
-  screenIndex: number
-  itemsPerScreen: number
-}): ItemizedClassType[] =>
-  classesList.filter(
-    (classInfo) =>
-      // If the class was not on the last screen
-      classInfo.startItem >= (screenIndex - 1) * itemsPerScreen &&
-      // If the class is not large enough to be on the next screen
-      classInfo.startItem < screenIndex * itemsPerScreen
-  )
-
-function splitDisplay(classesList: ClassType[]) {
-  // If we are in a NextJS server-side render, window will not be present. We
-  // also want to exit out early if this page is `/display` on the client or
-  // does not include `/display/`
-  if (
-    typeof window == 'undefined' ||
-    window.location.pathname === '/display' ||
-    !window.location.pathname.includes('/display/')
-  )
-    return classesList
-
-  let items = 0
-  const itemizedClassesList: ItemizedClassType[] = classesList.map(
-    (classType) => {
-      const startItem = items
-      items += classType.drivers.length
-
-      return {
-        ...classType,
-        startItem,
-      } satisfies ItemizedClassType
-    }
-  )
-
-  // Calculate ClassesList for each screen.
-  const numberOfScreens = 4 // TODO: This should be configurable
-  const itemsPerScreen = Math.ceil(items / numberOfScreens)
-
-  try {
-    const screenIndex = Number.parseInt(
-      window.location.pathname.replace('/display/', '')
-    )
-
-    return splitDisplayLogic({
-      classesList: itemizedClassesList,
-      screenIndex,
-      itemsPerScreen,
-    })
-  } catch (e) {
-    console.warn(
-      'Failed to generate classList for this display. Falling back to the full list'
-    )
-    console.warn(e)
-
-    return classesList
-  }
-}
-
-export const Display: FC<{
-  currentCompetitor: number
-  allRuns: CompetitorList
-  runCount: number | null
-  renderOnTrack: boolean
-}> = ({ currentCompetitor, allRuns, runCount, renderOnTrack }) => {
-  // Sort classes in class order as per the index value
-  // in the timing software
-
-  console.log({ currentCompetitor, allRuns, runCount, renderOnTrack })
-
-  const classes = useMemo(() => {
-    return allRuns.reduce(
-      (all: { classIndex: number; class: string }[], current) => {
-        const currentRunIncluded = all.some(
-          (cls) => cls.classIndex == current.classIndex
-        )
-        if (currentRunIncluded) return all
-
-        console.log(`"${current.class}"`)
-
-        return [
-          ...all,
-          { classIndex: current.classIndex, class: current.class },
-        ]
-      },
-      []
-    )
-  }, [allRuns])
-
-  const printClassesList = useMemo(() => {
-    const classesList = classes.map((carClass) => ({
-      carClass,
-      drivers: allRuns
-        .filter((data) => data.classIndex === carClass.classIndex)
-        .sort(
-          (a, b) =>
-            Math.min(...a.times.map((time) => time?.time || 10000000)) -
-            Math.min(...b.times.map((time) => time?.time || 10000000))
-        ),
-    }))
-
-    const displayContent = splitDisplay(classesList)
-
-    if (!displayContent) return
-
-    return displayContent
-  }, [classes])
-
-  if (!currentCompetitor || !runCount) {
-    console.warn('Missing currentCompetitor or runCount data')
-    return <div />
-  } // This will never be called, but it is needed to make typescript happy
-
-  const currentRunArray = allRuns.filter((a) => a.number === currentCompetitor)
-  const currentRun = currentRunArray[0]
-
-  const displayNumber = getDisplayNumber()
-
-  if (!printClassesList) return null
-
-  return (
-    <Container>
-      <DisplayHeader display={displayNumber} />
-
-      {printClassesList.map((eventClass) => (
-        <div key={eventClass.carClass.class}>
-          <Typography component="div">
-            <Box
-              sx={{
-                display: 'grid',
-                gridAutoColumns: '1fr',
-              }}
-            >
-              <Box
-                fontWeight="fontWeightMedium"
-                sx={{
-                  gridColumn: '1 / 3',
-                  m: 1,
-                }}
-              >
-                {eventClass.carClass.class}
-              </Box>
-              <Box
-                sx={{
-                  gridColumn: '3 / 4',
-                  m: 1,
-                }}
-              >
-                <Chip
-                  label={'Class Record: ' + eventClass.drivers[0].classRecord}
-                  variant="outlined"
-                  color="info"
-                  size="small"
-                  icon={<Timer />}
-                />
-              </Box>
-            </Box>
-          </Typography>
-          <ResultsTable
-            data={eventClass.drivers.sort(
-              (a, b) =>
-                Math.min(...a.times.map((time) => time?.time || 10000000)) -
-                Math.min(...b.times.map((time) => time?.time || 10000000))
-            )}
-            runCount={runCount as number}
-          />
-        </div>
-      ))}
-      {(displayNumber === 4 || displayNumber === 0) &&
-      renderOnTrack === true ? (
-        <Grid>
-          <Grid
-            sx={{
-              height: 6,
-            }}
-          ></Grid>
-          <Grid
-            sx={{
-              fontSize: 24,
-              height: 130,
-            }}
-          >
-            <PrimaryPaper>
-              ON TRACK
-              <br />
-              {currentRun.number}: {currentRun.firstName} {currentRun.lastName}
-              {', '}
-              {currentRun.vehicle}
-              <br></br>
-              {currentRun.class}
-            </PrimaryPaper>
-          </Grid>
-          <Grid item xs={4}>
-            <RenderInfo currentRun={currentRun} allRuns={allRuns} />
-          </Grid>
-        </Grid>
-      ) : (
-        ''
-      )}
-    </Container>
-  )
-}
-
-export const DisplayCompetitorList: FC<{
-  allRuns: CompetitorList
-}> = ({ allRuns }) => {
-  // Sort classes in class order as per the index value
-  // in the timing software
-
-  const classes: { classIndex: number; class: string }[] = []
-  let maxClassIndex = 0
-
-  allRuns.forEach((a) => {
-    if (a.classIndex > maxClassIndex) {
-      maxClassIndex = a.classIndex
-    }
-  })
-
-  for (let i = 1; i < maxClassIndex + 1; i++) {
-    let shouldSkip = false
-    allRuns.forEach((row) => {
-      if (shouldSkip) {
-        return
-      }
-      if (row.classIndex === i) {
-        classes.push({ classIndex: row.classIndex, class: row.class })
-        shouldSkip = true
-      }
-    })
-  }
-
-  const printClassesList = useMemo(() => {
-    const classesList = classes.map((carClass) => ({
-      carClass,
-      drivers: allRuns
-        .filter((data) => data.classIndex === carClass.classIndex)
-        .sort(
-          (a, b) =>
-            Math.min(...a.times.map((time) => time?.time || 10000000)) -
-            Math.min(...b.times.map((time) => time?.time || 10000000))
-        ),
-    }))
-
-    const displayContent = splitDisplay(classesList)
-
-    if (!displayContent) return
-
-    return displayContent
-  }, [classes])
-
-  const displayNumber = getDisplayNumber()
-  const runCount = 1
-
-  if (printClassesList) {
-    return (
-      <Container>
-        <DisplayHeader display={displayNumber} />
-
-        {printClassesList.map((eventClass) => (
-          <div key={eventClass.carClass.class}>
-            <Typography component="div">
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridAutoColumns: '1fr',
-                }}
-              >
-                <Box
-                  fontWeight="fontWeightMedium"
-                  sx={{
-                    gridColumn: '1 / 3',
-                    m: 1,
-                  }}
-                >
-                  {eventClass.carClass.class}
-                </Box>
-                <Box
-                  sx={{
-                    gridColumn: '3 / 4',
-                    m: 1,
-                  }}
-                >
-                  <Chip
-                    label={'Class Record: ' + eventClass.drivers[0].classRecord}
-                    variant="outlined"
-                    color="info"
-                    size="small"
-                    icon={<Timer />}
-                  />
-                </Box>
-              </Box>
-            </Typography>
-            <ResultsTable
-              data={eventClass.drivers.sort(
-                (a, b) =>
-                  Math.min(...a.times.map((time) => time?.time || 10000000)) -
-                  Math.min(...b.times.map((time) => time?.time || 10000000))
-              )}
-              runCount={runCount as number}
-            />
-          </div>
-        ))}
-      </Container>
-    )
-  } else {
-    return <div />
-  }
-}
 
 const tableFontSizeMid = '1.2rem'
 const tableFontSizeLarge = '1.4rem'
@@ -394,8 +59,8 @@ function RenderSector({
   sectorColor: string
   defaultBest: number
 
-  previousPB: number
-  previousGlobalBest: number
+  previousPB: number | null
+  previousGlobalBest: number | null
 }) {
   const { deltaPB, deltaLeader } = calculateDeltas({
     time,
@@ -419,7 +84,7 @@ function RenderSector({
         />
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
-        {time > 0 ? (time > 0 ? (time / 1000).toFixed(2) : '') : ''}
+        {time > 0 ? (time / 1000).toFixed(2) : ''}
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
         {time > 0 &&
@@ -443,30 +108,43 @@ function RenderSector({
   )
 }
 
+const bestFinishTimeText = (
+  title: string,
+  processor: GetBestFinish,
+  competitors: CompetitorList
+) => {
+  const { time, name, car } = processor(competitors)
+  if (name === '') return ''
+  return `${title}: ${(time / 1000).toFixed(2)} by ${name} in the ${car}`
+}
+
 export const RenderInfo: FC<{
   currentRun: Competitor
   allRuns: CompetitorList
 }> = ({ currentRun, allRuns }) => {
-  const {
-    sector1Colour,
-    sector2Colour,
-    sector3Colour,
-    finishColour,
-    bestFinishTime,
-    previousBestFinishTime,
-    defaultBest,
-    bestFinishTimeOfTheDay,
-    bestFinishTimeOfTheDayName,
-    bestFinishTimeOfTheDayCar,
-    bestFinishTimeOfTheDayLady,
-    bestFinishTimeOfTheDayLadyName,
-    bestFinishTimeOfTheDayLadyCar,
-    bestFinishTimeOfTheDayJunior,
-    bestFinishTimeOfTheDayJuniorName,
-    bestFinishTimeOfTheDayJuniorCar,
-  } = RankTimes(currentRun, allRuns)
+  const defaultBest = Number.MAX_SAFE_INTEGER
 
   const { classIndex } = currentRun
+
+  const idx = currentRun.times.length - 1
+  const splits = currentRun.times[idx]!
+
+  const times = calculateTimes(splits)
+  const globalBest = getGlobalBestSectors(allRuns)
+  const personalBest = getPersonalBestSectors(currentRun)
+  const classBest = getClassBestSectors(classIndex, allRuns)
+
+  const {
+    first: sector1Colour,
+    second: sector2Colour,
+    third: sector3Colour,
+    finish: finishColour,
+  } = getSectorColors(globalBest, personalBest, times)
+
+  const [personalBestFinishTime, previousPersonalBestFinishTime] =
+    getPersonalBestTotal(currentRun)
+  const [bestFinishTime, previousBestFinishTime] =
+    getBestFinishTheWorseVersion(allRuns)
 
   const {
     bestSector1,
@@ -475,38 +153,18 @@ export const RenderInfo: FC<{
     previousBestSector1,
     previousBestSector2,
     previousBestSector3,
-  } = useMemo(
-    () => getClassBestSectorTimes(classIndex, allRuns),
-    [classIndex, allRuns]
-  ) || {
-    bestSector1: 0,
-    bestSector2: 0,
-    bestSector3: 0,
-    previousBestSector1: 0,
-    previousBestSector2: 0,
-    previousBestSector3: 0,
-  }
-
-  const { personalBestFinishTime, previousPersonalBestFinishTime } = useMemo(
-    () => getPersonalBestTotal(currentRun),
-    [currentRun]
-  )
+  } = classBest
 
   const {
-    personalBestSector1,
-    personalBestSector2,
-    personalBestSector3,
-    previousPersonalBestSector1,
-    previousPersonalBestSector2,
-    previousPersonalBestSector3,
-  } = useMemo(() => getPersonalBestSector(currentRun), [currentRun])
+    bestSector1: personalBestSector1,
+    bestSector2: personalBestSector2,
+    bestSector3: personalBestSector3,
+    previousBestSector1: previousPersonalBestSector1,
+    previousBestSector2: previousPersonalBestSector2,
+    previousBestSector3: previousPersonalBestSector3,
+  } = personalBest
 
-  const idx = currentRun.times.length - 1
-  const times = currentRun.times[idx]
-
-  if (typeof times == 'undefined') return <div />
-
-  const { sector1, sector2, sector3, finish } = calculateTimes(times)
+  const { sector1, sector2, sector3, finish } = times
 
   return (
     <Grid>
@@ -587,32 +245,11 @@ export const RenderInfo: FC<{
           <Grid sx={{ fontSize: tableFontSizeLarge }}>
             Fastest finish times for the day
             <br />
-            {bestFinishTimeOfTheDayName !== ''
-              ? 'Outright: ' +
-                (bestFinishTimeOfTheDay / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayName +
-                ' in the ' +
-                bestFinishTimeOfTheDayCar
-              : ''}
+            {bestFinishTimeText('Outright', getGlobalBestFinish, allRuns)}
             <br />
-            {bestFinishTimeOfTheDayLadyName !== ''
-              ? 'Lady: ' +
-                (bestFinishTimeOfTheDayLady / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayLadyName +
-                ' in the ' +
-                bestFinishTimeOfTheDayLadyCar
-              : ''}
+            {bestFinishTimeText('Lady', getFemaleBestFinish, allRuns)}
             <br />
-            {bestFinishTimeOfTheDayJuniorName !== ''
-              ? 'Junior: ' +
-                (bestFinishTimeOfTheDayJunior / 1000).toFixed(2) +
-                ' by ' +
-                bestFinishTimeOfTheDayJuniorName +
-                ' in the ' +
-                bestFinishTimeOfTheDayJuniorCar
-              : ''}
+            {bestFinishTimeText('Junior', getJuniorBestFinish, allRuns)}
             <br />
           </Grid>
         </PrimaryPaper>

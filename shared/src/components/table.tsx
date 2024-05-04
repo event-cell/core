@@ -80,7 +80,7 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
   )
 }
 
-export const ResultsTable: FC<{
+export const CompetitorTable: FC<{
   data: Competitor[]
   runCount: number
 }> = ({ data, runCount }) => {
