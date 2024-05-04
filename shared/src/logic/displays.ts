@@ -22,7 +22,7 @@ export type ItemizedClassType = ClassType & { startItem: number }
  * This is the internal logic of the {@link splitDisplay} function. It is here
  * to make it easier to test
  */
-const splitDisplayLogic = ({
+export const splitDisplayLogic = ({
   classesList,
   screenIndex,
   itemsPerScreen,
@@ -36,7 +36,7 @@ const splitDisplayLogic = ({
       // If the class was not on the last screen
       classInfo.startItem >= (screenIndex - 1) * itemsPerScreen &&
       // If the class is not large enough to be on the next screen
-      classInfo.startItem < screenIndex * itemsPerScreen
+      classInfo.startItem < screenIndex * itemsPerScreen,
   )
 
 export function splitDisplay(classesList: ClassType[]) {
@@ -57,7 +57,7 @@ export function splitDisplay(classesList: ClassType[]) {
         ...classType,
         startItem,
       } satisfies ItemizedClassType
-    }
+    },
   )
 
   // Calculate ClassesList for each screen.
@@ -66,7 +66,7 @@ export function splitDisplay(classesList: ClassType[]) {
 
   try {
     const screenIndex = Number.parseInt(
-      window.location.pathname.replace('/display/', '')
+      window.location.pathname.replace('/display/', ''),
     )
 
     return splitDisplayLogic({
@@ -76,7 +76,7 @@ export function splitDisplay(classesList: ClassType[]) {
     })
   } catch (e) {
     console.warn(
-      'Failed to generate classList for this display. Falling back to the full list'
+      'Failed to generate classList for this display. Falling back to the full list',
     )
     console.warn(e)
 
