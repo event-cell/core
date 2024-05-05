@@ -139,7 +139,7 @@ export const RenderInfo: FC<{
     second: sector2Colour,
     third: sector3Colour,
     finish: finishColour,
-  } = getSectorColors(globalBest, personalBest, times)
+  } = getSectorColors(classBest, personalBest, times)
 
   const [personalBestFinishTime, previousPersonalBestFinishTime] =
     getPersonalBestTotal(currentRun)
