@@ -100,6 +100,10 @@ function getBestFinish(competitors: CompetitorList): BestFinish {
     (a, b) => a.best.time - b.best.time
   )[0]
 
+  if (!bestRun) {
+    return {} as BestFinish;
+  }
+
   return {
     name: bestRun.competitor.firstName + ' ' + bestRun.competitor.lastName,
     car: bestRun.competitor.vehicle,

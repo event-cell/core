@@ -32,7 +32,8 @@ class Config {
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
-    const config = ConfigType.parse(fileContents)
+    const parsedContents = JSON.parse(fileContents)
+    const config = ConfigType.parse(parsedContents)
     this.set(config)
   }
 

@@ -10,6 +10,7 @@ import {
   getGlobalBestSectors,
   getPersonalBestSectors,
   getSectorColors,
+  getClassBestSectors
 } from 'ui-shared'
 import { TimeInfo } from 'server/src/router/objects'
 
@@ -100,7 +101,8 @@ export const TrackDisplay = () => {
   const idx = currentCompetitor.times.length - 1
   const splits = currentCompetitor.times[idx]!
 
-  const globalBest = getGlobalBestSectors(competitors.data)
+  // const globalBest = getGlobalBestSectors(competitors.data)
+  const classBest = getClassBestSectors(currentCompetitor.classIndex, competitors.data)
   const personalBest = getPersonalBestSectors(currentCompetitor)
   const times = calculateTimes(splits)
   const {
@@ -108,7 +110,7 @@ export const TrackDisplay = () => {
     second: sector2Colour,
     third: sector3Colour,
     finish: finishPartial,
-  } = getSectorColors(globalBest, personalBest, times)
+  } = getSectorColors(classBest, personalBest, times)
 
   const { sector1, sector2, sector3 } = times
 

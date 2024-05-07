@@ -51,7 +51,7 @@ export async function getCompetitorJSON() {
     number: competitor.C_NUM || -1,
     lastName: competitor.C_FIRST_NAME || 'N/A',
     firstName: competitor.C_LAST_NAME || 'N/A',
-    class: competitor.C_SERIE || competitor.C_I29 || 'N/A',
+    class: competitor.C_I29 || 'N/A',
     classIndex: competitor.C_I21 || 0,
     vehicle: competitor.C_COMMITTEE || 'N/A',
     classRecord: competitor.C_TEAM || '0.00',
