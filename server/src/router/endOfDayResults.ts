@@ -52,6 +52,8 @@ export const endOfDayResults = router().query('generate', {
       }
     })
 
+    const fastestTimeOfTheDay = competitorsOutright[0].time
+
     // sort into classes and calculate class order
     competitorsOutright.sort(
       (a, b) => a.classIndex - b.classIndex || a.time - b.time
@@ -64,12 +66,15 @@ export const endOfDayResults = router().query('generate', {
       const currentClassCount = competitors.filter(function (element) {
         return element.classIndex === currentClass
       }).length
+      // keep track of position in class
       // if changing classes reset counters
       if (currentClass !== lastClass) {
         classPosition = 1
       } else {
         classPosition++
       }
+
+      // calculate if this is a new class record
       let newRecord = ''
       if (
         classPosition === 1 &&
@@ -77,7 +82,19 @@ export const endOfDayResults = router().query('generate', {
       ) {
         newRecord = 'Record'
       }
+
+      // check if element.time is the fastest time of the day
+      let award = ''
+      if (element.time === fastestTimeOfTheDay) {
+        award = 'Fastest time of the day'
+      }
+
+      // finish by setting lastclass for next comparision
+
       lastClass = currentClass
+      
+      // only return a row if a certificate will be awarded
+      //
       // logic for when to award a certificate
       // 5 or more in a class, top 3
       // 4 or more in a class, top 2
@@ -98,14 +115,17 @@ export const endOfDayResults = router().query('generate', {
           time: element.time,
           classRecord: element.classRecord,
           newRecord: newRecord,
+          award: award
         }
       }
     })
 
-    // for (const row of data) {
-    //   if (typeof row === 'undefined') continue
-    //   table.push(row)
-    // }
+// before exporting to excel, sort by class with classPosition from 3 to 1
+    competitorsShortlist.sort(
+      (a, b) => (a?.classIndex || 0) - (b?.classIndex || 0) || (b?.classPosition || 0) - (a?.classPosition || 0)
+    )
+
+
 
     const workbook = new Excel.Workbook()
     const worksheet = workbook.addWorksheet('Sheet1')
