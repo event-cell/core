@@ -247,10 +247,6 @@ export const RenderInfo: FC<{
             <br />
             {bestFinishTimeText('Outright', getGlobalBestFinish, allRuns)}
             <br />
-            {bestFinishTimeText('Lady', getFemaleBestFinish, allRuns)}
-            <br />
-            {bestFinishTimeText('Junior', getJuniorBestFinish, allRuns)}
-            <br />
           </Grid>
         </PrimaryPaper>
       </Grid>
