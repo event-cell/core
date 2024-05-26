@@ -84,6 +84,7 @@ export const CompetitorTable: FC<{
   data: Competitor[]
   runCount: number
 }> = ({ data, runCount }) => {
+  console.log(data)
   return (
     <TableContainer component={Paper}>
       <MUITable sx={{ minWidth: 640 }} size="small">
@@ -92,6 +93,7 @@ export const CompetitorTable: FC<{
             <TableCell width={200} sx={{ fontSize: '0.8rem' }}>
               Competitor
             </TableCell>
+            <TableCell>Outright</TableCell>
             {range(runCount).map((_, index) => (
               <TableCell key={index} sx={{ fontSize: '0.8rem' }}>
                 Run {index + 1}
@@ -101,7 +103,7 @@ export const CompetitorTable: FC<{
         </TableHead>
 
         <TableBody>
-          {data.map((row: Competitor) => (
+          {data.map((row) => (
             <TableRow key={row.number}>
               <TableCell width={240}>
                 <Box
@@ -163,6 +165,8 @@ export const CompetitorTable: FC<{
                   </Box>
                 </Box>
               </TableCell>
+
+              <TableCell>{row.outright}</TableCell>
 
               {ensureData(
                 row.times.filter(

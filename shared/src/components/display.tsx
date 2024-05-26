@@ -8,6 +8,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from '@mui/material'
 import React, { FC } from 'react'
 
@@ -19,11 +20,9 @@ import {
   getPersonalBestSectors,
   getPersonalBestTotal,
   getSectorColors,
-  getBestFinishTheWorseVersion,
   getGlobalBestFinish,
   type GetBestFinish,
-  getFemaleBestFinish,
-  getJuniorBestFinish,
+  getBestN,
 } from '../logic'
 
 import { Competitor, CompetitorList } from 'server/src/router/objects'
@@ -48,9 +47,8 @@ function RenderSector({
   bestSector,
   sectorColor,
   defaultBest,
-
   previousPB,
-  previousGlobalBest,
+  previousClassBest,
 }: {
   sectorName: string
   time: number
@@ -58,16 +56,15 @@ function RenderSector({
   bestSector: number
   sectorColor: string
   defaultBest: number
-
   previousPB: number | null
-  previousGlobalBest: number | null
+  previousClassBest: number | null
 }) {
-  const { deltaPB, deltaLeader } = calculateDeltas({
+  const { deltaPB, deltaClassLeader } = calculateDeltas({
     time,
     pb: sectorPB,
     previousPB,
-    globalBest: bestSector,
-    previousGlobalBest,
+    classBest: bestSector,
+    previousClassBest,
   })
 
   return (
@@ -98,24 +95,14 @@ function RenderSector({
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
         {time > 0 &&
         bestSector !== defaultBest &&
-        bestSector - defaultBest !== deltaLeader
-          ? deltaLeader > 0
-            ? '+' + (deltaLeader / 1000).toFixed(2)
-            : (deltaLeader / 1000).toFixed(2)
+        bestSector - defaultBest !== deltaClassLeader
+          ? deltaClassLeader > 0
+            ? '+' + (deltaClassLeader / 1000).toFixed(2)
+            : (deltaClassLeader / 1000).toFixed(2)
           : ''}
       </TableCell>
     </TableRow>
   )
-}
-
-const bestFinishTimeText = (
-  title: string,
-  processor: GetBestFinish,
-  competitors: CompetitorList
-) => {
-  const { time, name, car } = processor(competitors)
-  if (name === '') return ''
-  return `${title}: ${(time / 1000).toFixed(2)} by ${name} in the ${car}`
 }
 
 export const RenderInfo: FC<{
@@ -130,7 +117,6 @@ export const RenderInfo: FC<{
   const splits = currentRun.times[idx]!
 
   const times = calculateTimes(splits)
-  const globalBest = getGlobalBestSectors(allRuns)
   const personalBest = getPersonalBestSectors(currentRun)
   const classBest = getClassBestSectors(classIndex, allRuns)
 
@@ -141,27 +127,26 @@ export const RenderInfo: FC<{
     finish: finishColour,
   } = getSectorColors(classBest, personalBest, times)
 
-  const [personalBestFinishTime, previousPersonalBestFinishTime] =
-    getPersonalBestTotal(currentRun)
-  const [bestFinishTime, previousBestFinishTime] =
-    getBestFinishTheWorseVersion(allRuns)
-
   const {
     bestSector1,
     bestSector2,
     bestSector3,
+    bestFinish,
     previousBestSector1,
     previousBestSector2,
     previousBestSector3,
+    previousBestFinish,
   } = classBest
 
   const {
     bestSector1: personalBestSector1,
     bestSector2: personalBestSector2,
     bestSector3: personalBestSector3,
+    bestFinish: personalBestFinish,
     previousBestSector1: previousPersonalBestSector1,
     previousBestSector2: previousPersonalBestSector2,
     previousBestSector3: previousPersonalBestSector3,
+    previousBestFinish: previousPersonalBestFinish,
   } = personalBest
 
   const { sector1, sector2, sector3, finish } = times
@@ -196,7 +181,7 @@ export const RenderInfo: FC<{
                 sectorColor={sector1Colour}
                 defaultBest={defaultBest}
                 previousPB={previousPersonalBestSector1}
-                previousGlobalBest={previousBestSector1}
+                previousClassBest={previousBestSector1}
               />
 
               <RenderSector
@@ -207,7 +192,7 @@ export const RenderInfo: FC<{
                 sectorColor={sector2Colour}
                 defaultBest={defaultBest}
                 previousPB={previousPersonalBestSector2}
-                previousGlobalBest={previousBestSector2}
+                previousClassBest={previousBestSector2}
               />
 
               <RenderSector
@@ -218,18 +203,18 @@ export const RenderInfo: FC<{
                 sectorColor={sector3Colour}
                 defaultBest={defaultBest}
                 previousPB={previousPersonalBestSector3}
-                previousGlobalBest={previousBestSector3}
+                previousClassBest={previousBestSector3}
               />
 
               <RenderSector
                 sectorName={'Finish'}
                 time={finish}
-                sectorPB={personalBestFinishTime}
-                bestSector={bestFinishTime}
+                sectorPB={personalBestFinish}
+                bestSector={bestFinish}
                 sectorColor={finishColour}
                 defaultBest={defaultBest}
-                previousPB={previousPersonalBestFinishTime}
-                previousGlobalBest={previousBestFinishTime}
+                previousPB={previousPersonalBestFinish}
+                previousClassBest={previousBestFinish}
               />
             </TableBody>
           </MUITable>
@@ -243,10 +228,15 @@ export const RenderInfo: FC<{
       <Grid>
         <PrimaryPaper>
           <Grid sx={{ fontSize: tableFontSizeLarge }}>
-            Fastest finish times for the day
-            <br />
-            {bestFinishTimeText('Outright', getGlobalBestFinish, allRuns)}
-            <br />
+            <Typography variant="h4">Fastest Times</Typography>
+            <ol>
+              {getBestN(allRuns, 10).map((finish) => (
+                <li>
+                  {(finish.time / 1000).toFixed(2)} : {finish.name} [
+                  {finish.car}]{' '}
+                </li>
+              ))}
+            </ol>
           </Grid>
         </PrimaryPaper>
       </Grid>

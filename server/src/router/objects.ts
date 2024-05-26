@@ -14,6 +14,7 @@ export type TimeInfoList = z.infer<typeof TimeInfoList>
 
 export const Competitor = z.object({
   number: z.number(),
+  outright: z.number(),
   lastName: z.string(),
   firstName: z.string(),
   class: z.string(),
