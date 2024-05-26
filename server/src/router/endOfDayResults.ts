@@ -16,17 +16,6 @@ export const endOfDayResults = router().query('generate', {
 
     const table: string[][] = []
 
-    // table.push([
-    //   'Class',
-    //   'Class_posn',
-    //   'Time',
-    //   'Outright',
-    //   'Name',
-    //   'Car',
-    //   'Record',
-    //   'Award',
-    // ])
-
     const competitors = await getCompetitorJSON()
 
     // Add outright position

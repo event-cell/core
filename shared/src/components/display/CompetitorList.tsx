@@ -5,6 +5,7 @@ import { CompetitorList } from 'server/src/router/objects'
 import { CompetitorTable } from '../table'
 import { DisplayHeader } from './header'
 import { getDisplayNumber, splitDisplay } from '../../logic/displays'
+import { getPersonalBestSectors } from '../../logic'
 
 export const DisplayCompetitorList: FC<{
   competitors: CompetitorList
@@ -31,23 +32,25 @@ export const DisplayCompetitorList: FC<{
   )
 
   const printClassesList = useMemo(() => {
-    const classesList = classes.map((carClass) => ({
-      carClass,
-      drivers: competitors
-        .filter((data) => data.classIndex === carClass.classIndex)
-        .sort(
-          (a, b) =>
-            Math.min(...a.times.map((time) => time?.time || 10000000)) -
-            Math.min(...b.times.map((time) => time?.time || 10000000))
-        ),
-    }))
+    const classesList = classes
+      .map((carClass) => ({
+        carClass,
+        drivers: competitors
+          .filter((data) => data.classIndex === carClass.classIndex)
+          .sort(
+            (a, b) =>
+              Math.min(...a.times.map((time) => time?.time || 10000000)) -
+              Math.min(...b.times.map((time) => time?.time || 10000000))
+          ),
+      }))
+      .sort((a, b) => a.carClass.classIndex - b.carClass.classIndex)
 
     const displayContent = splitDisplay(classesList)
 
     if (!displayContent) return
 
     return displayContent
-  }, [classes])
+  }, [competitors, classes])
 
   const displayNumber = getDisplayNumber()
 

@@ -23,10 +23,12 @@ export interface BestSectorTimes {
   bestSector1: number
   bestSector2: number
   bestSector3: number
+  bestFinish: number
 
   previousBestSector1: number | null
   previousBestSector2: number | null
   previousBestSector3: number | null
+  previousBestFinish: number | null
 }
 
 /**
@@ -53,15 +55,20 @@ function getBestSectors(competitors: CompetitorList): BestSectorTimes {
   const [bestSector3, previousBestSector3] = getTopTimes(
     runs.map((run) => run.time - run.split2)
   )
+  const [bestFinish, previousBestFinish] = getTopTimes(
+    runs.map((run) => run.time)
+  )
 
   return {
     bestSector1,
     bestSector2,
     bestSector3,
+    bestFinish,
 
     previousBestSector1,
     previousBestSector2,
     previousBestSector3,
+    previousBestFinish
   }
 }
 
@@ -78,38 +85,42 @@ export const getClassBestSectors = (
 
 export const getPersonalBestTotal = (competitor: Competitor) =>
   getTopTimes(competitor.times.filter(Boolean).map((run) => run.time))
-export const getBestFinishTheWorseVersion = (competitors: CompetitorList) =>
-  getTopTimes(
-    competitors
-      .flatMap((competitor) => competitor.times)
-      .filter(Boolean)
-      .map((run) => run.time)
-  )
+
 
 export type BestFinish = { name: string; car: string; time: number }
 
-function getBestFinish(competitors: CompetitorList): BestFinish {
+export function getBestN(competitors: CompetitorList, count: number): BestFinish[] {
+
+// create a new array of objects with the competitor and their best time
+// filter out any competitors that have no times
+// sort the array by the best time
+// get the first element of the array
+// if there is no best run, return an empty object
+// return the best run's competitor's name, car, and time
+
+
+
   const competitorBestRuns = competitors
     .map((competitor) => ({
       competitor,
-      best: competitor.times.filter(Boolean).sort((a, b) => a.time - b.time)[0],
+      best: competitor.times
+      .filter(Boolean)
+      .filter(time => time.status===0)
+      .sort((a, b) => a.time - b.time)[0],
     }))
-    .filter(Boolean)
+    .filter(run => run.best !== undefined)
 
-  const bestRun = competitorBestRuns.sort(
+
+  return competitorBestRuns.sort(
     (a, b) => a.best.time - b.best.time
-  )[0]
-
-  if (!bestRun) {
-    return {} as BestFinish;
-  }
-
-  return {
-    name: bestRun.competitor.firstName + ' ' + bestRun.competitor.lastName,
-    car: bestRun.competitor.vehicle,
-    time: bestRun.best.time,
-  }
+  ).slice(0, count).map(({ competitor, best }) => ({
+    name: competitor.firstName + ' ' + competitor.lastName,
+    car: competitor.vehicle,
+    time: best.time,
+  }))
 }
+
+const getBestFinish = (competitors: CompetitorList) => getBestN(competitors, 1)[0]
 
 export type GetBestFinish = typeof getBestFinish
 export const getGlobalBestFinish = getBestFinish
@@ -167,7 +178,7 @@ export function getSectorColors(
       times.sector2
     ),
     third: getSectorColor(classBest.bestSector3, pb.bestSector3, times.sector3),
-    finish: getSectorColor(classBest.bestSector3, pb.bestSector3, times.finish),
+    finish: getSectorColor(classBest.bestFinish, pb.bestFinish, times.finish),
   }
 }
 
@@ -184,22 +195,22 @@ export function calculateDeltas({
   time,
   pb,
   previousPB,
-  globalBest,
-  previousGlobalBest,
+  classBest,
+  previousClassBest,
 }: {
   time: number
   pb: number
   previousPB: number | null
-  globalBest: number
-  previousGlobalBest: number | null
-}): { deltaPB: number; deltaLeader: number } {
-  if (!previousPB || !previousGlobalBest) {
-    return { deltaPB: 0, deltaLeader: 0 }
+  classBest: number
+  previousClassBest: number | null
+}): { deltaPB: number; deltaClassLeader: number } {
+  if (!previousPB || !previousClassBest) {
+    return { deltaPB: 0, deltaClassLeader: 0 }
   }
 
   return {
     deltaPB: time == pb ? time - previousPB : time - pb,
-    deltaLeader:
-      time == globalBest ? time - previousGlobalBest : time - globalBest,
+    deltaClassLeader:
+      time == classBest ? time - previousClassBest : time - classBest,
   }
 }
