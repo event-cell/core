@@ -24,7 +24,9 @@ export const currentCompetitor = router().query('number', {
         select: {
           C_NUM: true,
           C_HOUR2: true,
-
+        },
+        where: {
+          C_STATUS: 0,
         },
         orderBy: {
           C_HOUR2: 'desc',
