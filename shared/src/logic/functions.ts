@@ -68,7 +68,7 @@ function getBestSectors(competitors: CompetitorList): BestSectorTimes {
     previousBestSector1,
     previousBestSector2,
     previousBestSector3,
-    previousBestFinish
+    previousBestFinish,
   }
 }
 
@@ -86,41 +86,44 @@ export const getClassBestSectors = (
 export const getPersonalBestTotal = (competitor: Competitor) =>
   getTopTimes(competitor.times.filter(Boolean).map((run) => run.time))
 
-
 export type BestFinish = { name: string; car: string; time: number }
 
-export function getBestN(competitors: CompetitorList, count: number): BestFinish[] {
-
-// create a new array of objects with the competitor and their best time
-// filter out any competitors that have no times
-// sort the array by the best time
-// get the first element of the array
-// if there is no best run, return an empty object
-// return the best run's competitor's name, car, and time
-
-
+export function getBestN(
+  competitors: CompetitorList,
+  count: number
+): BestFinish[] {
+  // create a new array of objects with the competitor and their best time
+  // filter out any competitors that have no times
+  // sort the array by the best time
+  // get the first element of the array
+  // if there is no best run, return an empty object
+  // return the best run's competitor's name, car, and time
 
   const competitorBestRuns = competitors
     .map((competitor) => ({
       competitor,
       best: competitor.times
-      .filter(Boolean)
-      .filter(time => time.status===0)
-      .sort((a, b) => a.time - b.time)[0],
+        .filter(Boolean)
+        .filter((time) => time.status === 0)
+        .filter((time) => time.time !== 0)
+        .sort((a, b) => a.time - b.time)[0],
     }))
-    .filter(run => run.best !== undefined)
+    .filter((run) => run.best !== undefined)
 
+  console.log('bestruns', competitorBestRuns)
 
-  return competitorBestRuns.sort(
-    (a, b) => a.best.time - b.best.time
-  ).slice(0, count).map(({ competitor, best }) => ({
-    name: competitor.firstName + ' ' + competitor.lastName,
-    car: competitor.vehicle,
-    time: best.time,
-  }))
+  return competitorBestRuns
+    .sort((a, b) => a.best.time - b.best.time)
+    .slice(0, count)
+    .map(({ competitor, best }) => ({
+      name: competitor.firstName + ' ' + competitor.lastName,
+      car: competitor.vehicle,
+      time: best.time,
+    }))
 }
 
-const getBestFinish = (competitors: CompetitorList) => getBestN(competitors, 1)[0]
+const getBestFinish = (competitors: CompetitorList) =>
+  getBestN(competitors, 1)[0]
 
 export type GetBestFinish = typeof getBestFinish
 export const getGlobalBestFinish = getBestFinish
