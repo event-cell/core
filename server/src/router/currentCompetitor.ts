@@ -34,6 +34,7 @@ export const currentCompetitor = router().query('number', {
               C_STATUS: 65536,
             },
           ],
+          C_NUM: { not: 0 },
         },
         orderBy: {
           C_HOUR2: 'desc',
