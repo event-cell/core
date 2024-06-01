@@ -85,11 +85,20 @@ export async function getCompetitorJSON() {
     })
   }
 
+  let position = 1
   return competitors
     .map((c) => ({
       c,
       bestSectors: getPersonalBestSectors(c),
     }))
     .sort((a, b) => a.bestSectors.bestFinish - b.bestSectors.bestFinish)
-    .map((c, index) => ({ ...c.c, outright: index + 1 }))
+    .map((c, index) => {
+      if (c.c.times.some((time) => time && time.time > 0)) {
+        const result = { ...c.c, outright: position }
+        position++
+        return result
+      } else {
+        return c.c
+      }
+    })
 }

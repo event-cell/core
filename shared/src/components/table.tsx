@@ -166,7 +166,7 @@ export const CompetitorTable: FC<{
                 </Box>
               </TableCell>
 
-              <TableCell>{row.outright}</TableCell>
+              <TableCell>{row.outright !== -1 ? row.outright : ''}</TableCell>
 
               {ensureData(
                 row.times.filter(
