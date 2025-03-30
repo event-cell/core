@@ -2,6 +2,8 @@
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
     "outDir": "build",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "lib": ["dom", "esnext"]
   }
 }
