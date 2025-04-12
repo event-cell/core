@@ -42,7 +42,8 @@ async function uploadLiveTiming() {
       Body: fileStream
     }
 
-    const result = await s3.upload(uploadParams).promise()
+    // const result = await s3.upload(uploadParams).promise()
+    let result
     logger.info('Live timing uploaded successfully:', result)
   } catch (error) {
     logger.error('Error rendering or uploading live timing:', error)
