@@ -9,20 +9,27 @@ import { config } from './config'
 export type EventDB = {
   event: pcEvent
   eventData: pcEventData
-  online: pcOnline
+  online: pcOnline | null
 }
 
 export function getEventDatabases(eventId: string): EventDB {
   const eventPath = config.eventDatabasePath
 
-  return {
-    online: new pcOnline({
+  let online: EventDB['online'] = null
+
+  try {
+    online = new pcOnline({
       datasources: {
         db: {
           url: `file:${join(eventPath, `Online.scdb`)}`,
         },
       },
-    }),
+    })
+  }
+  catch {}
+
+  return {
+    online,
     event: new pcEvent({
       datasources: {
         db: {
