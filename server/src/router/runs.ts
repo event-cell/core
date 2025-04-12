@@ -5,5 +5,5 @@ import { getCurrentHeat } from '../utils'
 
 export const runs = router().query('count', {
   output: z.number(),
-  resolve: () => getCurrentHeat(),
+  resolve: getCurrentHeat,
 })

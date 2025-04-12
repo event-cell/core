@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { createReactQueryHooks } from '@trpc/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -25,9 +25,16 @@ export const useTrpcClient = create(() =>
   trpc.createClient({ url: config.backendUrl })
 )
 
+function getRouterPrefix() {
+  const firstPath = window.location.pathname.split('/')[1]
+  if (firstPath.includes('-')) return firstPath
+  return ''
+}
+
 function App() {
   const [queryClient] = useState(() => new QueryClient())
   const trpcClient = useTrpcClient()
+  const root = useMemo(getRouterPrefix, [])
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
@@ -35,14 +42,14 @@ function App() {
         <Theme>
           <Router>
             <Routes>
-              <Route path="/admin/" element={<Admin />} />
-              <Route path="/display/" element={<DisplayPage />} />
-              <Route path="/display/1" element={<DisplayPage />} />
-              <Route path="/display/2" element={<DisplayPage />} />
-              <Route path="/display/3" element={<DisplayPage />} />
-              <Route path="/display/4" element={<DisplayPage />} />
-              <Route path="/trackdisplay" element={<TrackDisplay />} />
-              <Route path="/announcer" element={<Announcer />} />
+              <Route path={root + "/admin/"} element={<Admin />} />
+              <Route path={root + "/display/"} element={<DisplayPage />} />
+              <Route path={root + "/display/1"} element={<DisplayPage />} />
+              <Route path={root + "/display/2"} element={<DisplayPage />} />
+              <Route path={root + "/display/3"} element={<DisplayPage />} />
+              <Route path={root + "/display/4"} element={<DisplayPage />} />
+              <Route path={root + "/trackdisplay"} element={<TrackDisplay />} />
+              <Route path={root + "/announcer"} element={<Announcer />} />
             </Routes>
           </Router>
         </Theme>

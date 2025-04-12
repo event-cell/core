@@ -1,4 +1,5 @@
-import { Box, Container, Grid, Typography } from '@mui/material'
+import { Box, Container, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid'
 import CarCrash from '@mui/icons-material/CarCrash'
 import React, { useEffect } from 'react'
 
@@ -127,25 +128,25 @@ export const TrackDisplay = () => {
           rowSpacing={0}
           columnSpacing={{ xs: 1, sm: 1, md: 2, lg: 4, xl: 4 }}
         >
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <Box
               sx={{ height: 48, borderRadius: '4px', display: 'block' }}
               bgcolor={sector1Colour}
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <Box
               sx={{ height: 48, borderRadius: '4px', display: 'block' }}
               bgcolor={sector2Colour}
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <Box
               sx={{ height: 48, borderRadius: '4px', display: 'block' }}
               bgcolor={sector3Colour}
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <Box
               sx={{
                 fontSize: 130,
@@ -165,7 +166,7 @@ export const TrackDisplay = () => {
                 : ''}{' '}
             </Box>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <Box
               sx={{
                 fontSize: 130,
@@ -185,7 +186,7 @@ export const TrackDisplay = () => {
                 : ''}{' '}
             </Box>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <Box
               sx={{
                 fontSize: 130,
@@ -205,13 +206,13 @@ export const TrackDisplay = () => {
                 : ''}{' '}
             </Box>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{xs:12}}>
             <Box
               sx={{ height: 72, borderRadius: '4px', display: 'block' }}
               bgcolor={finishColor}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{xs:12}}>
             <Box
               sx={{
                 fontSize: 320,

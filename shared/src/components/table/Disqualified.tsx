@@ -1,13 +1,13 @@
 import React from 'react'
 
-import { Chip } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2'
+import Chip from '@mui/material/Chip'
+import Grid from '@mui/material/Grid'
 import Cancel from '@mui/icons-material/Cancel'
 
 import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
 
 export const Disqualified = () => (
-  <Grid2
+  <Grid
     container
     spacing={0.25}
     sx={{
@@ -15,7 +15,7 @@ export const Disqualified = () => (
       width: MAIN_WIDTH,
     }}
   >
-    <Grid2 xs={12} display="flex" justifyContent="left" alignItems="center">
+    <Grid size={{xs:12}} display="flex" justifyContent="left" alignItems="center">
       <Chip
         label="DSQ"
         variant="outlined"
@@ -23,6 +23,6 @@ export const Disqualified = () => (
         size="small"
         icon={<Cancel />}
       />
-    </Grid2>
-  </Grid2>
+    </Grid>
+  </Grid>
 )

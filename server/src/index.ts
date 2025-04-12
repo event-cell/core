@@ -7,7 +7,9 @@ import { resolve, join } from 'path'
 import { trpcRouter } from './router'
 import { setup } from './setup'
 import { scheduledTasks } from './scheduledTasks'
-import { setupLogger } from './utils'
+import { getCurrentHeat, setupLogger } from './utils'
+import { getCompetitorJSON } from './router/shared'
+import { getCurrentCompetitor } from './router/currentCompetitor'
 const logger = setupLogger('server')
 
 const uiPath = resolve(__dirname, 'ui')
@@ -30,6 +32,16 @@ const app = express()
       router: trpcRouter,
     })
   )
+
+  app.get('/api/simple/currentCompetitor.json', async (req, res) => {
+    res.json(await getCurrentCompetitor())
+  })
+  app.get('/api/simple/competitors.json', async (req, res) => {
+    res.json(await getCompetitorJSON())
+  })
+  app.get('/api/simple/runs.json', async (req, res) => {
+    res.json(await getCurrentHeat())
+  })
 
   // Pass all unfound routes to the UI for react-router to handle
   app.get('*', (req, res) => {

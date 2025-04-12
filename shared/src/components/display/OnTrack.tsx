@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material'
+import Grid from '@mui/material/Grid'
 import React from 'react'
 import { RenderInfo } from '../display'
 import { PrimaryPaper } from '../ui'
@@ -40,7 +40,7 @@ export const OnTrack = ({
           {currentRun.class}
         </PrimaryPaper>
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={{ xs:4 }}>
         <RenderInfo currentRun={currentRun} allRuns={competitors} />
       </Grid>
     </Grid>

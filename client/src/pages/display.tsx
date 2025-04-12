@@ -6,11 +6,15 @@ import { DisplayCompetitorList, OnTrack } from 'ui-shared'
 import { requestWrapper } from '../components/requestWrapper'
 import { getDisplayNumber } from 'ui-shared/src/logic/displays'
 import { Container } from '@mui/material'
+import { useQuery } from 'react-query'
+import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi'
 
 export const DisplayPage = () => {
-  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
-  const competitors = trpc.useQuery(['competitors.list'])
-  const runCount = trpc.useQuery(['runs.count'])
+  const currentCompetitor = useQuery({ queryKey: 'currentCompetitor', queryFn: getCurrentCompetitor })
+  const competitors = useQuery({ queryKey: 'competitors', queryFn: getCompetitors })
+  const runCount = useQuery({ queryKey: 'runCount', queryFn: getRunCount })
+
+  console.log(competitors)
 
   let displayRefresh = 15
 

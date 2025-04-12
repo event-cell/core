@@ -4,21 +4,29 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "vitest",
-    "dup": "jscpd"
-  },
-  "devDependencies": {
-    "@total-typescript/ts-reset": "^0.5.1",
-    "@types/react": "^18.0.26",
-    "jscpd": "^3.5.3",
-    "typescript": "^4.9.4",
-    "vitest": "^1.6.0"
+    "dup": "jscpd",
+    "build": "tsc"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@mui/icons-material": "^5.11.0",
-    "@mui/material": "^5.11.2",
-    "@mui/x-data-grid": "^5.17.17",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
+    "@mui/system": "^7.0.2",
+    "@types/react": "^19.1.1",
+    "@types/react-dom": "^19.1.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "server": "*"
+  },
+  "devDependencies": {
+    "@total-typescript/ts-reset": "^0.6.1",
+    "@types/react": "^19.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "jscpd": "^4.0.5",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   }
 }

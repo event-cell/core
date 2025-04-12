@@ -1,13 +1,14 @@
 import React, { FC } from 'react'
 
-import { Chip } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2'
+import Chip from '@mui/material/Chip'
+import Grid from '@mui/material/Grid'
+
 import MeetingRoom from '@mui/icons-material/MeetingRoom'
 
 import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
 
 export const DNS: FC<Record<string, never>> = () => (
-  <Grid2
+  <Grid
     container
     spacing={0.25}
     sx={{
@@ -15,7 +16,7 @@ export const DNS: FC<Record<string, never>> = () => (
       width: MAIN_WIDTH,
     }}
   >
-    <Grid2 xs={12} display="flex" justifyContent="left" alignItems="center">
+    <Grid size={{xs:12}} display="flex" justifyContent="left" alignItems="center">
       <Chip
         label="DNS"
         variant="outlined"
@@ -23,6 +24,6 @@ export const DNS: FC<Record<string, never>> = () => (
         size="small"
         icon={<MeetingRoom />}
       />
-    </Grid2>
-  </Grid2>
+    </Grid>
+  </Grid>
 )

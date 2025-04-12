@@ -102,3 +102,5 @@ export async function getCompetitorJSON() {
       }
     })
 }
+export type GetCompetitorJsonReturn = ReturnType<typeof getCompetitorJSON>
+

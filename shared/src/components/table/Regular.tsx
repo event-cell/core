@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 
-import Grid2 from '@mui/material/Unstable_Grid2'
+import Grid from '@mui/material/Grid'
 
 import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
 
@@ -10,7 +10,7 @@ export const Regular: FC<{
   sector3: string
   finishTime: string
 }> = ({ sector1, sector2, sector3, finishTime }) => (
-  <Grid2
+  <Grid
     container
     spacing={0.25}
     sx={{
@@ -18,11 +18,11 @@ export const Regular: FC<{
       width: MAIN_WIDTH,
     }}
   >
-    <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+    <Grid size={{xs:6}} display="flex" justifyContent="left" alignItems="center">
       {sector3}
-    </Grid2>
-    <Grid2
-      xs={6}
+    </Grid>
+    <Grid
+      size={{xs:6}}
       display="flex"
       justifyContent="right"
       alignItems="center"
@@ -31,12 +31,12 @@ export const Regular: FC<{
       sx={{ fontSize: '0.9rem', fontWeight: 700 }}
     >
       {finishTime}
-    </Grid2>
-    <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+    </Grid>
+    <Grid size={{xs:6}} display="flex" justifyContent="left" alignItems="center">
       {sector1}
-    </Grid2>
-    <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
+    </Grid>
+    <Grid size={{xs:6}} display="flex" justifyContent="right" alignItems="center">
       {sector2}
-    </Grid2>
-  </Grid2>
+    </Grid>
+  </Grid>
 )

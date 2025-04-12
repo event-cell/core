@@ -149,7 +149,7 @@ export const Announcer = () => {
           rowSpacing={1}
           columnSpacing={{ xs: 1, sm: 1, md: 2, lg: 4, xl: 4 }}
         >
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <PrimaryPaper
               sx={{
                 fontSize: 24,
@@ -164,7 +164,7 @@ export const Announcer = () => {
               {currentCompetitor.class}
             </PrimaryPaper>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <PrimaryPaperCenter
               sx={{
                 fontSize: 48,
@@ -175,7 +175,7 @@ export const Announcer = () => {
               {currentCompetitor.special}
             </PrimaryPaperCenter>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <PrimaryPaperCenter
               sx={{
                 fontSize: 48,
@@ -186,13 +186,13 @@ export const Announcer = () => {
               Run {runCount.data}
             </PrimaryPaperCenter>
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={{xs:4}}>
             <RenderInfo
               currentRun={currentCompetitor}
               allRuns={competitorList.data}
             />
           </Grid>
-          <Grid item xs={8}>
+          <Grid size={{xs:8}}>
             <RenderClassList
               classes={classes}
               allRuns={competitorList.data}
