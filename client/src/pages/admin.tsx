@@ -4,6 +4,9 @@ import {
   CircularProgress,
   Container,
   TextField,
+  Checkbox,
+  FormControlLabel,
+  Typography,
 } from '@mui/material';
 import { green, red } from '@mui/material/colors';
 import React from 'react';
@@ -38,9 +41,10 @@ export const Admin = () => {
   };
 
   return (
-    <Container>
-      <h1>TODO: Protect this page with auth</h1>
-
+    <Container maxWidth="sm" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Admin Panel
+      </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
           required
@@ -62,6 +66,43 @@ export const Admin = () => {
             setNewConfig({ ...newConfig, eventName: e.target.value });
           }}
         />
+      </Box>
+      <Box mt={4} p={2} border={1} borderRadius={2}>
+        <Typography variant="h6" gutterBottom>
+          Live Timing Settings
+        </Typography>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={!!newConfig.uploadLiveTiming}
+              onChange={(e) =>
+                setNewConfig({
+                  ...newConfig,
+                  uploadLiveTiming: e.target.checked,
+                })
+              }
+            />
+          }
+          label="Upload Live Timing"
+        />
+
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Live Timing Output Path"
+          value={newConfig.liveTimingOutputPath || ''}
+          onChange={(e) =>
+            setNewConfig({
+              ...newConfig,
+              liveTimingOutputPath: e.target.value,
+            })
+          }
+        />
+
+        <Typography variant="body2" color="textSecondary" mt={1}>
+          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/2025-04-18/api/simple/
+        </Typography>
       </Box>
 
       <Box sx={{ m: 1, position: 'relative' }}>
@@ -89,7 +130,6 @@ export const Admin = () => {
           />
         )}
       </Box>
-
       <Box sx={{ m: 1, position: 'relative' }}>
         <Button
           variant="contained"

@@ -12,9 +12,10 @@ export const ConfigType = z
   .object({
     eventId: z.string(),
     eventName: z.string(),
-
     eventDatabasePath: z.string(),
     recordsDatabasePath: z.string(),
+    uploadLiveTiming: z.boolean().optional(),
+    liveTimingOutputPath: z.string().optional(),
   })
   .deepPartial()
 export type ConfigType = z.infer<typeof ConfigType>
@@ -25,10 +26,12 @@ export type ConfigType = z.infer<typeof ConfigType>
 class Config {
   public eventId = '001'
   public eventName = 'Unnamed Event'
-
   public eventDatabasePath = join(__dirname, '..', 'prisma/Events')
   public recordsDatabasePath = '/data/records'
   public resultsPath = '/data/results'
+  public uploadLiveTiming = false
+  public liveTimingOutputPath = '/data/live-timing'
+
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
@@ -64,19 +67,29 @@ class Config {
   public set(config: ConfigType) {
     if (config.eventId) this.eventId = config.eventId
     if (config.eventName) this.eventName = config.eventName
-
     if (config.eventDatabasePath)
       this.eventDatabasePath = config.eventDatabasePath
     if (config.recordsDatabasePath)
       this.recordsDatabasePath = config.recordsDatabasePath
+    if (typeof config.uploadLiveTiming === 'boolean') {
+      if (this.uploadLiveTiming !== config.uploadLiveTiming) {
+        logger.info(`uploadLiveTiming changed to ${config.uploadLiveTiming}`)
+      }
+      this.uploadLiveTiming = config.uploadLiveTiming
+    }
+    if (typeof config.liveTimingOutputPath === 'string') {
+      logger.info(`liveTimingOutputPath set to ${config.liveTimingOutputPath}`)
+      this.liveTimingOutputPath = config.liveTimingOutputPath
+    }
   }
 
   public asJSON() {
     return {
       eventId: this.eventId,
       eventName: this.eventName,
-
       eventDatabasePath: this.eventDatabasePath,
+      uploadLiveTiming: this.uploadLiveTiming,
+      liveTimingOutputPath: this.liveTimingOutputPath,
     }
   }
 
