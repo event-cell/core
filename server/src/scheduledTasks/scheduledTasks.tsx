@@ -328,7 +328,7 @@ async function generateIndexFile() {
         }
         
         html += `
-      <a href="${dir}" class="event-link">
+      <a href="${dir}/display/" class="event-link">
         <div class="event-date">${formattedDate}</div>
         ${eventName ? `<div class="event-name">${eventName}</div>` : ''}
       </a>`;

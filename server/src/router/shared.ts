@@ -48,19 +48,37 @@ export async function getCompetitorJSON() {
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
-  const competitors: CompetitorList = tCOMPETITORSTable.map((competitor) => ({
-    number: competitor.C_NUM || -1,
-    lastName: competitor.C_FIRST_NAME || 'N/A',
-    firstName: competitor.C_LAST_NAME || 'N/A',
-    class: competitor.C_I29 || 'N/A',
-    classIndex: competitor.C_I21 || 0,
-    vehicle: competitor.C_COMMITTEE || 'N/A',
-    classRecord: competitor.C_TEAM || '0.00',
-    special: nullToUndefined(competitor.C_I28),
-    miscAward: nullToUndefined(competitor.C_I30),
-    times: [],
-    outright: -1,
-  }))
+  const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor) => {
+    // Get the event date to determine which field to use for class name
+    const eventDate = await event.tPARAMETERS.findFirst({
+      where: { C_PARAM: 'DATE' }
+    });
+    
+    // Default to C_I29 (2023+ format)
+    let className = competitor.C_I29;
+    
+    // If event date is before 2023, use C_SERIE (pre-2023 format)
+    if (eventDate?.C_VALUE) {
+      const date = new Date((Number(eventDate.C_VALUE) - 25569) * 86400 * 1000);
+      if (date.getFullYear() < 2023) {
+        className = competitor.C_SERIE;
+      }
+    }
+    
+    return {
+      number: competitor.C_NUM || -1,
+      lastName: competitor.C_FIRST_NAME || 'N/A',
+      firstName: competitor.C_LAST_NAME || 'N/A',
+      class: className || 'N/A',
+      classIndex: competitor.C_I21 || 0,
+      vehicle: competitor.C_COMMITTEE || 'N/A',
+      classRecord: competitor.C_TEAM || '0.00',
+      special: nullToUndefined(competitor.C_I28),
+      miscAward: nullToUndefined(competitor.C_I30),
+      times: [],
+      outright: -1,
+    };
+  }));
 
   for (let i = 0; i < competitors.length; i++) {
     heats.forEach((heat, index) => {
