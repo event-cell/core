@@ -2,7 +2,7 @@ import { setupLogger, rsyncService } from '../utils'
 
 const logger = setupLogger('scheduledTasks/scheduledTasks')
 import { config } from '../config'
-import { mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync } from 'fs'
+import { mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync, readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import dayjs from 'dayjs'
 import { getCompetitorJSON } from '../router/shared'
@@ -11,6 +11,7 @@ import { getCurrentHeat } from '../utils'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import { event } from '../router/shared'
+import { getEventDatabases } from '../dbUtils'
 
 const execAsync = promisify(exec)
 
@@ -238,6 +239,15 @@ async function generateIndexFile() {
       background-color: #3c3c3c;
       transform: translateX(5px);
     }
+    .event-date {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .event-name {
+      font-size: 14px;
+      color: #aaa;
+    }
     .toggle-icon {
       font-size: 18px;
       color: #1976d2;
@@ -301,8 +311,27 @@ async function generateIndexFile() {
       directoriesByYear[year].forEach(dir => {
         const date = dayjs(dir);
         const formattedDate = date.format('MMMM D, YYYY');
+        
+        // Get event name from metadata if available
+        let eventName = '';
+        try {
+          const metadataPath = join(config.liveTimingOutputPath, dir, 'metadata.json');
+          if (existsSync(metadataPath)) {
+            const metadataContent = readFileSync(metadataPath, 'utf8');
+            const metadata = JSON.parse(metadataContent) as { eventName?: string };
+            if (metadata.eventName) {
+              eventName = metadata.eventName;
+            }
+          }
+        } catch (error) {
+          logger.warn(`Could not read metadata for ${dir}: ${error}`);
+        }
+        
         html += `
-      <a href="${dir}/display/" class="event-link">${formattedDate}</a>`;
+      <a href="${dir}" class="event-link">
+        <div class="event-date">${formattedDate}</div>
+        ${eventName ? `<div class="event-name">${eventName}</div>` : ''}
+      </a>`;
       });
       
       html += `
@@ -372,6 +401,42 @@ async function getEventDate() {
   }
 }
 
+/**
+ * Writes a metadata.json file with event information
+ * @param dateDirPath The directory path for the date
+ * @param eventId The event ID
+ */
+async function writeMetadataFile(dateDirPath: string, eventId: string) {
+  try {
+    const metadataPath = join(dateDirPath, 'metadata.json')
+    let eventName = 'Event'
+    
+    // Get the event name from the database
+    try {
+      const { event } = getEventDatabases(eventId)
+      const title2Param = await event.tPARAMETERS.findFirst({
+        where: { C_PARAM: 'TITLE2' }
+      })
+      if (title2Param?.C_VALUE) {
+        eventName = title2Param.C_VALUE
+      }
+    } catch (error) {
+      logger.error('Failed to get event name from database:', error)
+    }
+    
+    const metadata = {
+      eventId,
+      eventName,
+      lastUpdated: new Date().toISOString()
+    }
+    
+    await safeWriteFile(metadataPath, metadata, 'metadata.json')
+    logger.info(`Wrote metadata file to ${metadataPath}`)
+  } catch (error) {
+    logger.error('Failed to write metadata file:', error)
+  }
+}
+
 async function syncLiveTimingData() {
   // Check if uploadLiveTiming is enabled
   if (!config.uploadLiveTiming) {
@@ -406,6 +471,10 @@ async function syncLiveTimingData() {
     // Export live timing data to ensure the API directory has content
     logger.info('Exporting live timing data')
     await exportLiveTimingData()
+    
+    // Write metadata file with event information
+    logger.info('Writing metadata file')
+    await writeMetadataFile(dateDirPath, config.eventId)
     
     // Check if this is the first run for this date or if eventId changed
     const isFirstRun = !copiedDates.has(dateStr) || eventIdChanged;
