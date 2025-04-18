@@ -30,6 +30,7 @@ export const Admin = () => {
   const [newConfig, setNewConfig] = useState({
     eventId: '',
     eventName: '',
+    eventDate: '',
     uploadLiveTiming: false,
     liveTimingOutputPath: ''
   });
@@ -40,6 +41,7 @@ export const Admin = () => {
       setNewConfig({
         eventId: config.data.eventId || '',
         eventName: config.data.eventName || '',
+        eventDate: config.data.eventDate || '',
         uploadLiveTiming: config.data.uploadLiveTiming || false,
         liveTimingOutputPath: config.data.liveTimingOutputPath || ''
       });
@@ -54,8 +56,8 @@ export const Admin = () => {
   const fetchEventDate = async () => {
     setIsLoadingEventDate(true);
     try {
-      // Call the getEventDate procedure from the config router
-      const eventName = await trpcClient.config.getEventDate.query();
+      // Get the event name from the configuration
+      const eventName = config.data?.eventName || '';
       
       // Update the newConfig with the event name
       setNewConfig(prev => ({
@@ -63,8 +65,8 @@ export const Admin = () => {
         eventName: eventName
       }));
     } catch (error) {
-      console.error('Failed to fetch event date:', error);
-      // If we can't get the event date, use a default name with the current date
+      console.error('Failed to get event name from configuration:', error);
+      // If we can't get the event name, use a default name with the current date
       const currentDate = dayjs().format('MMMM D, YYYY');
       setNewConfig(prev => ({
         ...prev,
@@ -95,6 +97,7 @@ export const Admin = () => {
       setNewConfig({
         eventId: result.eventId,
         eventName: result.eventName,
+        eventDate: result.eventDate,
         uploadLiveTiming: result.uploadLiveTiming,
         liveTimingOutputPath: result.liveTimingOutputPath
       });
@@ -130,28 +133,17 @@ export const Admin = () => {
             setNewConfig({ ...newConfig, eventId: e.target.value });
           }}
         />
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            required
-            fullWidth
-            label="Event Name"
-            value={newConfig.eventName || ''}
-            InputProps={{
-              readOnly: true,
-              endAdornment: isLoadingEventDate ? (
-                <CircularProgress size={20} />
-              ) : null,
-            }}
-          />
-          <Button 
-            variant="outlined" 
-            onClick={fetchEventDate}
-            disabled={isLoadingEventDate}
-            sx={{ minWidth: '120px' }}
-          >
-            {isLoadingEventDate ? <CircularProgress size={24} /> : 'Get Name'}
-          </Button>
-        </Box>
+        <TextField
+          fullWidth
+          label="Event Name"
+          value={newConfig.eventName || ''}
+          InputProps={{
+            readOnly: true,
+            endAdornment: isLoadingEventDate ? (
+              <CircularProgress size={20} />
+            ) : null,
+          }}
+        />
       </Box>
       <Box mt={4} p={2} border={1} borderRadius={2}>
         <Typography variant="h6" gutterBottom>
@@ -187,7 +179,7 @@ export const Admin = () => {
         />
 
         <Typography variant="body2" color="textSecondary" mt={1}>
-          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/{dayjs().format('YYYY-MM-DD')}/api/simple/
+          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/{newConfig.eventDate || dayjs().format('YYYY-MM-DD')}/api/simple/
         </Typography>
       </Box>
 

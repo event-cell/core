@@ -12,6 +12,36 @@ import dayjs from 'dayjs';
 // ✅ Initialize tRPC
 const t = initTRPC.create();
 
+// Helper function to get event date in YYYY-MM-DD format
+async function getEventDateFormatted() {
+  try {
+    // Get the event database
+    const { event } = getEventDatabases(config.eventId);
+    
+    // Query the TPARAMETERS table for the DATE parameter
+    const dateParam = await event.tPARAMETERS.findFirst({
+      where: { C_PARAM: 'DATE' }
+    });
+    
+    if (dateParam && dateParam.C_VALUE) {
+      // Convert Excel serial date to JavaScript date
+      // Excel dates are number of days since January 1, 1900
+      // JavaScript dates are milliseconds since January 1, 1970
+      const excelDate = Number(dateParam.C_VALUE);
+      const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+      
+      // Format the date in YYYY-MM-DD format
+      return dayjs(jsDate).format('YYYY-MM-DD');
+    } else {
+      logger.warn('No event date found in database, using current date');
+      return dayjs().format('YYYY-MM-DD');
+    }
+  } catch (error) {
+    logger.error('Error getting event date from database:', error);
+    return dayjs().format('YYYY-MM-DD');
+  }
+}
+
 export const configRoute = t.router({
   eventName: t.procedure
     .output(z.string())
@@ -21,9 +51,20 @@ export const configRoute = t.router({
     .output(z.string())
     .query(() => config.eventId),
 
-  getEventDate: t.procedure
-    .output(z.string())
+  get: t.procedure
+    .output(z.object({
+      eventId: z.string(),
+      eventName: z.string(),
+      eventDate: z.string(),
+      uploadLiveTiming: z.boolean(),
+      liveTimingOutputPath: z.string()
+    }))
     .query(async () => {
+      logger.warn('TODO: config.get should be protected by authentication');
+      const eventDate = await getEventDateFormatted();
+      
+      // Format the event name with date first
+      let formattedEventName = '';
       try {
         // Get the event database
         const { event } = getEventDatabases(config.eventId);
@@ -51,35 +92,23 @@ export const configRoute = t.router({
           // Format the date in a longer format (e.g., "January 15, 2023")
           const formattedDate = dayjs(jsDate).format('MMMM D, YYYY');
           
-          // Combine title2 and date
-          const eventName = `${formattedDate}: ${title2} `;
-          
-          logger.info(`Found event date in database: ${eventName}`);
-          return eventName;
+          // Combine date and title2 (date first)
+          formattedEventName = `${formattedDate}: ${title2}`;
         } else {
           logger.warn('No event date found in database, using current date');
           const currentDate = dayjs().format('MMMM D, YYYY');
-          return `${currentDate}: ${title2}`;
+          formattedEventName = `${currentDate}: ${title2}`;
         }
       } catch (error) {
         logger.error('Error getting event date from database:', error);
         const currentDate = dayjs().format('MMMM D, YYYY');
-        return `${currentDate}`;
+        formattedEventName = currentDate;
       }
-    }),
-
-  get: t.procedure
-    .output(z.object({
-      eventId: z.string(),
-      eventName: z.string(),
-      uploadLiveTiming: z.boolean(),
-      liveTimingOutputPath: z.string()
-    }))
-    .query(() => {
-      logger.warn('TODO: config.get should be protected by authentication');
+      
       return {
         eventId: config.eventId,
-        eventName: config.eventName,
+        eventName: formattedEventName,
+        eventDate: eventDate,
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath
       };
@@ -90,6 +119,7 @@ export const configRoute = t.router({
     .output(z.object({
       eventName: z.string(),
       eventId: z.string(),
+      eventDate: z.string(),
       uploadLiveTiming: z.boolean(),
       liveTimingOutputPath: z.string()
     }))
@@ -104,6 +134,7 @@ export const configRoute = t.router({
 
       // Get the event name
       let eventName = '';
+      let eventDate = '';
       try {
         // Check if eventId is defined before calling getEventDatabases
         if (input.eventId) {
@@ -133,21 +164,27 @@ export const configRoute = t.router({
             // Format the date in a longer format (e.g., "January 15, 2023")
             const formattedDate = dayjs(jsDate).format('MMMM D, YYYY');
             
-            // Combine title2 and date
-            eventName = `${title2}: ${formattedDate}`;
+            // Format the date in YYYY-MM-DD format
+            eventDate = dayjs(jsDate).format('YYYY-MM-DD');
+            
+            // Combine date and title2 (date first)
+            eventName = `${formattedDate}: ${title2}`;
           } else {
             logger.warn('No event date found in database, using current date');
             const currentDate = dayjs().format('MMMM D, YYYY');
+            eventDate = dayjs().format('YYYY-MM-DD');
             eventName = `${currentDate}: ${title2}`;
           }
         } else {
           logger.warn('No event ID provided, using current date');
           const currentDate = dayjs().format('MMMM D, YYYY');
+          eventDate = dayjs().format('YYYY-MM-DD');
           eventName = currentDate;
         }
       } catch (error) {
         logger.error('Error getting event date from database:', error);
         const currentDate = dayjs().format('MMMM D, YYYY');
+        eventDate = dayjs().format('YYYY-MM-DD');
         eventName = `${currentDate}`;
       }
 
@@ -176,6 +213,7 @@ export const configRoute = t.router({
       return {
         eventName,
         eventId: config.eventId,
+        eventDate: eventDate,
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath
       };

@@ -3,7 +3,7 @@ import { setupLogger, rsyncService } from '../utils'
 const logger = setupLogger('scheduledTasks/scheduledTasks')
 import { config } from '../config'
 import { mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import dayjs from 'dayjs'
 import { getCompetitorJSON } from '../router/shared'
 import { getCurrentCompetitor } from '../router/currentCompetitor'
@@ -29,6 +29,13 @@ let lastEventId = ''
 
 async function safeWriteFile(filePath: string, data: any, label: string) {
   try {
+    // Ensure the parent directory exists
+    const parentDir = dirname(filePath);
+    if (!existsSync(parentDir)) {
+      mkdirSync(parentDir, { recursive: true });
+      logger.info(`Created directory: ${parentDir}`);
+    }
+    
     // For currentCompetitor.json, ensure it's written as a number
     if (label === 'currentCompetitor.json') {
       writeFileSync(filePath, JSON.stringify(Number(data), null, 2))
@@ -392,12 +399,25 @@ async function syncLiveTimingData() {
       lastEventId = config.eventId;
     }
     
-    // Copy the client build to the data directory only on the first sync for this date
-    const clientBuildSource = join(__dirname, '..', '..', '..', 'client', 'build')
-    const displayDestPath = join(config.liveTimingOutputPath, dateStr, 'display')
+    // Define the specific date directory to sync
+    const dateDirPath = join(config.liveTimingOutputPath, dateStr)
+    const apiDirPath = join(dateDirPath, 'api', 'simple')
     
-    if (!copiedDates.has(dateStr) || eventIdChanged) {
-      logger.info(`First sync for ${dateStr} - copying client build from ${clientBuildSource} to ${displayDestPath}`)
+    // Export live timing data to ensure the API directory has content
+    logger.info('Exporting live timing data')
+    await exportLiveTimingData()
+    
+    // Check if this is the first run for this date or if eventId changed
+    const isFirstRun = !copiedDates.has(dateStr) || eventIdChanged;
+    
+    if (isFirstRun) {
+      logger.info(`First run for ${dateStr} or event ID changed - performing full sync`)
+      
+      // Copy the client build to the data directory
+      const clientBuildSource = join(__dirname, '..', '..', '..', 'client', 'build')
+      const displayDestPath = join(dateDirPath, 'display')
+      
+      logger.info(`Copying client build from ${clientBuildSource} to ${displayDestPath}`)
       
       // Create the destination directory if it doesn't exist
       if (!existsSync(displayDestPath)) {
@@ -415,37 +435,31 @@ async function syncLiveTimingData() {
       
       // Mark this date as copied
       copiedDates.add(dateStr)
-    } else {
-      logger.info(`Client build already copied for ${dateStr}, skipping copy step`)
-    }
-    
-    // Define the specific date directory to sync
-    const dateDirPath = join(config.liveTimingOutputPath, dateStr)
-    
-    // Sync the current date directory to its date-specific location
-    logger.info(`Starting rsync of ${dateStr} directory to date-specific location`)
-    await rsyncService.sync({
-      source: dateDirPath,
-      destination: join(config.rsyncRemotePath, dateStr),
-      exclude: ['*.tmp', '*.log'],
-      delete: true
-    })
-    logger.info(`Successfully synced ${dateStr} directory to date-specific location`)
-    
-    // Also sync to the live-timing directory for current day access
-    logger.info(`Starting rsync of ${dateStr} directory to live-timing directory`)
-    await rsyncService.sync({
-      source: dateDirPath,
-      destination: join(config.rsyncRemotePath, 'live-timing'),
-      exclude: ['*.tmp', '*.log'],
-      delete: true
-    })
-    logger.info(`Successfully synced ${dateStr} directory to live-timing directory`)
-    
-    // Only generate and sync the index file if this is the first sync for this date or eventId changed
-    if (!indexedDates.has(dateStr) || eventIdChanged) {
+      
+      // Generate the index file
       await generateIndexFile();
       logger.info('Generated index file for event selection');
+      indexedDates.add(dateStr)
+      
+      // Sync the entire date directory to its date-specific location
+      logger.info(`Starting rsync of ${dateStr} directory to date-specific location`)
+      await rsyncService.sync({
+        source: dateDirPath,
+        destination: join(config.rsyncRemotePath, dateStr),
+        exclude: ['*.tmp', '*.log'],
+        delete: true
+      })
+      logger.info(`Successfully synced ${dateStr} directory to date-specific location`)
+      
+      // Also sync to the live-timing directory for current day access
+      logger.info(`Starting rsync of ${dateStr} directory to live-timing directory`)
+      await rsyncService.sync({
+        source: dateDirPath,
+        destination: join(config.rsyncRemotePath, 'live-timing'),
+        exclude: ['*.tmp', '*.log'],
+        delete: true
+      })
+      logger.info(`Successfully synced ${dateStr} directory to live-timing directory`)
       
       // Sync the index file to the remote server
       logger.info('Syncing index file to remote server');
@@ -457,10 +471,30 @@ async function syncLiveTimingData() {
         isFile: true
       });
       logger.info('Successfully synced index file to remote server');
-      
-      // Mark this date as indexed
-      indexedDates.add(dateStr)
+    } else {
+      logger.info(`Subsequent run for ${dateStr} - only updating and syncing API data`)
     }
+    
+    // Always sync the API directory to ensure data is available quickly
+    logger.info(`Starting rsync of API directory to date-specific location`)
+    await rsyncService.sync({
+      source: apiDirPath,
+      destination: join(config.rsyncRemotePath, dateStr, 'api', 'simple'),
+      exclude: ['*.tmp', '*.log'],
+      delete: true
+    })
+    logger.info(`Successfully synced API directory to date-specific location`)
+    
+    // Also sync API to the live-timing directory for current day access
+    logger.info(`Starting rsync of API directory to live-timing directory`)
+    await rsyncService.sync({
+      source: apiDirPath,
+      destination: join(config.rsyncRemotePath, 'live-timing', 'api', 'simple'),
+      exclude: ['*.tmp', '*.log'],
+      delete: true
+    })
+    logger.info(`Successfully synced API directory to live-timing directory`)
+    
   } catch (error) {
     logger.error('Failed to sync live timing data to remote server:', error)
   }
@@ -473,7 +507,7 @@ export async function executeScheduledTasks() {
 
   if (config.uploadLiveTiming) {
     logger.info('Uploading live timing enabled — proceeding with upload')
-    await exportLiveTimingData()
+    // Only call syncLiveTimingData, which now handles exporting data internally
     await syncLiveTimingData()
   } else {
     logger.info('Live timing upload is disabled')
