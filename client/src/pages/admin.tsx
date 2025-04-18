@@ -9,8 +9,7 @@ import {
   Typography,
 } from '@mui/material';
 import { green, red } from '@mui/material/colors';
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { trpc, useTrpcClient } from '../App';
 import dayjs from 'dayjs';
 
@@ -24,12 +23,85 @@ export const Admin = () => {
   const loading = setConfig.isPending;
   const config = trpc.config.get.useQuery(undefined);
   const [isEndOfDayLoading, setIsEndOfDayLoading] = useState(false);
+  const [isLoadingEventDate, setIsLoadingEventDate] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  const [newConfig, setNewConfig] = useState(config.data || {});
+  // Initialize newConfig with default values to prevent undefined errors
+  const [newConfig, setNewConfig] = useState({
+    eventId: '',
+    eventName: '',
+    uploadLiveTiming: false,
+    liveTimingOutputPath: ''
+  });
+
+  // Update newConfig when config.data changes
+  useEffect(() => {
+    if (config.data) {
+      setNewConfig({
+        eventId: config.data.eventId || '',
+        eventName: config.data.eventName || '',
+        uploadLiveTiming: config.data.uploadLiveTiming || false,
+        liveTimingOutputPath: config.data.liveTimingOutputPath || ''
+      });
+    }
+  }, [config.data]);
 
   const requestErrors = requestWrapper({ config });
   if (requestErrors) return requestErrors;
   if (!config.data) return null;
+
+  // Function to fetch event date
+  const fetchEventDate = async () => {
+    setIsLoadingEventDate(true);
+    try {
+      // Call the getEventDate procedure from the config router
+      const eventName = await trpcClient.config.getEventDate.query();
+      
+      // Update the newConfig with the event name
+      setNewConfig(prev => ({
+        ...prev,
+        eventName: eventName
+      }));
+    } catch (error) {
+      console.error('Failed to fetch event date:', error);
+      // If we can't get the event date, use a default name with the current date
+      const currentDate = dayjs().format('MMMM D, YYYY');
+      setNewConfig(prev => ({
+        ...prev,
+        eventName: currentDate
+      }));
+    } finally {
+      setIsLoadingEventDate(false);
+      setInitialLoadDone(true);
+    }
+  };
+
+  // If we haven't done the initial load yet, do it now
+  if (!initialLoadDone && config.data) {
+    // Use requestAnimationFrame to schedule this for the next frame
+    // This avoids React hooks errors
+    requestAnimationFrame(() => {
+      fetchEventDate();
+    });
+  }
+
+  // Function to handle saving the configuration
+  const handleSave = async () => {
+    try {
+      // Save the configuration and get the updated values
+      const result = await setConfig.mutateAsync(newConfig);
+      
+      // Update the state with the returned values
+      setNewConfig({
+        eventId: result.eventId,
+        eventName: result.eventName,
+        uploadLiveTiming: result.uploadLiveTiming,
+        liveTimingOutputPath: result.liveTimingOutputPath
+      });
+    } catch (error) {
+      console.error('Failed to save configuration:', error);
+    }
+  };
 
   const buttonSx = {
     ...(setConfig.status === 'success' && {
@@ -58,16 +130,28 @@ export const Admin = () => {
             setNewConfig({ ...newConfig, eventId: e.target.value });
           }}
         />
-        <TextField
-          required
-          fullWidth
-          label="Event Name"
-          defaultValue={config.data.eventName}
-          onChange={(e) => {
-            setConfig.reset();
-            setNewConfig({ ...newConfig, eventName: e.target.value });
-          }}
-        />
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <TextField
+            required
+            fullWidth
+            label="Event Name"
+            value={newConfig.eventName || ''}
+            InputProps={{
+              readOnly: true,
+              endAdornment: isLoadingEventDate ? (
+                <CircularProgress size={20} />
+              ) : null,
+            }}
+          />
+          <Button 
+            variant="outlined" 
+            onClick={fetchEventDate}
+            disabled={isLoadingEventDate}
+            sx={{ minWidth: '120px' }}
+          >
+            {isLoadingEventDate ? <CircularProgress size={24} /> : 'Get Name'}
+          </Button>
+        </Box>
       </Box>
       <Box mt={4} p={2} border={1} borderRadius={2}>
         <Typography variant="h6" gutterBottom>
@@ -112,9 +196,7 @@ export const Admin = () => {
           variant="contained"
           disabled={loading}
           sx={buttonSx}
-          onClick={() => {
-            setConfig.mutate(newConfig);
-          }}
+          onClick={handleSave}
         >
           Save
         </Button>
