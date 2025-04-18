@@ -1,35 +1,43 @@
-import { router } from '@trpc/server'
-import { z } from 'zod'
-import { setupLogger } from '../utils'
-const logger = setupLogger('router/config')
+import { z } from 'zod';
+import { initTRPC } from '@trpc/server';
+import { setupLogger } from '../utils';
+const logger = setupLogger('router/config');
 
-import { config, ConfigType } from '../config'
-import { getEventDatabases } from '../dbUtils'
-import { setNewEvent } from './shared'
+import { config, ConfigType } from '../config';
+import { getEventDatabases } from '../dbUtils';
+import { setNewEvent } from './shared';
 
-export const configRoute = router()
-  .query('eventName', { output: z.string(), resolve: () => config.eventName })
-  .query('eventId', { output: z.string(), resolve: () => config.eventId })
-  .query('get', {
-    output: ConfigType,
-    resolve: (req) => {
-      logger.warn('TODO: config.get should be protected by authentication')
-      return config.asJSON()
-    },
-  })
-  .mutation('set', {
-    input: ConfigType,
-    resolve: (req) => {
-      logger.warn('TODO: config.set should be protected by authentication')
+// ✅ Initialize tRPC
+const t = initTRPC.create();
 
-      config.set(req.input)
-      config.storeConfig()
+export const configRoute = t.router({
+  eventName: t.procedure
+    .output(z.string())
+    .query(() => config.eventName),
 
-      // We need to reload the database
-      if (req.input.eventId) {
-        setNewEvent(getEventDatabases(req.input.eventId))
+  eventId: t.procedure
+    .output(z.string())
+    .query(() => config.eventId),
+
+  get: t.procedure
+    .output(ConfigType)
+    .query(() => {
+      logger.warn('TODO: config.get should be protected by authentication');
+      return config.asJSON();
+    }),
+
+  set: t.procedure
+    .input(ConfigType)
+    .mutation(({ input }) => {
+      logger.warn('TODO: config.set should be protected by authentication');
+
+      config.set(input);
+      config.storeConfig();
+
+      if (input.eventId) {
+        setNewEvent(getEventDatabases(input.eventId));
       }
 
-      return config.asJSON()
-    },
-  })
+      return config.asJSON();
+    }),
+});

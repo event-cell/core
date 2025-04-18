@@ -1,6 +1,5 @@
 import { CircularProgress, Container, Typography } from '@mui/material'
-import { TRPCClientErrorLike } from '@trpc/client'
-import { UseQueryResult } from 'react-query'
+import { UseQueryResult } from '@tanstack/react-query'
 import React from 'react'
 
 export function requestWrapper(

@@ -4,44 +4,42 @@ import {
   CircularProgress,
   Container,
   TextField,
-} from '@mui/material'
-import { green, red } from '@mui/material/colors'
-import React, { useState } from 'react'
-import { trpc, useTrpcClient } from '../App'
+} from '@mui/material';
+import { green, red } from '@mui/material/colors';
+import React from 'react';
+import { useState } from 'react';
+import { trpc, useTrpcClient } from '../App';
 
-import { requestWrapper } from '../components/requestWrapper'
+import { requestWrapper } from '../components/requestWrapper';
 
 export const Admin = () => {
-  const trpcClient = useTrpcClient()
+  const trpcClient = useTrpcClient();
 
-  const config = trpc.useQuery(['config.get'])
-  const setConfig = trpc.useMutation(['config.set'])
+  // ✅ New v10-style hooks
+  const setConfig = trpc.config.set.useMutation();
+  const loading = setConfig.isPending;
+  const config = trpc.config.get.useQuery(undefined);
 
-  const [newConfig, setNewConfig] = useState(config.data || {})
-  const loading = setConfig.status === 'loading'
+  const [newConfig, setNewConfig] = useState(config.data || {});
 
-  const requestErrors = requestWrapper({ config })
-  if (requestErrors) return requestErrors
-  if (!config.data) return null // This will never be called, but it is needed to make typescript happy
+  const requestErrors = requestWrapper({ config });
+  if (requestErrors) return requestErrors;
+  if (!config.data) return null;
 
   const buttonSx = {
     ...(setConfig.status === 'success' && {
       bgcolor: green[500],
-      '&:hover': {
-        bgcolor: green[700],
-      },
+      '&:hover': { bgcolor: green[700] },
     }),
     ...(setConfig.status === 'error' && {
       bgcolor: red[500],
-      '&:hover': {
-        bgcolor: red[700],
-      },
+      '&:hover': { bgcolor: red[700] },
     }),
-  }
+  };
 
   return (
     <Container>
-      <h1>TODO: Protect this page auth of some kind</h1>
+      <h1>TODO: Protect this page with auth</h1>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
@@ -50,8 +48,8 @@ export const Admin = () => {
           label="Event ID"
           defaultValue={config.data.eventId}
           onChange={(e) => {
-            setConfig.reset() // Reset the mutate status, removes the green button
-            setNewConfig({ ...newConfig, eventId: e.target.value })
+            setConfig.reset();
+            setNewConfig({ ...newConfig, eventId: e.target.value });
           }}
         />
         <TextField
@@ -60,8 +58,8 @@ export const Admin = () => {
           label="Event Name"
           defaultValue={config.data.eventName}
           onChange={(e) => {
-            setConfig.reset() // Reset the mutate status, removes the green button
-            setNewConfig({ ...newConfig, eventName: e.target.value })
+            setConfig.reset();
+            setNewConfig({ ...newConfig, eventName: e.target.value });
           }}
         />
       </Box>
@@ -72,7 +70,7 @@ export const Admin = () => {
           disabled={loading}
           sx={buttonSx}
           onClick={() => {
-            setConfig.mutate(newConfig)
+            setConfig.mutate(newConfig);
           }}
         >
           Save
@@ -91,16 +89,17 @@ export const Admin = () => {
           />
         )}
       </Box>
+
       <Box sx={{ m: 1, position: 'relative' }}>
         <Button
           variant="contained"
           disabled={loading}
           sx={buttonSx}
           onClick={async () => {
-            const data = await trpcClient.query('endofdayresults.generate')
+            const data = await trpcClient.endofdayresults.generate.query(); // ✅ updated for v10
             const mediaType =
-              'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
-            window.location.href = `${mediaType}${data.xlsx}`
+              'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
+            window.location.href = `${mediaType}${data.xlsx}`;
           }}
         >
           End of Day Results
@@ -120,5 +119,5 @@ export const Admin = () => {
         )}
       </Box>
     </Container>
-  )
-}
+  );
+};

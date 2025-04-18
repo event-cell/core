@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { createReactQueryHooks } from '@trpc/react'
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { httpBatchLink } from '@trpc/client';
+import { createTRPCReact } from '@trpc/react-query';
 import { Theme } from 'ui-shared'
 import { create } from 'zustand'
 
@@ -12,18 +13,26 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
 import { DisplayPage } from './pages/display'
-import { TRPCRouter } from 'server/src/router'
 import { config } from './config'
 import { Admin } from './pages/admin'
 import { TrackDisplay } from './pages/trackDisplay'
 import { Announcer } from './pages/announcer'
 
+import type { TRPCRouter } from 'server/src/router';
+
+
 // The tRPC hook. Will be used to make requests to the server
-export const trpc = createReactQueryHooks<TRPCRouter>()
+export const trpc = createTRPCReact<TRPCRouter>();
 
 export const useTrpcClient = create(() =>
-  trpc.createClient({ url: config.backendUrl })
-)
+  trpc.createClient({
+    links: [
+      httpBatchLink({
+        url: config.backendUrl,
+      }),
+    ],
+  })
+);
 
 function getRouterPrefix() {
   const firstPath = window.location.pathname.split('/')[1]
