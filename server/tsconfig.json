@@ -4,6 +4,8 @@
     "outDir": "build",
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "lib": ["dom", "esnext"]
-  }
+    "lib": ["dom", "esnext"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["src/**/*"]
 }

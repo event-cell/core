@@ -230,3 +230,5 @@ server/prisma/Records/records.sqlite-journal
 public/shared
 public/src
 client/src/shared
+yarn.lock
+

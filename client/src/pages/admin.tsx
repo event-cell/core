@@ -12,6 +12,7 @@ import { green, red } from '@mui/material/colors';
 import React from 'react';
 import { useState } from 'react';
 import { trpc, useTrpcClient } from '../App';
+import dayjs from 'dayjs';
 
 import { requestWrapper } from '../components/requestWrapper';
 
@@ -22,6 +23,7 @@ export const Admin = () => {
   const setConfig = trpc.config.set.useMutation();
   const loading = setConfig.isPending;
   const config = trpc.config.get.useQuery(undefined);
+  const [isEndOfDayLoading, setIsEndOfDayLoading] = useState(false);
 
   const [newConfig, setNewConfig] = useState(config.data || {});
 
@@ -101,7 +103,7 @@ export const Admin = () => {
         />
 
         <Typography variant="body2" color="textSecondary" mt={1}>
-          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/2025-04-18/api/simple/
+          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/{dayjs().format('YYYY-MM-DD')}/api/simple/
         </Typography>
       </Box>
 
@@ -133,18 +135,23 @@ export const Admin = () => {
       <Box sx={{ m: 1, position: 'relative' }}>
         <Button
           variant="contained"
-          disabled={loading}
+          disabled={isEndOfDayLoading}
           sx={buttonSx}
           onClick={async () => {
-            const data = await trpcClient.endofdayresults.generate.query(); // ✅ updated for v10
-            const mediaType =
-              'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
-            window.location.href = `${mediaType}${data.xlsx}`;
+            setIsEndOfDayLoading(true);
+            try {
+              const data = await trpcClient.endofdayresults.generate.query();
+              const mediaType =
+                'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
+              window.location.href = `${mediaType}${data.xlsx}`;
+            } finally {
+              setIsEndOfDayLoading(false);
+            }
           }}
         >
           End of Day Results
         </Button>
-        {loading && (
+        {isEndOfDayLoading && (
           <CircularProgress
             size={24}
             sx={{

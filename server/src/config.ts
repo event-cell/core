@@ -16,6 +16,10 @@ export const ConfigType = z
     recordsDatabasePath: z.string(),
     uploadLiveTiming: z.boolean().optional(),
     liveTimingOutputPath: z.string().optional(),
+    rsyncRemoteHost: z.string().optional(),
+    rsyncRemoteUser: z.string().optional(),
+    rsyncRemotePath: z.string().optional(),
+    rsyncSshKeyPath: z.string().optional(),
   })
   .deepPartial()
 export type ConfigType = z.infer<typeof ConfigType>
@@ -31,6 +35,10 @@ class Config {
   public resultsPath = '/data/results'
   public uploadLiveTiming = false
   public liveTimingOutputPath = '/data/live-timing'
+  public rsyncRemoteHost = ''
+  public rsyncRemoteUser = ''
+  public rsyncRemotePath = ''
+  public rsyncSshKeyPath = '/data/.ssh/id_rsa'
 
 
   constructor() {
@@ -38,6 +46,13 @@ class Config {
     const parsedContents = JSON.parse(fileContents)
     const config = ConfigType.parse(parsedContents)
     this.set(config)
+    
+    // Force uploadLiveTiming to false on startup
+    if (this.uploadLiveTiming) {
+      logger.info('Forcing uploadLiveTiming to false on startup')
+      this.uploadLiveTiming = false
+      this.storeConfig()
+    }
   }
 
   private get configPath() {
@@ -81,6 +96,10 @@ class Config {
       logger.info(`liveTimingOutputPath set to ${config.liveTimingOutputPath}`)
       this.liveTimingOutputPath = config.liveTimingOutputPath
     }
+    if (config.rsyncRemoteHost) this.rsyncRemoteHost = config.rsyncRemoteHost
+    if (config.rsyncRemoteUser) this.rsyncRemoteUser = config.rsyncRemoteUser
+    if (config.rsyncRemotePath) this.rsyncRemotePath = config.rsyncRemotePath
+    if (config.rsyncSshKeyPath) this.rsyncSshKeyPath = config.rsyncSshKeyPath
   }
 
   public asJSON() {
@@ -90,6 +109,10 @@ class Config {
       eventDatabasePath: this.eventDatabasePath,
       uploadLiveTiming: this.uploadLiveTiming,
       liveTimingOutputPath: this.liveTimingOutputPath,
+      rsyncRemoteHost: this.rsyncRemoteHost,
+      rsyncRemoteUser: this.rsyncRemoteUser,
+      rsyncRemotePath: this.rsyncRemotePath,
+      rsyncSshKeyPath: this.rsyncSshKeyPath,
     }
   }
 

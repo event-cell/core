@@ -7,11 +7,21 @@ import { getDisplayNumber } from 'ui-shared/src/logic/displays'
 import { Container } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi'
+import type { CompetitorList } from 'server/src/router/objects'
 
 export const DisplayPage = () => {
-  const currentCompetitor = useQuery({ queryKey: ['currentCompetitor'], queryFn: getCurrentCompetitor })
-  const competitors = useQuery({ queryKey: ['competitors'], queryFn: getCompetitors })
-  const runCount = useQuery({ queryKey: ['runCount'], queryFn: getRunCount })
+  const currentCompetitor = useQuery({
+    queryKey: ['currentCompetitor'],
+    queryFn: getCurrentCompetitor
+  })
+  const competitors = useQuery({
+    queryKey: ['competitors'],
+    queryFn: getCompetitors
+  })
+  const runCount = useQuery({
+    queryKey: ['runCount'],
+    queryFn: getRunCount
+  })
 
   console.log(competitors)
 
@@ -39,9 +49,9 @@ export const DisplayPage = () => {
   if (requestErrors) return requestErrors
 
   if (!competitors.data) {
-    console.warn('Missing allRuns data')
+    console.warn('Missing competitors data')
     return null
-  } // This will never be called, but it is needed to make typescript happy
+  }
 
   const currentDisplayNumber = getDisplayNumber()
   const shouldDisplayCompetitorList =
@@ -49,12 +59,14 @@ export const DisplayPage = () => {
 
   return (
     <Container>
-      <DisplayCompetitorList
-        competitors={competitors.data}
-        runCount={runCount.data || 1}
-      />
+      {competitors.data && runCount.data && (
+        <DisplayCompetitorList
+          competitors={competitors.data}
+          runCount={runCount.data}
+        />
+      )}
 
-      {shouldDisplayCompetitorList && currentCompetitor.data && (
+      {shouldDisplayCompetitorList && currentCompetitor.data && competitors.data && (
         <OnTrack
           currentCompetitorId={currentCompetitor.data}
           competitors={competitors.data}

@@ -37,17 +37,17 @@ export async function getCurrentCompetitor() {
       take: 1,
     });
 
-    return competitorQuery[0]?.C_NUM || undefined;
+    return competitorQuery[0]?.C_NUM || 1;
   } catch (e) {
     warn(`Error getting current competitor: ${e}`);
-    return undefined; // Add fallback return
+    return 1;
   }
 }
 
 export const currentCompetitor = t.router({
   number: t.procedure
-    .output(z.number().optional())
+    .output(z.number())
     .query(() => getCurrentCompetitor()),
 });
 
-export type GetCurrentCompetitorReturn = ReturnType<typeof getCurrentCompetitor>;
+export type GetCurrentCompetitorReturn = number;

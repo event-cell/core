@@ -27,7 +27,7 @@
   },
   "scripts": {
     "setup": "echo 'No setup tasks for client'",
-    "dev": "vite --port 3000",
+    "dev": "vite --port 3000 --host",
     "build": "tsc && vite build"
   },
   "eslintConfig": {

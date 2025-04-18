@@ -113,10 +113,17 @@ export const RenderInfo: FC<{
 
   const { classIndex } = currentRun
 
-  const idx = currentRun.times.length - 1
-  const splits = currentRun.times[idx]!
-
-  const times = calculateTimes(splits)
+  // Check if there are any times
+  const hasTimes = currentRun.times.length > 0;
+  
+  // Only calculate times if there are any
+  let times = { sector1: 0, sector2: 0, sector3: 0, finish: 0 };
+  if (hasTimes) {
+    const idx = currentRun.times.length - 1;
+    const splits = currentRun.times[idx]!;
+    times = calculateTimes(splits);
+  }
+  
   const personalBest = getPersonalBestSectors(currentRun)
   const classBest = getClassBestSectors(classIndex, allRuns)
 
