@@ -7,7 +7,6 @@ import { getDisplayNumber } from 'ui-shared/src/logic/displays'
 import { Container } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi'
-import type { CompetitorList } from 'server/src/router/objects'
 
 export const DisplayPage = () => {
   const currentCompetitor = useQuery({

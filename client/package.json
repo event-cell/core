@@ -29,7 +29,7 @@
     "setup": "echo 'No setup tasks for client'",
     "dev": "vite --port 3000 --host",
     "build": "tsc && vite build",
-    "build:static": "tsc && vite build && cp -r dist/* ../server/build/ui/",
+    "build:server-ui": "tsc && vite build && cp -r build/* ../server/build/server/ui/",
     "build:live-timing": "node build/live-timing-direct.js",
     "preview": "vite preview"
   },

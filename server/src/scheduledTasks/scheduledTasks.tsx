@@ -287,7 +287,7 @@ async function syncLiveTimingData() {
       logger.info(`First run for ${dateStr} or event ID changed - performing full sync`)
       
       // Copy the client build to the data directory
-      const clientBuildSource = join(__dirname, '..', '..', '..', 'client', 'build')
+      const clientBuildSource = join(__dirname, '..','..', 'build', 'server', 'ui')
       const displayDestPath = join(dateDirPath, 'display')
       
       logger.info(`Copying client build from ${clientBuildSource} to ${displayDestPath}`)
