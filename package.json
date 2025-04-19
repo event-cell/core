@@ -4,7 +4,8 @@
     "server",
     "client",
     "shared",
-    "cli-client"
+    "cli-client",
+    "live-timing"
   ],
   "scripts": {
     "server:dev": "cd server && yarn dev",

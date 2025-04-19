@@ -152,4 +152,39 @@ h2 {
   border-top: 1px solid #333;
   color: #777;
   font-size: 14px;
+}
+
+.personal-history-section {
+  background-color: #1e3a5f;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border-left: 4px solid #4caf50;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.personal-history-button {
+  display: inline-block;
+  background-color: #4caf50;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+}
+
+.personal-history-button:hover {
+  background-color: #388e3c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.personal-history-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 } 

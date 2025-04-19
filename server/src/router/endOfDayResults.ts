@@ -11,7 +11,6 @@ export const endOfDayResults = t.router({
   generate: t.procedure.query(async () => {
     logger.warn('TODO: endOfDayResults should be protected by authentication');
 
-    const table: string[][] = [];
     const competitors = await getCompetitorJSON();
 
     // Sort by best time

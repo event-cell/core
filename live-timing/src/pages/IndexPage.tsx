@@ -3,6 +3,7 @@ import { Header } from '../components/Header';
 import { CurrentEvent } from '../components/CurrentEvent';
 import { EventList } from '../components/EventList';
 import { Footer } from '../components/Footer';
+import { PersonalHistorySection } from '../components/PersonalHistorySection';
 
 interface IndexPageProps {
   initialEventDirectories?: string[];
@@ -21,6 +22,7 @@ export const IndexPage: React.FC<IndexPageProps> = ({
         initialEventDirectories={initialEventDirectories}
         initialMetadataMap={initialMetadataMap}
       />
+      <PersonalHistorySection />
       <Footer />
     </>
   );

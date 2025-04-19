@@ -25,7 +25,7 @@
   },
   "scripts": {
     "dev": "vite --port 3000 --host",
-    "build": "tsc && vite build",
+    "build": "rm -rf dist && tsc && vite build",
     "build:live-timing": "node build/live-timing-direct.js",
     "build:personal-history": "node build/personal-history-direct.js",
     "preview": "vite preview"
@@ -57,4 +57,4 @@
     "typescript": "^5.8.3",
     "vite": "^6.2.6"
   }
-} 
+}
