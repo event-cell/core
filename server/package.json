@@ -1,14 +1,14 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "build/server/index.js",
+  "main": "dist/server/index.js",
   "license": "GPL-v3.0-or-later",
   "private": true,
   "scripts": {
-    "start": "node build/server/index.js",
+    "start": "node dist/server/index.js",
     "dev": "ts-node-dev --exit-child --respawn src/index.ts",
     "setup": "yarn prisma migrate dev --name auto --schema prisma/schemaRecords.prisma && yarn prismaGenerate",
-    "build": "tsc && cp -r ../client/build build/server/ui",
+    "build": "rm -rf dist && tsc && cp -r ../client/dist dist/server/ui",
     "prismaGenerate": "prisma generate --schema=./prisma/schemaEvent.prisma && prisma generate --schema=./prisma/schemaEventData.prisma && prisma generate --schema=./prisma/schemaRecords.prisma && prisma generate --schema=./prisma/schemaOnline.prisma",
     "prismaIntrospect": "yarn prisma db pull --schema prisma/schemaEvent.prisma && yarn prisma db pull --schema prisma/schemaEventData.prisma && yarn prisma db pull --schema prisma/schemaOnline.prisma"
   },
