@@ -1,13 +1,10 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist/server",
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "lib": ["dom", "esnext"],
-    "typeRoots": ["./node_modules/@types"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    "outDir": "./dist/server",
+    "rootDir": "./src",
+    "composite": true
   },
-  "include": ["src/**/*"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
