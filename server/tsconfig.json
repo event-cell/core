@@ -2,7 +2,8 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist/server",
-    "rootDir": "./src",
+    // comment out rootDir to enable cross workspace imports
+    // "rootDir": "./src",
     "composite": true
   },
   "include": ["src"],

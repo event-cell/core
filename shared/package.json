@@ -1,5 +1,6 @@
 {
   "name": "ui-shared",
+  "type": "module",
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
@@ -22,10 +23,15 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/react": "^19.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.29.1",
-    "@typescript-eslint/parser": "^8.29.1",
-    "eslint": "^9.24.0",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/parser": "^8.30.1",
+    "eslint": "^9.25.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "jscpd": "^4.0.5",
+    "prettier": "^3.5.3",
     "typescript": "^5.8.3",
     "vitest": "^3.1.1"
   }
