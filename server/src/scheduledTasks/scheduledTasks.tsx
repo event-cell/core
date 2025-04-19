@@ -12,6 +12,7 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import { event } from '../router/shared'
 import { getEventDatabases } from '../dbUtils'
+import { buildLiveTimingIndex } from './liveTimingBuilder'
 
 const execAsync = promisify(exec)
 
@@ -29,6 +30,8 @@ const indexedDates = new Set<string>()
 let lastEventId = ''
 // Flag to indicate when index regeneration is needed
 let regenerateIndexFlag = false
+// Track when the index was last built
+let lastIndexBuildTime = 0
 
 async function safeWriteFile(filePath: string, data: any, label: string) {
   try {
@@ -130,249 +133,10 @@ async function generateIndexFile() {
     
     logger.info(`Found ${directories.length} date directories on remote server`);
 
-    // Group directories by year
-    const directoriesByYear: Record<string, string[]> = {};
-    directories.forEach(dir => {
-      const year = dir.substring(0, 4);
-      if (!directoriesByYear[year]) {
-        directoriesByYear[year] = [];
-      }
-      directoriesByYear[year].push(dir);
-    });
-
-    // Sort years in descending order
-    const years = Object.keys(directoriesByYear).sort().reverse();
-
-    // Generate HTML content
-    let html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SDMA Live Timing</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      line-height: 1.6;
-      background-color: #121212;
-      color: #fff;
-    }
-    h1 {
-      color: #fff;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
-      margin-top: 0;
-    }
-    h2 {
-      color: #fff;
-      margin-top: 0;
-    }
-    .current-event {
-      background-color: #1e3a5f;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 30px;
-      border-left: 4px solid #1976d2;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .current-event-button {
-      display: inline-block;
-      background-color: #1976d2;
-      color: white;
-      padding: 15px 30px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: 500;
-      text-align: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-      border: 2px solid transparent;
-    }
-    .current-event-button:hover {
-      background-color: #1565c0;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-      border-color: #90caf9;
-    }
-    .current-event-button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    .year-section {
-      margin-bottom: 20px;
-    }
-    .year-header {
-      background-color: #1e1e1e;
-      padding: 15px;
-      cursor: pointer;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #333;
-      transition: background-color 0.3s;
-    }
-    .year-header:hover {
-      background-color: #2c2c2c;
-    }
-    .year-content {
-      display: none;
-      padding: 15px;
-      border-left: 2px solid #333;
-      margin-left: 10px;
-      background-color: #1a1a1a;
-      border-radius: 0 0 8px 8px;
-    }
-    .year-content.active {
-      display: block;
-    }
-    .event-link {
-      display: block;
-      padding: 12px;
-      margin: 8px 0;
-      text-decoration: none;
-      color: #fff;
-      border-radius: 4px;
-      background-color: #2c2c2c;
-      transition: background-color 0.3s, transform 0.2s;
-    }
-    .event-link:hover {
-      background-color: #3c3c3c;
-      transform: translateX(5px);
-    }
-    .event-date {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-    .event-name {
-      font-size: 14px;
-      color: #aaa;
-    }
-    .toggle-icon {
-      font-size: 18px;
-      color: #1976d2;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: 500;
-      color: #1976d2;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo-icon {
-      font-size: 28px;
-    }
-    .description {
-      color: #aaa;
-      margin-bottom: 30px;
-    }
-    .footer {
-      margin-top: 50px;
-      padding-top: 20px;
-      border-top: 1px solid #333;
-      color: #777;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="logo">
-      <span class="material-icons logo-icon">timer</span>
-      SDMA Live Timing
-    </div>
-  </div>
-  
-    <div class="current-event">
-    <h2>Current Event</h2>
-    <a href="live-timing/display/" class="current-event-button">View Live Timing</a>
-  </div>
-  
-  <h2>Historical Events</h2>`;
-
-    // Add each year section
-    years.forEach(year => {
-      html += `
-  <div class="year-section">
-    <div class="year-header" onclick="toggleYear('${year}')">
-      <span>${year}</span>
-      <span class="toggle-icon" id="toggle-${year}">▼</span>
-    </div>
-    <div class="year-content" id="year-${year}">`;
-      
-      // Add each event in the year
-      directoriesByYear[year].forEach(dir => {
-        const date = dayjs(dir);
-        const formattedDate = date.format('MMMM D, YYYY');
-        
-        // Get event name from metadata if available
-        let eventName = '';
-        try {
-          const metadataPath = join(config.liveTimingOutputPath, dir, 'metadata.json');
-          if (existsSync(metadataPath)) {
-            const metadataContent = readFileSync(metadataPath, 'utf8');
-            const metadata = JSON.parse(metadataContent) as { eventName?: string };
-            if (metadata.eventName) {
-              eventName = metadata.eventName;
-            }
-          }
-        } catch (error) {
-          logger.warn(`Could not read metadata for ${dir}: ${error}`);
-        }
-        
-        html += `
-      <a href="${dir}/display/" class="event-link">
-        <div class="event-date">${formattedDate}</div>
-        ${eventName ? `<div class="event-name">${eventName}</div>` : ''}
-      </a>`;
-      });
-      
-      html += `
-    </div>
-  </div>`;
-    });
-
-    // Add JavaScript for toggling year sections
-    html += `
-  <div class="footer">
-    <p>Event Cell Live Timing System</p>
-  </div>
-  
-  <script>
-    function toggleYear(year) {
-      const content = document.getElementById('year-' + year);
-      const toggle = document.getElementById('toggle-' + year);
-      
-      if (content.classList.contains('active')) {
-        content.classList.remove('active');
-        toggle.textContent = '▼';
-      } else {
-        content.classList.add('active');
-        toggle.textContent = '▲';
-      }
-    }
-  </script>
-</body>
-</html>`;
-
-    // Write the index file to the output path
-    const indexPath = join(config.liveTimingOutputPath, 'index.html');
-    writeFileSync(indexPath, html);
-    logger.info(`Generated index file at ${indexPath}`);
+    // Build the live-timing index site
+    await buildLiveTimingIndex();
+    
+    logger.info('Generated index file for event selection');
   } catch (error) {
     logger.error('Failed to generate index file:', error);
   }
@@ -469,6 +233,8 @@ async function syncLiveTimingData() {
       copiedDates.clear();
       indexedDates.clear();
       lastEventId = config.eventId;
+      // Set the regenerate flag when eventId changes
+      regenerateIndexFlag = true;
     }
     
     // Define the specific date directory to sync
@@ -486,11 +252,19 @@ async function syncLiveTimingData() {
     // Check if this is the first run for this date or if eventId changed
     const isFirstRun = !copiedDates.has(dateStr) || eventIdChanged;
     
-    // If regenerateIndexFlag is true, regenerate the index file
-    if (regenerateIndexFlag) {
-      logger.info('Regenerating index file based on flag');
-      await generateIndexFile();
-      logger.info('Generated index file for event selection');
+    // Determine if we need to build the index
+    const currentTime = Date.now();
+    const timeSinceLastBuild = currentTime - lastIndexBuildTime;
+    const shouldBuildIndex = regenerateIndexFlag || 
+                            (isFirstRun && !indexedDates.has(dateStr)) || 
+                            timeSinceLastBuild > 3600000; // Rebuild every hour at most
+    
+    // If we need to build the index, do it once
+    if (shouldBuildIndex) {
+      logger.info('Building index file');
+      await buildLiveTimingIndex();
+      lastIndexBuildTime = currentTime;
+      indexedDates.add(dateStr);
       
       // Sync the index file to the remote server
       logger.info('Syncing index file to remote server');
@@ -505,6 +279,8 @@ async function syncLiveTimingData() {
       
       // Reset the flag after regeneration
       regenerateIndexFlag = false;
+    } else {
+      logger.info('Skipping index build - already up to date');
     }
     
     if (isFirstRun) {
@@ -532,44 +308,6 @@ async function syncLiveTimingData() {
       
       // Mark this date as copied
       copiedDates.add(dateStr)
-      
-      // Generate the index file if not already generated by regenerateIndexFlag
-      if (!regenerateIndexFlag) {
-        await generateIndexFile();
-        logger.info('Generated index file for event selection');
-      }
-      indexedDates.add(dateStr)
-      
-      // Sync the entire date directory to its date-specific location
-      logger.info(`Starting rsync of ${dateStr} directory to date-specific location`)
-      await rsyncService.sync({
-        source: dateDirPath,
-        destination: join(config.rsyncRemotePath, dateStr),
-        exclude: ['*.tmp', '*.log'],
-        delete: true
-      })
-      logger.info(`Successfully synced ${dateStr} directory to date-specific location`)
-      
-      // Also sync to the live-timing directory for current day access
-      logger.info(`Starting rsync of ${dateStr} directory to live-timing directory`)
-      await rsyncService.sync({
-        source: dateDirPath,
-        destination: join(config.rsyncRemotePath, 'live-timing'),
-        exclude: ['*.tmp', '*.log'],
-        delete: true
-      })
-      logger.info(`Successfully synced ${dateStr} directory to live-timing directory`)
-      
-      // Sync the index file to the remote server
-      logger.info('Syncing index file to remote server');
-      await rsyncService.sync({
-        source: join(config.liveTimingOutputPath, 'index.html'),
-        destination: config.rsyncRemotePath,
-        exclude: ['*.tmp', '*.log'],
-        delete: false,
-        isFile: true
-      });
-      logger.info('Successfully synced index file to remote server');
     } else {
       logger.info(`Subsequent run for ${dateStr} - only updating and syncing API data`)
     }

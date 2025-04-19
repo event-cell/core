@@ -5,6 +5,7 @@ import { configRoute } from './config'
 import { runs } from './runs'
 import { currentCompetitor } from './currentCompetitor'
 import { endOfDayResults } from './endOfDayResults'
+import { events } from './events'
 
 const t = initTRPC.create(); // Optionally pass context typing here
 
@@ -14,6 +15,7 @@ export const trpcRouter = t.router({
   config: configRoute,
   currentcompetitor: currentCompetitor,
   endofdayresults: endOfDayResults,
+  events: events,
 });
 
 export type TRPCRouter = typeof trpcRouter;
