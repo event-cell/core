@@ -28,7 +28,9 @@
   "scripts": {
     "setup": "echo 'No setup tasks for client'",
     "dev": "vite --port 3000 --host",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "build:static": "tsc && vite build && cp -r dist/* ../server/build/ui/",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [

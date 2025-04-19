@@ -75,10 +75,10 @@ async function exportLiveTimingData() {
     await safeWriteFile(join(apiDir, 'currentCompetitor.json'), currentCompetitor, 'currentCompetitor.json')
     
     // Calculate the maximum number of runs for any competitor
-    const maxRuns = competitors.reduce((max, competitor) => {
+    const maxRuns = Math.max(1, competitors.reduce((max, competitor) => {
       const competitorRuns = competitor.times.length;
       return competitorRuns > max ? competitorRuns : max;
-    }, 0);
+    }, 0));
     
     // Export maxRuns to runs.json
     await safeWriteFile(join(apiDir, 'runs.json'), maxRuns, 'runs.json')

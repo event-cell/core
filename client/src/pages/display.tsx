@@ -57,12 +57,15 @@ export const DisplayPage = () => {
   const shouldDisplayCompetitorList =
     currentDisplayNumber === 0 || currentDisplayNumber === 4
 
+  // For timing.sdmahillclimb.com.au, if runCount is 0, set it to 1 to ensure competitor list is displayed
+  const effectiveRunCount = window.location.hostname === 'timing.sdmahillclimb.com.au' && runCount.data === 0 ? 1 : (runCount.data || 1)
+
   return (
     <Container>
       {competitors.data && runCount.data && (
         <DisplayCompetitorList
           competitors={competitors.data}
-          runCount={runCount.data}
+          runCount={effectiveRunCount}
         />
       )}
 
