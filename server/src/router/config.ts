@@ -5,8 +5,8 @@ const logger = setupLogger('router/config');
 
 import { config, ConfigType } from '../config';
 import { getEventDatabases } from '../dbUtils';
-import { setNewEvent } from './shared';
-import { syncLiveTimingData } from '../scheduledTasks/scheduledTasks';
+import { setNewEvent } from '../router/shared';
+import { syncLiveTimingData, setRegenerateIndexFlag } from '../scheduledTasks/scheduledTasks';
 import dayjs from 'dayjs';
 
 // ✅ Initialize tRPC
@@ -197,6 +197,7 @@ export const configRoute = t.router({
         
         // If upload is enabled, trigger a sync to recreate and upload the directory
         if (config.uploadLiveTiming) {
+          setRegenerateIndexFlag();
           await syncLiveTimingData();
         }
       } else if (input.eventId) {
@@ -207,6 +208,7 @@ export const configRoute = t.router({
       // If uploadLiveTiming was just enabled, trigger an immediate sync
       if (!wasUploadEnabled && config.uploadLiveTiming) {
         logger.info('Upload live timing was just enabled, triggering immediate sync');
+        setRegenerateIndexFlag();
         await syncLiveTimingData();
       }
 

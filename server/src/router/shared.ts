@@ -49,27 +49,14 @@ export async function getCompetitorJSON() {
   } catch (e) {}
 
   const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor) => {
-    // Get the event date to determine which field to use for class name
-    const eventDate = await event.tPARAMETERS.findFirst({
-      where: { C_PARAM: 'DATE' }
-    });
-    
-    // Default to C_I29 (2023+ format)
-    let className = competitor.C_I29;
-    
-    // If event date is before 2023, use C_SERIE (pre-2023 format)
-    if (eventDate?.C_VALUE) {
-      const date = new Date((Number(eventDate.C_VALUE) - 25569) * 86400 * 1000);
-      if (date.getFullYear() < 2023) {
-        className = competitor.C_SERIE;
-      }
-    }
+    // Check if C_I29 has a value, if not fall back to C_SERIE
+    let className = competitor.C_I29 || competitor.C_SERIE || 'N/A';
     
     return {
       number: competitor.C_NUM || -1,
       lastName: competitor.C_FIRST_NAME || 'N/A',
       firstName: competitor.C_LAST_NAME || 'N/A',
-      class: className || 'N/A',
+      class: className,
       classIndex: competitor.C_I21 || 0,
       vehicle: competitor.C_COMMITTEE || 'N/A',
       classRecord: competitor.C_TEAM || '0.00',
