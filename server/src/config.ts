@@ -1,12 +1,17 @@
 /// <reference types="@total-typescript/ts-reset" />
 
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { z } from 'zod'
 
 import { setupLogger } from './utils/index.js'
 
 const logger = setupLogger('config')
+
+// Get the directory name in ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 export const ConfigType = z
   .object({
@@ -40,13 +45,12 @@ class Config {
   public rsyncRemotePath = ''
   public rsyncSshKeyPath = '/data/.ssh/id_rsa'
 
-
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
     const parsedContents = JSON.parse(fileContents)
     const config = ConfigType.parse(parsedContents)
     this.set(config)
-    
+
     // Force uploadLiveTiming to false on startup
     if (this.uploadLiveTiming) {
       logger.info('Forcing uploadLiveTiming to false on startup')
@@ -64,7 +68,7 @@ class Config {
     if (existsSync('/data/')) {
       if (!existsSync('/data/config.json')) {
         logger.info(
-          'Creating config file in `/data/`. If this is not where you want it, specify the CONFIG_DIR env variable'
+          'Creating config file in `/data/`. If this is not where you want it, specify the CONFIG_DIR env variable',
         )
         writeFileSync('/data/config.json', '{}')
       }

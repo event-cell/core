@@ -1,35 +1,22 @@
 {
   "name": "live-timing",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@fontsource/roboto": "^5.2.5",
-    "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
-    "@tanstack/react-query": "^5.74.4",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@trpc/client": "^11.1.0",
-    "@trpc/react-query": "^11.1.0",
-    "@trpc/server": "^11.1.0",
-    "@types/node": "^22.14.1",
-    "@types/react": "^19.1.1",
-    "@types/react-dom": "^19.1.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.5.0",
-    "ui-shared": "*",
-    "web-vitals": "^4.2.4",
-    "zustand": "^5.0.3"
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.1"
   },
   "scripts": {
-    "dev": "vite --port 3000 --host",
-    "build": "yarn workspace server build && rm -rf dist && tsc && vite build",
-    "build:live-timing": "node build/live-timing-direct.js",
-    "build:personal-history": "node build/personal-history-direct.js",
-    "preview": "vite preview"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "deploy": "tsx scripts/deploy.ts"
   },
   "eslintConfig": {
     "extends": [
@@ -50,16 +37,17 @@
     ]
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.30.1",
-    "@typescript-eslint/parser": "^8.30.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.25.0",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.3",
-    "vite": "^6.2.6"
+    "@types/node": "^20.11.19",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "tsx": "^4.7.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.0"
   }
 }

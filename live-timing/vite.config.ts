@@ -1,12 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import metadataPlugin from './vite-plugin-metadata'
-import { config } from '../server/dist/server/src/config.js'
 
 export default defineConfig({
   root: path.resolve(__dirname, 'src'),
-  plugins: [react(), metadataPlugin()],
+  plugins: [react()],
   base: './',
   publicDir: path.resolve(__dirname, 'public'),
   resolve: {

@@ -30,7 +30,7 @@
     "setup": "echo 'No setup tasks for client'",
     "dev": "vite --port 3000 --host",
     "build": "rm -rf dist && tsc && vite build",
-    "build:server-ui": "rm -rf dist && tsc && vite build && cp -r dist/* ../server/dist/server/ui/",
+    "build:server-ui": "rm -rf dist && tsc && vite build && mkdir -p ../server/dist/server/ui && cp -r dist/* ../server/dist/server/ui/",
     "preview": "vite preview"
   },
   "eslintConfig": {

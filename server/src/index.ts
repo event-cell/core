@@ -4,7 +4,8 @@ import express from 'express'
 import * as trpcExpress from '@trpc/server/adapters/express'
 import cors from 'cors'
 import { existsSync } from 'fs'
-import { resolve, join } from 'path'
+import { resolve, join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { cwd } from 'process'
 
 import { trpcRouter } from './router/index.js'
@@ -13,9 +14,15 @@ import { executeScheduledTasks } from './scheduledTasks/index.js'
 import { getCurrentHeat, setupLogger } from './utils/index.js'
 import { getCompetitorJSON } from './router/shared.js'
 import { getCurrentCompetitor } from './router/currentCompetitor.js'
+
+// Get the directory name in ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
 const logger = setupLogger('server')
 
-const uiPath = resolve(__dirname, 'ui')
+// Define paths
+const uiPath = join(__dirname, '..', 'dist', 'server', 'ui')
 const app = express()
 
 ;(async () => {
@@ -24,17 +31,23 @@ const app = express()
   // Log working directory and paths
   const workingDir = cwd()
   const serverDir = __dirname
-  console.log('Current working directory:', workingDir)
-  console.log('Server directory:', serverDir)
-  console.log('UI path:', uiPath)
-  logger.info('Current working directory:', workingDir)
-  logger.info('Server directory:', serverDir)
-  logger.info('UI path:', uiPath)
+  const absoluteUiPath = resolve(workingDir, uiPath)
+
+  logger.info('Server paths:')
+  logger.info(`- Current working directory: ${workingDir}`)
+  logger.info(`- Server directory: ${serverDir}`)
+  logger.info(`- UI path (relative): ${uiPath}`)
+  logger.info(`- UI path (absolute): ${absoluteUiPath}`)
+  logger.info(`- UI exists: ${existsSync(uiPath) ? 'Yes' : 'No'}`)
 
   // We only want to serve the UI in production. In development, we will handle it
   // elsewhere
-  if (existsSync(uiPath)) app.use(express.static(uiPath))
-  else logger.info('UI not found, skipping static serving')
+  if (existsSync(uiPath)) {
+    app.use(express.static(uiPath))
+    logger.info('Serving UI from:', uiPath)
+  } else {
+    logger.info('UI not found, skipping static serving')
+  }
 
   app.use(express.json())
   app.use(cors())
@@ -43,7 +56,7 @@ const app = express()
     '/api/v1/',
     trpcExpress.createExpressMiddleware({
       router: trpcRouter,
-    })
+    }),
   )
 
   logger.info('Server started')
@@ -57,7 +70,6 @@ const app = express()
   app.get('/api/simple/runs.json', async (req, res) => {
     res.json(await getCurrentHeat())
   })
-
 
   logger.info('gets defined')
   // app.get('*', (req, res) => {
@@ -91,7 +103,7 @@ const app = express()
   const serverPort = process.env.PORT || 8080
 
   app.listen(serverPort, () =>
-    logger.info(`Server listening on port ${serverPort}`)
+    logger.info(`Server listening on port ${serverPort}`),
   )
 
   const mins = 1
@@ -99,7 +111,10 @@ const app = express()
   logger.info('Running scheduled tasks')
   await executeScheduledTasks()
   // and then loop
-  setInterval(async () => {
-    await executeScheduledTasks()
-  }, mins * 60 * 1000)
+  setInterval(
+    async () => {
+      await executeScheduledTasks()
+    },
+    mins * 60 * 1000,
+  )
 })()
