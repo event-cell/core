@@ -10,7 +10,6 @@ body {
 
 h1 {
   color: #fff;
-  border-bottom: 1px solid #333;
   padding-bottom: 10px;
   margin-top: 0;
 }
@@ -18,6 +17,8 @@ h1 {
 h2 {
   color: #fff;
   margin-top: 0;
+  font-size: 4rem;
+  font-weight: bold;
 }
 
 .current-event {
@@ -42,6 +43,8 @@ h2 {
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   border: 2px solid transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .current-event-button:hover {
@@ -77,16 +80,23 @@ h2 {
 }
 
 .year-content {
-  display: none;
-  padding: 15px;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
   border-left: 2px solid #333;
   margin-left: 10px;
   background-color: #1a1a1a;
   border-radius: 0 0 8px 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 .year-content.active {
-  display: block;
+  max-height: 1000px;
+  padding: 15px;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .event-link {
@@ -106,19 +116,25 @@ h2 {
 }
 
 .event-date {
-  font-size: 16px;
+  font-size: 2rem;
   font-weight: 500;
   margin-bottom: 4px;
 }
 
 .event-name {
-  font-size: 14px;
+  font-size: 2rem;
   color: #aaa;
 }
 
 .toggle-icon {
   font-size: 18px;
   color: #1976d2;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+}
+
+.year-header[data-expanded="true"] .toggle-icon {
+  transform: rotate(180deg);
 }
 
 .header {
@@ -176,6 +192,8 @@ h2 {
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   border: 2px solid transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .personal-history-button:hover {
@@ -187,4 +205,65 @@ h2 {
 .personal-history-button:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-} 
+}
+
+/* Add button container styles */
+.button-container {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.button-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1976d2, #4caf50);
+  z-index: 0;
+}
+
+.button-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+/* Add button animation */
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.current-event-button, .personal-history-button {
+  animation: buttonPulse 3s infinite ease-in-out;
+}
+
+/* Remove the hover effect for button container */
+/* .button-container:hover {
+  transform: translateY(-2px);
+  transition: transform 0.3s ease;
+} */ 

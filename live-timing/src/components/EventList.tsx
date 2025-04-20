@@ -49,12 +49,12 @@ export const EventList: React.FC<EventListProps> = ({
         }
 
         // Fetch event directories from metadata.json
-        const response = await fetch('/metadata.json')
+        const response = await fetch('/site-metadata.json')
         if (!response.ok) {
           throw new Error('Failed to load events')
         }
         const data = (await response.json()) as EventData
-        const eventDirectories = data.directories
+        const eventDirectories = data.eventDirectories
         const sortedDates = sortDatesDescending(eventDirectories)
         setDates(sortedDates)
 
