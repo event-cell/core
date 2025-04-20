@@ -1,5 +1,3 @@
-import { executeScheduledTasks } from './scheduledTasks'
+import { executeScheduledTasks, syncLiveTimingData, setRegenerateIndexFlag } from './scheduledTasks.js'
 
-export async function scheduledTasks() {
-  await executeScheduledTasks()
-}
+export { executeScheduledTasks, syncLiveTimingData, setRegenerateIndexFlag }

@@ -1,10 +1,10 @@
 import { join } from 'path'
 
-import { PrismaClient as pcEvent } from '../prisma/generated/event'
-import { PrismaClient as pcEventData } from '../prisma/generated/eventData'
-import { PrismaClient as pcOnline } from '../prisma/generated/online'
+import { PrismaClient as pcEvent } from './prisma/generated/event/index.js'
+import { PrismaClient as pcEventData } from './prisma/generated/eventData/index.js'
+import { PrismaClient as pcOnline } from './prisma/generated/online/index.js'
 
-import { config } from './config'
+import { config } from './config.js'
 
 export type EventDB = {
   event: pcEvent
@@ -25,8 +25,7 @@ export function getEventDatabases(eventId: string): EventDB {
         },
       },
     })
-  }
-  catch {}
+  } catch {}
 
   return {
     online,

@@ -5,13 +5,14 @@ import * as trpcExpress from '@trpc/server/adapters/express'
 import cors from 'cors'
 import { existsSync } from 'fs'
 import { resolve, join } from 'path'
+import { cwd } from 'process'
 
-import { trpcRouter } from './router'
-import { setup } from './setup'
-import { scheduledTasks } from './scheduledTasks'
-import { getCurrentHeat, setupLogger } from './utils'
-import { getCompetitorJSON } from './router/shared'
-import { getCurrentCompetitor } from './router/currentCompetitor'
+import { trpcRouter } from './router/index.js'
+import { setup } from './setup/index.js'
+import { executeScheduledTasks } from './scheduledTasks/index.js'
+import { getCurrentHeat, setupLogger } from './utils/index.js'
+import { getCompetitorJSON } from './router/shared.js'
+import { getCurrentCompetitor } from './router/currentCompetitor.js'
 const logger = setupLogger('server')
 
 const uiPath = resolve(__dirname, 'ui')
@@ -19,6 +20,16 @@ const app = express()
 
 ;(async () => {
   await setup()
+
+  // Log working directory and paths
+  const workingDir = cwd()
+  const serverDir = __dirname
+  console.log('Current working directory:', workingDir)
+  console.log('Server directory:', serverDir)
+  console.log('UI path:', uiPath)
+  logger.info('Current working directory:', workingDir)
+  logger.info('Server directory:', serverDir)
+  logger.info('UI path:', uiPath)
 
   // We only want to serve the UI in production. In development, we will handle it
   // elsewhere
@@ -86,9 +97,9 @@ const app = express()
   const mins = 1
   // Start Immediately
   logger.info('Running scheduled tasks')
-  scheduledTasks()
+  await executeScheduledTasks()
   // and then loop
-  setInterval(() => {
-    scheduledTasks()
+  setInterval(async () => {
+    await executeScheduledTasks()
   }, mins * 60 * 1000)
 })()

@@ -3,8 +3,9 @@
   "compilerOptions": {
     "outDir": "./dist/server",
     // comment out rootDir to enable cross workspace imports
-    // "rootDir": "./src",
-    "composite": true
+    "rootDir": "./src",
+    "composite": true,
+    "noEmit": false // Create JS files from TS files
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

@@ -13,12 +13,12 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
-import { trpc } from '../App';
+import { trpc } from '../App.js';
 import { RenderInfo, CompetitorTable } from 'ui-shared';
-import { requestWrapper } from '../components/requestWrapper';
-import { CompetitorList } from 'server/src/router/objects';
+import { requestWrapper } from '../components/requestWrapper.js';
+import { CompetitorList } from '../../../server/src/router/objects.js';
 
-import type { Competitor } from '../../../server/src/router/objects';
+import type { Competitor } from '../../../server/src/router/objects.js';
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),

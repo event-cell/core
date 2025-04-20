@@ -2,8 +2,8 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { warn } from 'winston';
 
-import { event, eventData } from './shared';
-import { getCurrentHeat, getHeatInterTableKey } from '../utils';
+import { event, eventData } from './shared.js';
+import { getCurrentHeat, getHeatInterTableKey } from '../utils/index.js';
 
 const t = initTRPC.create();
 
@@ -19,7 +19,7 @@ export async function getCurrentCompetitor() {
     const currentHeat = await getCurrentHeat();
     const heatInterTable = eventData[getHeatInterTableKey(currentHeat)];
 
-    const competitorQuery = await heatInterTable.findMany({
+    const competitorQuery = await (heatInterTable as any).findMany({
       select: {
         C_NUM: true,
         C_HOUR2: true,

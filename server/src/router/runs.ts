@@ -1,7 +1,7 @@
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 
-import { getCurrentHeat } from '../utils';
+import { getCurrentHeat } from '../utils/index.js';
 
 const t = initTRPC.create();
 

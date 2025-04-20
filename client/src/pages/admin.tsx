@@ -10,10 +10,10 @@ import {
 } from '@mui/material';
 import { green, red } from '@mui/material/colors';
 import React, { useState, useEffect } from 'react';
-import { trpc, useTrpcClient } from '../App';
+import { trpc, useTrpcClient } from '../App.js';
 import dayjs from 'dayjs';
 
-import { requestWrapper } from '../components/requestWrapper';
+import { requestWrapper } from '../components/requestWrapper.js';
 
 export const Admin = () => {
   const trpcClient = useTrpcClient();

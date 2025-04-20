@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server';
-import { CompetitorList } from './objects';
-import { getCompetitorJSON } from './shared';
+import { CompetitorList } from './objects.js';
+import { getCompetitorJSON } from './shared.js';
 
 const t = initTRPC.create();
 

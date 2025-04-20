@@ -1,3 +1,3 @@
-export * from './Theme'
-export * from './table'
-export * from './display'
+export * from './Theme.js'
+export * from './table.js'
+export * from './display.js'

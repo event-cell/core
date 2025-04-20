@@ -4,7 +4,7 @@ import type {
   Competitor,
   CompetitorList,
   TimeInfo,
-} from 'server/src/router/objects'
+} from 'server/src/router/objects.js'
 
 export interface Splits {
   split1: number

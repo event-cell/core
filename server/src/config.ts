@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { z } from 'zod'
 
-import { setupLogger } from './utils'
+import { setupLogger } from './utils/index.js'
 
 const logger = setupLogger('config')
 

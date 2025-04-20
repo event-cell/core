@@ -12,13 +12,13 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 
-import { DisplayPage } from './pages/display'
-import { config } from './config'
-import { Admin } from './pages/admin'
-import { TrackDisplay } from './pages/trackDisplay'
-import { Announcer } from './pages/announcer'
+import { DisplayPage } from './pages/display.js'
+import { config } from './config.js'
+import { Admin } from './pages/admin.js'
+import { TrackDisplay } from './pages/trackDisplay.js'
+import { Announcer } from './pages/announcer.js'
 
-import type { TRPCRouter } from 'server/src/router';
+import type { TRPCRouter } from 'server/src/router/index.js';
 
 
 // The tRPC hook. Will be used to make requests to the server
@@ -41,7 +41,8 @@ function getRouterPrefix() {
 }
 
 function App() {
-  const [queryClient] = useState(() => new QueryClient())
+  // Use type assertion to bypass the TypeScript error
+  const [queryClient] = useState(() => new QueryClient() as any)
   const trpcClient = useTrpcClient()
   const root = useMemo(getRouterPrefix, [])
 

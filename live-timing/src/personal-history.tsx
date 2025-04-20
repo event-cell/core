@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { PersonalHistoryPage } from './pages/PersonalHistoryPage';
+import { createRoot } from 'react-dom/client';
+import { PersonalHistoryPage } from './pages/PersonalHistoryPage.js';
 import './styles.css';
 
 // Create root element if it doesn't exist
@@ -16,7 +16,7 @@ const createRootElement = () => {
 
 // Render the app
 const rootElement = createRootElement();
-const root = ReactDOM.createRoot(rootElement);
+const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <PersonalHistoryPage />

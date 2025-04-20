@@ -19,6 +19,9 @@
     "build": "yarn client:build && yarn server:build",
     "lint": "eslint ."
   },
+  "resolutions": {
+    "@tanstack/query-core": "^5.74.4"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.29.1",
     "@typescript-eslint/parser": "^8.29.1",
@@ -26,5 +29,12 @@
     "eslint-plugin-react": "^7.37.5",
     "typescript": "^5.8.3"
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.9.1",
+  "packageExtensions": {
+    "@tanstack/query-core@*": {
+      "peerDependencies": {
+        "@tanstack/query-core": "5.74.4"
+      }
+    }
+  }
 }

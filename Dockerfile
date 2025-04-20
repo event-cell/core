@@ -8,7 +8,7 @@ COPY yarn.lock .
 RUN yarn
 
 # Generate prisma files
-COPY server/prisma prisma
+COPY server/src/prisma prisma
 RUN yarn prismaGenerate
 
 # Download the latest build from the github CI and put it at server/build

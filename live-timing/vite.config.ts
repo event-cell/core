@@ -1,24 +1,48 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import metadataPlugin from './vite-plugin-metadata'
+import { config } from '../server/dist/server/src/config.js'
 
 export default defineConfig({
-  plugins: [react()],
+  root: path.resolve(__dirname, 'src'),
+  plugins: [react(), metadataPlugin()],
+  base: './',
+  publicDir: path.resolve(__dirname, 'public'),
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    alias: {
+      // Add aliases for server imports
+      server: path.resolve(__dirname, '../server/src'),
+    },
+  },
   build: {
-    outDir: 'dist',
+    outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,
-    manifest: false,
     rollupOptions: {
       input: {
-        'live-timing': path.resolve(__dirname, 'src/index.html'),
-        'personal-history': path.resolve(__dirname, 'src/personal-history.html'),
+        index: path.resolve(__dirname, 'src/index.html'),
+        'personal-history': path.resolve(
+          __dirname,
+          'src/personal-history.html',
+        ),
       },
       output: {
-        // force assets to be emitted into each chunk's subfolder
-        entryFileNames: asset => `[name]/assets/[name].js`,
-        chunkFileNames: asset => `[name]/assets/[name]-[hash].js`,
-        assetFileNames: asset => `[name]/assets/[name]-[hash][extname]`
-      }
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: ({ name }) => {
+          if (/\.(gif|jpe?g|png|svg)$/.test(name ?? '')) {
+            return 'assets/images/[name]-[hash][extname]'
+          }
+          if (/\.css$/.test(name ?? '')) {
+            return 'assets/css/[name]-[hash][extname]'
+          }
+          if (/\.html$/.test(name ?? '')) {
+            return '[name][extname]'
+          }
+          return 'assets/[name]-[hash][extname]'
+        },
+      },
     },
-  }
-}) 
+  },
+})

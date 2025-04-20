@@ -1,5 +1,5 @@
-import { config } from '../config'
-import { setupLogger } from './index'
+import { config } from '../config.js'
+import { setupLogger } from './index.js'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 

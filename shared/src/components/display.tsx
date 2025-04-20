@@ -23,12 +23,12 @@ import {
   getGlobalBestFinish,
   type GetBestFinish,
   getBestN,
-} from '../logic'
+} from '../logic/index.js'
 
-import { Competitor, CompetitorList } from 'server/src/router/objects'
+import { Competitor, CompetitorList } from 'server/src/router/objects.js'
 
-export * from './display/CompetitorList'
-export * from './display/OnTrack'
+export * from './display/CompetitorList.js'
+export * from './display/OnTrack.js'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),

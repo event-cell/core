@@ -26,7 +26,7 @@
   },
   "scripts": {
     "dev": "vite --port 3000 --host",
-    "build": "rm -rf dist && tsc && vite build",
+    "build": "yarn workspace server build && rm -rf dist && tsc && vite build",
     "build:live-timing": "node build/live-timing-direct.js",
     "build:personal-history": "node build/personal-history-direct.js",
     "preview": "vite preview"

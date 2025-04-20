@@ -1,4 +1,4 @@
-import { trpc } from '../../../client/src/utils/trpc';
+import { trpc } from '../../../client/src/utils/trpc.js';
 
 /**
  * Fetches the list of event directories from the server

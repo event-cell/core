@@ -1,4 +1,4 @@
-import { CompetitorList } from 'server/src/router/objects'
+import { CompetitorList } from 'server/src/router/objects.js'
 
 export interface ClassType {
   drivers: CompetitorList

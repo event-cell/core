@@ -1,18 +1,18 @@
-import { setupLogger, rsyncService } from '../utils'
+import { setupLogger, rsyncService } from '../utils/index.js'
 
 const logger = setupLogger('scheduledTasks/scheduledTasks')
-import { config } from '../config'
+import { config } from '../config.js'
 import { mkdirSync, writeFileSync, existsSync, cpSync, rmSync, readdirSync, readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import dayjs from 'dayjs'
-import { getCompetitorJSON } from '../router/shared'
-import { getCurrentCompetitor } from '../router/currentCompetitor'
-import { getCurrentHeat } from '../utils'
+import { getCompetitorJSON } from '../router/shared.js'
+import { getCurrentCompetitor } from '../router/currentCompetitor.js'
+import { getCurrentHeat } from '../utils/index.js'
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import { event } from '../router/shared'
-import { getEventDatabases } from '../dbUtils'
-import { buildLiveTimingIndex } from './liveTimingBuilder'
+import { event } from '../router/shared.js'
+import { getEventDatabases } from '../dbUtils.js'
+import { buildLiveTimingIndex } from './liveTimingBuilder.js'
 
 const execAsync = promisify(exec)
 
@@ -208,7 +208,7 @@ async function writeMetadataFile(dateDirPath: string, eventId: string) {
   }
 }
 
-async function syncLiveTimingData() {
+export async function syncLiveTimingData() {
   // Check if uploadLiveTiming is enabled
   if (!config.uploadLiveTiming) {
     logger.info('Live timing upload is disabled, skipping sync')
@@ -265,17 +265,6 @@ async function syncLiveTimingData() {
       await buildLiveTimingIndex();
       lastIndexBuildTime = currentTime;
       indexedDates.add(dateStr);
-      
-      // Sync the index file to the remote server
-      logger.info('Syncing index file to remote server');
-      await rsyncService.sync({
-        source: join(config.liveTimingOutputPath, 'index.html'),
-        destination: config.rsyncRemotePath,
-        exclude: ['*.tmp', '*.log'],
-        delete: false,
-        isFile: true
-      });
-      logger.info('Successfully synced index file to remote server');
       
       // Reset the flag after regeneration
       regenerateIndexFlag = false;
@@ -336,8 +325,6 @@ async function syncLiveTimingData() {
     logger.error('Failed to sync live timing data to remote server:', error)
   }
 }
-
-export { syncLiveTimingData }
 
 export async function executeScheduledTasks() {
   logger.info('Task Scheduler called')

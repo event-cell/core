@@ -1,6 +1,6 @@
-import type { CompetitorList } from 'server/src/router/objects'
-import type { GetCurrentCompetitorReturn } from 'server/src/router/currentCompetitor'
-import { config } from './config'
+import type { CompetitorList } from 'server/src/router/objects.js'
+import type { GetCurrentCompetitorReturn } from 'server/src/router/currentCompetitor.js'
+import { config } from './config.js'
 
 export async function getCompetitors(): Promise<CompetitorList> {
   const response = await fetch(config.simpleBackendUrl + '/simple/competitors.json')

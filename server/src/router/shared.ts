@@ -1,9 +1,9 @@
-import { config } from '../config'
-import { EventDB, getEventDatabases } from '../dbUtils'
+import { config } from '../config.js'
+import { EventDB, getEventDatabases } from '../dbUtils.js'
 import { TRPCError } from '@trpc/server'
-import { CompetitorList, TimeInfoList } from './objects'
-import { nullToUndefined } from '../utils'
-import { getPersonalBestSectors } from '../utils/competitors'
+import { CompetitorList, TimeInfoList } from './objects.js'
+import { nullToUndefined } from '../utils/index.js'
+import { getPersonalBestSectors } from '../utils/competitors.js'
 
 export let { event, eventData, online } = getEventDatabases(config.eventId)
 

@@ -3,8 +3,8 @@ import Grid from '@mui/material/Grid';
 import CarCrash from '@mui/icons-material/CarCrash';
 import React, { useEffect } from 'react';
 
-import { trpc } from '../App';
-import { requestWrapper } from '../components/requestWrapper';
+import { trpc } from '../App.js';
+import { requestWrapper } from '../components/requestWrapper.js';
 
 import {
   calculateTimes,
@@ -12,9 +12,9 @@ import {
   getPersonalBestSectors,
   getSectorColors,
 } from 'ui-shared';
-import { TimeInfo } from 'server/src/router/objects';
+import { TimeInfo } from '../../../server/src/router/objects.js';
 
-import type { Competitor } from '../../../server/src/router/objects';
+import type { Competitor } from '../../../server/src/router/objects.js';
 
 let displayInterval: NodeJS.Timeout;
 

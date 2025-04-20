@@ -1,4 +1,4 @@
-import { Competitor, CompetitorList } from '../router/objects'
+import { Competitor, CompetitorList } from '../router/objects.js'
 
 export interface BestSectorTimes {
   bestSector1: number

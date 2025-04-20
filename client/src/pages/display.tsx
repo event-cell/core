@@ -2,11 +2,11 @@ import React, { useEffect } from 'react'
 
 import { DisplayCompetitorList, OnTrack } from 'ui-shared'
 
-import { requestWrapper } from '../components/requestWrapper'
-import { getDisplayNumber } from 'ui-shared/src/logic/displays'
+import { requestWrapper } from '../components/requestWrapper.js'
+import { getDisplayNumber } from 'ui-shared/src/logic/displays.js'
 import { Container } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi'
+import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi.js'
 
 export const DisplayPage = () => {
   const currentCompetitor = useQuery({

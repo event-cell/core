@@ -8,12 +8,13 @@
   "scripts": {
     "start": "node dist/server/index.js",
     "dev": "ts-node-dev --exit-child --respawn src/index.ts",
-    "setup": "yarn prisma migrate dev --name auto --schema prisma/schemaRecords.prisma && yarn prismaGenerate",
-    "build": "rm -rf dist && tsc && cp -r ../client/dist dist/server/ui",
-    "prismaGenerate": "prisma generate --schema=./prisma/schemaEvent.prisma && prisma generate --schema=./prisma/schemaEventData.prisma && prisma generate --schema=./prisma/schemaRecords.prisma && prisma generate --schema=./prisma/schemaOnline.prisma",
-    "prismaIntrospect": "yarn prisma db pull --schema prisma/schemaEvent.prisma && yarn prisma db pull --schema prisma/schemaEventData.prisma && yarn prisma db pull --schema prisma/schemaOnline.prisma"
+    "prismaSetup": "yarn prisma migrate dev --name auto --schema prisma/schemaRecords.prisma && yarn prismaGenerate",
+    "build": "rm -rf dist && yarn prismaGenerate && tsc && cpy \"src/prisma/**\" dist/server/prisma --recursive",
+    "prismaGenerate": "prisma generate --schema=./src/prisma/schemaEvent.prisma && prisma generate --schema=./src/prisma/schemaEventData.prisma && prisma generate --schema=./src/prisma/schemaRecords.prisma && prisma generate --schema=./src/prisma/schemaOnline.prisma",
+    "prismaIntrospect": "yarn src/prisma db pull --schema prisma/schemaEvent.prisma && yarn prisma db pull --schema prisma/schemaEventData.prisma && yarn prisma db pull --schema prisma/schemaOnline.prisma"
   },
   "dependencies": {
+    "@prisma/client": "6.6.0",
     "@trpc/server": "^11.1.0",
     "cors": "^2.8.5",
     "exceljs": "^4.4.0",
@@ -29,6 +30,7 @@
     "@types/node": "^22.14.1",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.30.1",
+    "cpy-cli": "^5.0.0",
     "eslint": "^9.25.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",

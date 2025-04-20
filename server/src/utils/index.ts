@@ -1,7 +1,7 @@
 import winston from 'winston'
 
-export * from './currentHeat'
-export * from './rsync'
+export * from './currentHeat.js'
+export * from './rsync.js'
 
 export function nullToUndefined<T>(type: T | null): T | undefined {
   if (type === null) return

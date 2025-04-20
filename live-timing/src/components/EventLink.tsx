@@ -1,6 +1,6 @@
 import React from 'react';
-import { formatDate } from '../utils/dateUtils';
-import { EventMetadata } from '../utils/metadataUtils';
+import { formatDate } from '../utils/dateUtils.js';
+import { EventMetadata } from '../utils/metadataUtils.js';
 
 interface EventLinkProps {
   dateStr: string;

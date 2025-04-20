@@ -1,4 +1,4 @@
-import { online } from '../router/shared'
+import { online } from '../router/shared.js'
 
 type HeatInterTableKey =
   | 'tTIMERECORDS_HEAT1_INTER1'

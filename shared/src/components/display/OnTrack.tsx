@@ -1,8 +1,8 @@
 import Grid from '@mui/material/Grid'
 import React from 'react'
-import { RenderInfo } from '../display'
-import { PrimaryPaper } from '../ui'
-import { CompetitorList } from 'server/src/router/objects'
+import { RenderInfo } from '../display.js'
+import { PrimaryPaper } from '../ui.js'
+import { CompetitorList } from 'server/src/router/objects.js'
 
 export const OnTrack = ({
   currentCompetitorId,

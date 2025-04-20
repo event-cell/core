@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { YearSection } from './YearSection';
-import { groupDatesByYear, sortDatesDescending } from '../utils/dateUtils';
-import { EventMetadata, fetchEventsMetadata } from '../utils/metadataUtils';
-import { fetchEventDirectories } from '../utils/apiUtils';
+import { YearSection } from './YearSection.js';
+import { groupDatesByYear, sortDatesDescending } from '../utils/dateUtils.js';
+import { EventMetadata, fetchEventsMetadata } from '../utils/metadataUtils.js';
+import { fetchEventDirectories } from '../utils/apiUtils.js';
 
 interface EventListProps {
   initialEventDirectories?: string[];

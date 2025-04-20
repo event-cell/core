@@ -1,2 +1,2 @@
-export * from './components'
-export * from './logic'
+export * from './components/index.js'
+export * from './logic/index.js'

@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server';
-import { setupLogger } from './../utils';
-import { getCompetitorJSON } from './shared';
+import { setupLogger } from '../utils/index.js';
+import { getCompetitorJSON } from './shared.js';
 import Excel from 'exceljs';
 import * as fs from 'fs';
 

@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
-import fs from 'fs';
-import path from 'path';
-import { IndexPage } from './pages/IndexPage';
-import { config } from 'server/src/config';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import fs from 'node:fs';
+import path from 'node:path';
+import { IndexPage } from './pages/IndexPage.js';
+import { config } from '../../server/src/config.js';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 
 const execAsync = promisify(exec);
 

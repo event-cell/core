@@ -1,11 +1,11 @@
 import { initTRPC } from '@trpc/server'
 
-import { competitors } from './competitors'
-import { configRoute } from './config'
-import { runs } from './runs'
-import { currentCompetitor } from './currentCompetitor'
-import { endOfDayResults } from './endOfDayResults'
-import { events } from './events'
+import { competitors } from './competitors.js'
+import { configRoute } from './config.js'
+import { runs } from './runs.js'
+import { currentCompetitor } from './currentCompetitor.js'
+import { endOfDayResults } from './endOfDayResults.js'
+import { events } from './events.js'
 
 const t = initTRPC.create(); // Optionally pass context typing here
 

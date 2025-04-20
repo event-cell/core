@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { IndexPage } from './pages/IndexPage';
+import { IndexPage } from './pages/IndexPage.js';
 import './styles.css';
 
 // Create root element if it doesn't exist

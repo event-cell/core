@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 
 import Grid from '@mui/material/Grid'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
+import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index.js'
 
 export const ClassRecord: FC<{
   sector1: string

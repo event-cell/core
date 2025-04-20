@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { EventLink } from './EventLink';
-import { EventMetadata } from '../utils/metadataUtils';
+import { EventLink } from './EventLink.js';
+import { EventMetadata } from '../utils/metadataUtils.js';
 
 interface YearSectionProps {
   year: string;

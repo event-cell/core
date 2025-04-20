@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { initTRPC } from '@trpc/server';
-import { setupLogger } from '../utils';
+import { setupLogger } from '../utils/index.js';
 const logger = setupLogger('router/config');
 
-import { config, ConfigType } from '../config';
-import { getEventDatabases } from '../dbUtils';
-import { setNewEvent } from '../router/shared';
-import { syncLiveTimingData, setRegenerateIndexFlag } from '../scheduledTasks/scheduledTasks';
+import { config, ConfigType } from '../config.js';
+import { getEventDatabases } from '../dbUtils.js';
+import { setNewEvent } from '../router/shared.js';
+import { syncLiveTimingData, setRegenerateIndexFlag } from '../scheduledTasks/index.js';
 import dayjs from 'dayjs';
 
 // ✅ Initialize tRPC
