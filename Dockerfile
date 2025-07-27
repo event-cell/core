@@ -21,8 +21,10 @@ COPY server/dist ./server/dist
 # Create config file
 RUN echo '{}' > ./server/dist/config.json
 
-# Copy node_modules for runtime dependencies
-COPY node_modules ./node_modules
+# Install production dependencies only
+WORKDIR /app/server
+RUN yarn workspaces focus --production
+WORKDIR /app
 
 WORKDIR /app
 ENV PORT=80
