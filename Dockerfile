@@ -10,7 +10,7 @@ COPY server/package.json ./server/
 RUN corepack enable
 
 # Install dependencies
-RUN yarn install --immutable
+RUN yarn install
 
 # Copy prisma schemas
 COPY server/src/prisma ./server/src/prisma/
