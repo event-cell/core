@@ -222,6 +222,35 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/webstorm
+
+# System files
+.DS_Store
+._.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS resource fork files
+._*
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+error.txt
+personalHistoryIdeasForLater.tsx
+
+# Yarn
+.yarn/
+.yarnrc.yml
+
+# Project specific
 server/src/prisma/migrations/migration_lock.toml
 server/src/prisma/migrations/20220925090913_auto/migration.sql
 server/src/prisma/Records/records.sqlite
@@ -232,3 +261,4 @@ public/src
 client/src/shared
 yarn.lock
 
+web-deploy-config.json
