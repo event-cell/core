@@ -1,4 +1,4 @@
-import { online } from '../router/shared'
+import { online } from '../router/shared.js'
 
 type HeatInterTableKey =
   | 'tTIMERECORDS_HEAT1_INTER1'
@@ -17,14 +17,20 @@ export const getHeatInterTableKey = (heat: number): HeatInterTableKey => {
 }
 
 export async function getCurrentHeat() {
-  const heatRow = await online.tPARAMETERS.findUnique({
-    where: {
-      C_PARAM: 'HEAT',
-    },
-    select: {
-      C_VALUE: true,
-    },
-  })
-  const currentHeat = parseInt(heatRow?.C_VALUE || '0')
-  return currentHeat
+  try {
+    if (!online) return 1
+    const heatRow = await online.tPARAMETERS.findUnique({
+      where: {
+        C_PARAM: 'HEAT',
+      },
+      select: {
+        C_VALUE: true,
+      },
+    })
+    const currentHeat = parseInt(heatRow?.C_VALUE || '0')
+    return currentHeat
+  } catch (e) {
+    console.error('Failed to fetch current heat', e)
+    return 1
+  }
 }

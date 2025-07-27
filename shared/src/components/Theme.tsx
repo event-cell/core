@@ -1,4 +1,5 @@
-import React, { FC } from 'react'
+import * as React from 'react'
+import { FC } from 'react'
 
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'

@@ -4,7 +4,7 @@ import type {
   Competitor,
   CompetitorList,
   TimeInfo,
-} from 'server/src/router/objects'
+} from 'server/src/router/objects.js'
 
 export interface Splits {
   split1: number
@@ -122,8 +122,10 @@ export function getBestN(
     }))
 }
 
-const getBestFinish = (competitors: CompetitorList) =>
-  getBestN(competitors, 1)[0]
+const getBestFinish = (competitors: CompetitorList) => {
+  const bestRuns = getBestN(competitors, 1);
+  return bestRuns.length > 0 ? bestRuns[0] : { name: 'No times yet', car: '', time: 0 };
+}
 
 export type GetBestFinish = typeof getBestFinish
 export const getGlobalBestFinish = getBestFinish

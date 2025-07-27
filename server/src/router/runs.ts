@@ -1,9 +1,12 @@
-import { router } from '@trpc/server'
-import { z } from 'zod'
+import { initTRPC } from '@trpc/server';
+import { z } from 'zod';
 
-import { getCurrentHeat } from '../utils'
+import { getCurrentHeat } from '../utils/index.js';
 
-export const runs = router().query('count', {
-  output: z.number(),
-  resolve: () => getCurrentHeat(),
-})
+const t = initTRPC.create();
+
+export const runs = t.router({
+  count: t.procedure
+    .output(z.number())
+    .query(() => getCurrentHeat()),
+});

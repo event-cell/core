@@ -1,0 +1,80 @@
+{
+    "ai": {
+      "behavior": {
+        "preferMinimalChanges": true,
+        "includeComments": true,
+        "commentStyle": "terse",
+        "explanationLevel": "low",
+        "codingStyle": "idiomatic",
+        "preferTypeSafety": true,
+        "focusOn": ["readability", "performance", "maintainability"],
+        "avoid": ["over-commenting", "inconsistent formatting", "experimental syntax", "CommonJS"]
+      }
+    },
+    "code": {
+      "formatting": {
+        "indentStyle": "space",
+        "indentSize": 2,
+        "maxLineLength": 100,
+        "semi": true,
+        "singleQuote": true,
+        "trailingComma": "es5"
+      },
+      "languagePreferences": {
+        "javascript": {
+          "framework": "react",
+          "useESModules": true,
+          "importStyle": "named",
+          "exportStyle": "named"
+        },
+        "typescript": {
+          "strict": true,
+          "module": "esnext",
+          "target": "es2020",
+          "moduleResolution": "bundler"
+        }
+      },
+      "moduleSystem": {
+        "use": "esmodules",
+        "imports": "Use import statements",
+        "exports": "Use export statements",
+        "fileExtensions": [".ts", ".tsx", ".js", ".jsx", ".mjs"]
+      },
+      "linting": {
+        "eslint": {
+          "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:react/recommended",
+            "plugin:react-hooks/recommended"
+          ],
+          "plugins": [
+            "@typescript-eslint",
+            "react",
+            "react-hooks"
+          ],
+          "rules": {
+            "@typescript-eslint/no-unused-vars": "error",
+            "@typescript-eslint/no-explicit-any": "warn",
+            "@typescript-eslint/explicit-function-return-type": "error",
+            "react/react-in-jsx-scope": "off",
+            "react-hooks/rules-of-hooks": "error",
+            "react-hooks/exhaustive-deps": "warn",
+            "no-console": "warn",
+            "no-debugger": "error",
+            "prefer-const": "error",
+            "no-var": "error",
+            "eqeqeq": "error"
+          },
+          "ignorePatterns": [
+            "node_modules",
+            "dist",
+            "build",
+            "*.config.js",
+            "*.config.ts"
+          ]
+        }
+      }
+    }
+  }
+  

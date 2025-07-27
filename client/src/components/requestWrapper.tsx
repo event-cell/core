@@ -1,10 +1,9 @@
 import { CircularProgress, Container, Typography } from '@mui/material'
-import { TRPCClientErrorLike } from '@trpc/client'
-import { UseQueryResult } from 'react-query'
+import { UseQueryResult } from '@tanstack/react-query'
 import React from 'react'
 
 export function requestWrapper(
-  requests: Record<string, UseQueryResult<unknown, TRPCClientErrorLike<never>>>,
+  requests: Record<string, UseQueryResult<unknown, unknown>>,
   ignoreLoadingKeys: string[] = []
 ) {
   for (const requestName in requests) {
@@ -13,10 +12,9 @@ export function requestWrapper(
       return (
         <Container>
           <Typography variant="h4">Error</Typography>
-          <Typography variant="body1">{request.error.message}</Typography>
           <Typography variant="h5">Technical details</Typography>
           <Typography variant="body1">
-            {JSON.stringify(request.error.data, null, 2)}
+            {JSON.stringify(request.error, null, 2)}
           </Typography>
         </Container>
       )

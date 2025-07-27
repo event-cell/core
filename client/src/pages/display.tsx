@@ -1,16 +1,28 @@
 import React, { useEffect } from 'react'
 
-import { trpc } from '../App'
 import { DisplayCompetitorList, OnTrack } from 'ui-shared'
 
-import { requestWrapper } from '../components/requestWrapper'
-import { getDisplayNumber } from 'ui-shared/src/logic/displays'
+import { requestWrapper } from '../components/requestWrapper.js'
+import { getDisplayNumber } from 'ui-shared/src/logic/displays.js'
 import { Container } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi.js'
 
 export const DisplayPage = () => {
-  const currentCompetitor = trpc.useQuery(['currentcompetitor.number'])
-  const competitors = trpc.useQuery(['competitors.list'])
-  const runCount = trpc.useQuery(['runs.count'])
+  const currentCompetitor = useQuery({
+    queryKey: ['currentCompetitor'],
+    queryFn: getCurrentCompetitor
+  })
+  const competitors = useQuery({
+    queryKey: ['competitors'],
+    queryFn: getCompetitors
+  })
+  const runCount = useQuery({
+    queryKey: ['runCount'],
+    queryFn: getRunCount
+  })
+
+  console.log(competitors)
 
   let displayRefresh = 15
 
@@ -36,22 +48,27 @@ export const DisplayPage = () => {
   if (requestErrors) return requestErrors
 
   if (!competitors.data) {
-    console.warn('Missing allRuns data')
+    console.warn('Missing competitors data')
     return null
-  } // This will never be called, but it is needed to make typescript happy
+  }
 
   const currentDisplayNumber = getDisplayNumber()
   const shouldDisplayCompetitorList =
     currentDisplayNumber === 0 || currentDisplayNumber === 4
 
+  // For timing.sdmahillclimb.com.au, if runCount is 0, set it to 1 to ensure competitor list is displayed
+  const effectiveRunCount = window.location.hostname === 'timing.sdmahillclimb.com.au' && runCount.data === 0 ? 1 : (runCount.data || 1)
+
   return (
     <Container>
-      <DisplayCompetitorList
-        competitors={competitors.data}
-        runCount={runCount.data || 1}
-      />
+      {competitors.data && runCount.data && (
+        <DisplayCompetitorList
+          competitors={competitors.data}
+          runCount={effectiveRunCount}
+        />
+      )}
 
-      {shouldDisplayCompetitorList && currentCompetitor.data && (
+      {shouldDisplayCompetitorList && currentCompetitor.data && competitors.data && (
         <OnTrack
           currentCompetitorId={currentCompetitor.data}
           competitors={competitors.data}

@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./server" },
+    { "path": "./client" },
+    { "path": "./live-timing" },
+    { "path": "./shared" },
+    { "path": "./cli-client" }
+  ]
+}

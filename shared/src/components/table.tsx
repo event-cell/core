@@ -10,8 +10,8 @@ import {
   TableRow,
 } from '@mui/material'
 
-import { ClassRecord, Disqualified, DNF, DNS, Regular } from './table/index'
-import { Competitor } from 'server/src/router/objects'
+import { ClassRecord, Disqualified, DNF, DNS, Regular } from './table/index.js'
+import { Competitor } from 'server/src/router/objects.js'
 
 type RunTime = {
   run: number
@@ -85,6 +85,12 @@ export const CompetitorTable: FC<{
   runCount: number
 }> = ({ data, runCount }) => {
   console.log(data)
+  
+  // Check if there are any valid run times
+  const hasValidRunTimes = data.some(competitor => 
+    competitor.times.some(time => time && time.time > 0)
+  );
+  
   return (
     <TableContainer component={Paper}>
       <MUITable sx={{ minWidth: 640 }} size="small">
@@ -94,7 +100,7 @@ export const CompetitorTable: FC<{
               Competitor
             </TableCell>
             <TableCell>Outright</TableCell>
-            {range(runCount).map((_, index) => (
+            {hasValidRunTimes && range(runCount).map((_, index) => (
               <TableCell key={index} sx={{ fontSize: '0.8rem' }}>
                 Run {index + 1}
               </TableCell>
@@ -168,7 +174,7 @@ export const CompetitorTable: FC<{
 
               <TableCell>{row.outright !== -1 ? row.outright : ''}</TableCell>
 
-              {ensureData(
+              {hasValidRunTimes && ensureData(
                 row.times.filter(
                   (time) => time?.time !== 0 || time?.status !== 0
                 )

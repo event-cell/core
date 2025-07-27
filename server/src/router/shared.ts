@@ -1,9 +1,9 @@
-import { config } from '../config'
-import { EventDB, getEventDatabases } from '../dbUtils'
+import { config } from '../config.js'
+import { EventDB, getEventDatabases } from '../dbUtils.js'
 import { TRPCError } from '@trpc/server'
-import { CompetitorList, TimeInfoList } from './objects'
-import { nullToUndefined } from '../utils'
-import { getPersonalBestSectors } from '../utils/competitors'
+import { CompetitorList, TimeInfoList } from './objects.js'
+import { nullToUndefined } from '../utils/index.js'
+import { getPersonalBestSectors } from '../utils/competitors.js'
 
 export let { event, eventData, online } = getEventDatabases(config.eventId)
 
@@ -48,19 +48,24 @@ export async function getCompetitorJSON() {
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
-  const competitors: CompetitorList = tCOMPETITORSTable.map((competitor) => ({
-    number: competitor.C_NUM || -1,
-    lastName: competitor.C_FIRST_NAME || 'N/A',
-    firstName: competitor.C_LAST_NAME || 'N/A',
-    class: competitor.C_I29 || 'N/A',
-    classIndex: competitor.C_I21 || 0,
-    vehicle: competitor.C_COMMITTEE || 'N/A',
-    classRecord: competitor.C_TEAM || '0.00',
-    special: nullToUndefined(competitor.C_I28),
-    miscAward: nullToUndefined(competitor.C_I30),
-    times: [],
-    outright: -1,
-  }))
+  const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor) => {
+    // Check if C_I29 has a value, if not fall back to C_SERIE
+    let className = competitor.C_I29 || competitor.C_SERIE || 'N/A';
+    
+    return {
+      number: competitor.C_NUM || -1,
+      lastName: competitor.C_FIRST_NAME || 'N/A',
+      firstName: competitor.C_LAST_NAME || 'N/A',
+      class: className,
+      classIndex: competitor.C_I21 || 0,
+      vehicle: competitor.C_COMMITTEE || 'N/A',
+      classRecord: competitor.C_TEAM || '0.00',
+      special: nullToUndefined(competitor.C_I28),
+      miscAward: nullToUndefined(competitor.C_I30),
+      times: [],
+      outright: -1,
+    };
+  }));
 
   for (let i = 0; i < competitors.length; i++) {
     heats.forEach((heat, index) => {
@@ -102,3 +107,5 @@ export async function getCompetitorJSON() {
       }
     })
 }
+export type GetCompetitorJsonReturn = ReturnType<typeof getCompetitorJSON>
+

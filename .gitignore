@@ -222,11 +222,13 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/webstorm
-server/prisma/migrations/migration_lock.toml
-server/prisma/migrations/20220925090913_auto/migration.sql
-server/prisma/Records/records.sqlite
-server/prisma/Records/records.sqlite-journal
+server/src/prisma/migrations/migration_lock.toml
+server/src/prisma/migrations/20220925090913_auto/migration.sql
+server/src/prisma/Records/records.sqlite
+server/src/prisma/Records/records.sqlite-journal
 
 public/shared
 public/src
 client/src/shared
+yarn.lock
+

@@ -4,45 +4,124 @@ import {
   CircularProgress,
   Container,
   TextField,
-} from '@mui/material'
-import { green, red } from '@mui/material/colors'
-import React, { useState } from 'react'
-import { trpc, useTrpcClient } from '../App'
+  Checkbox,
+  FormControlLabel,
+  Typography,
+} from '@mui/material';
+import { green, red } from '@mui/material/colors';
+import React, { useState, useEffect } from 'react';
+import { trpc, useTrpcClient } from '../App.js';
+import dayjs from 'dayjs';
 
-import { requestWrapper } from '../components/requestWrapper'
+import { requestWrapper } from '../components/requestWrapper.js';
 
 export const Admin = () => {
-  const trpcClient = useTrpcClient()
+  const trpcClient = useTrpcClient();
 
-  const config = trpc.useQuery(['config.get'])
-  const setConfig = trpc.useMutation(['config.set'])
+  // ✅ New v10-style hooks
+  const setConfig = trpc.config.set.useMutation();
+  const loading = setConfig.isPending;
+  const config = trpc.config.get.useQuery(undefined);
+  const [isEndOfDayLoading, setIsEndOfDayLoading] = useState(false);
+  const [isLoadingEventDate, setIsLoadingEventDate] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
-  const [newConfig, setNewConfig] = useState(config.data || {})
-  const loading = setConfig.status === 'loading'
+  // Initialize newConfig with default values to prevent undefined errors
+  const [newConfig, setNewConfig] = useState({
+    eventId: '',
+    eventName: '',
+    eventDate: '',
+    uploadLiveTiming: false,
+    liveTimingOutputPath: ''
+  });
 
-  const requestErrors = requestWrapper({ config })
-  if (requestErrors) return requestErrors
-  if (!config.data) return null // This will never be called, but it is needed to make typescript happy
+  // Update newConfig when config.data changes
+  useEffect(() => {
+    if (config.data) {
+      setNewConfig({
+        eventId: config.data.eventId || '',
+        eventName: config.data.eventName || '',
+        eventDate: config.data.eventDate || '',
+        uploadLiveTiming: config.data.uploadLiveTiming || false,
+        liveTimingOutputPath: config.data.liveTimingOutputPath || ''
+      });
+    }
+  }, [config.data]);
+
+  const requestErrors = requestWrapper({ config });
+  if (requestErrors) return requestErrors;
+  if (!config.data) return null;
+
+  // Function to fetch event date
+  const fetchEventDate = async () => {
+    setIsLoadingEventDate(true);
+    try {
+      // Get the event name from the configuration
+      const eventName = config.data?.eventName || '';
+      
+      // Update the newConfig with the event name
+      setNewConfig(prev => ({
+        ...prev,
+        eventName: eventName
+      }));
+    } catch (error) {
+      console.error('Failed to get event name from configuration:', error);
+      // If we can't get the event name, use a default name with the current date
+      const currentDate = dayjs().format('MMMM D, YYYY');
+      setNewConfig(prev => ({
+        ...prev,
+        eventName: currentDate
+      }));
+    } finally {
+      setIsLoadingEventDate(false);
+      setInitialLoadDone(true);
+    }
+  };
+
+  // If we haven't done the initial load yet, do it now
+  if (!initialLoadDone && config.data) {
+    // Use requestAnimationFrame to schedule this for the next frame
+    // This avoids React hooks errors
+    requestAnimationFrame(() => {
+      fetchEventDate();
+    });
+  }
+
+  // Function to handle saving the configuration
+  const handleSave = async () => {
+    try {
+      // Save the configuration and get the updated values
+      const result = await setConfig.mutateAsync(newConfig);
+      
+      // Update the state with the returned values
+      setNewConfig({
+        eventId: result.eventId,
+        eventName: result.eventName,
+        eventDate: result.eventDate,
+        uploadLiveTiming: result.uploadLiveTiming,
+        liveTimingOutputPath: result.liveTimingOutputPath
+      });
+    } catch (error) {
+      console.error('Failed to save configuration:', error);
+    }
+  };
 
   const buttonSx = {
     ...(setConfig.status === 'success' && {
       bgcolor: green[500],
-      '&:hover': {
-        bgcolor: green[700],
-      },
+      '&:hover': { bgcolor: green[700] },
     }),
     ...(setConfig.status === 'error' && {
       bgcolor: red[500],
-      '&:hover': {
-        bgcolor: red[700],
-      },
+      '&:hover': { bgcolor: red[700] },
     }),
-  }
+  };
 
   return (
-    <Container>
-      <h1>TODO: Protect this page auth of some kind</h1>
-
+    <Container maxWidth="sm" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Admin Panel
+      </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
           required
@@ -50,20 +129,58 @@ export const Admin = () => {
           label="Event ID"
           defaultValue={config.data.eventId}
           onChange={(e) => {
-            setConfig.reset() // Reset the mutate status, removes the green button
-            setNewConfig({ ...newConfig, eventId: e.target.value })
+            setConfig.reset();
+            setNewConfig({ ...newConfig, eventId: e.target.value });
           }}
         />
         <TextField
-          required
           fullWidth
           label="Event Name"
-          defaultValue={config.data.eventName}
-          onChange={(e) => {
-            setConfig.reset() // Reset the mutate status, removes the green button
-            setNewConfig({ ...newConfig, eventName: e.target.value })
+          value={newConfig.eventName || ''}
+          InputProps={{
+            readOnly: true,
+            endAdornment: isLoadingEventDate ? (
+              <CircularProgress size={20} />
+            ) : null,
           }}
         />
+      </Box>
+      <Box mt={4} p={2} border={1} borderRadius={2}>
+        <Typography variant="h6" gutterBottom>
+          Live Timing Settings
+        </Typography>
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={!!newConfig.uploadLiveTiming}
+              onChange={(e) =>
+                setNewConfig({
+                  ...newConfig,
+                  uploadLiveTiming: e.target.checked,
+                })
+              }
+            />
+          }
+          label="Upload Live Timing"
+        />
+
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Live Timing Output Path"
+          value={newConfig.liveTimingOutputPath || ''}
+          onChange={(e) =>
+            setNewConfig({
+              ...newConfig,
+              liveTimingOutputPath: e.target.value,
+            })
+          }
+        />
+
+        <Typography variant="body2" color="textSecondary" mt={1}>
+          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/{newConfig.eventDate || dayjs().format('YYYY-MM-DD')}/api/simple/
+        </Typography>
       </Box>
 
       <Box sx={{ m: 1, position: 'relative' }}>
@@ -71,9 +188,7 @@ export const Admin = () => {
           variant="contained"
           disabled={loading}
           sx={buttonSx}
-          onClick={() => {
-            setConfig.mutate(newConfig)
-          }}
+          onClick={handleSave}
         >
           Save
         </Button>
@@ -94,18 +209,23 @@ export const Admin = () => {
       <Box sx={{ m: 1, position: 'relative' }}>
         <Button
           variant="contained"
-          disabled={loading}
+          disabled={isEndOfDayLoading}
           sx={buttonSx}
           onClick={async () => {
-            const data = await trpcClient.query('endofdayresults.generate')
-            const mediaType =
-              'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,'
-            window.location.href = `${mediaType}${data.xlsx}`
+            setIsEndOfDayLoading(true);
+            try {
+              const data = await trpcClient.endofdayresults.generate.query();
+              const mediaType =
+                'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,';
+              window.location.href = `${mediaType}${data.xlsx}`;
+            } finally {
+              setIsEndOfDayLoading(false);
+            }
           }}
         >
           End of Day Results
         </Button>
-        {loading && (
+        {isEndOfDayLoading && (
           <CircularProgress
             size={24}
             sx={{
@@ -120,5 +240,5 @@ export const Admin = () => {
         )}
       </Box>
     </Container>
-  )
-}
+  );
+};

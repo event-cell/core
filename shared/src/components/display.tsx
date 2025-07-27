@@ -23,12 +23,12 @@ import {
   getGlobalBestFinish,
   type GetBestFinish,
   getBestN,
-} from '../logic'
+} from '../logic/index.js'
 
-import { Competitor, CompetitorList } from 'server/src/router/objects'
+import { Competitor, CompetitorList } from 'server/src/router/objects.js'
 
-export * from './display/CompetitorList'
-export * from './display/OnTrack'
+export * from './display/CompetitorList.js'
+export * from './display/OnTrack.js'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -113,10 +113,17 @@ export const RenderInfo: FC<{
 
   const { classIndex } = currentRun
 
-  const idx = currentRun.times.length - 1
-  const splits = currentRun.times[idx]!
-
-  const times = calculateTimes(splits)
+  // Check if there are any times
+  const hasTimes = currentRun.times.length > 0;
+  
+  // Only calculate times if there are any
+  let times = { sector1: 0, sector2: 0, sector3: 0, finish: 0 };
+  if (hasTimes) {
+    const idx = currentRun.times.length - 1;
+    const splits = currentRun.times[idx]!;
+    times = calculateTimes(splits);
+  }
+  
   const personalBest = getPersonalBestSectors(currentRun)
   const classBest = getClassBestSectors(classIndex, allRuns)
 

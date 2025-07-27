@@ -1,11 +1,11 @@
 import Timer from '@mui/icons-material/Timer'
 import { Typography, Box, Chip } from '@mui/material'
 import React, { FC, useMemo } from 'react'
-import { CompetitorList } from 'server/src/router/objects'
-import { CompetitorTable } from '../table'
-import { DisplayHeader } from './header'
-import { getDisplayNumber, splitDisplay } from '../../logic/displays'
-import { getPersonalBestSectors } from '../../logic'
+import { CompetitorList } from 'server/src/router/objects.js'
+import { CompetitorTable } from '../table.js'
+import { DisplayHeader } from './header.js'
+import { getDisplayNumber, splitDisplay } from '../../logic/displays.js'
+import { getPersonalBestSectors } from '../../logic/index.js'
 
 export const DisplayCompetitorList: FC<{
   competitors: CompetitorList

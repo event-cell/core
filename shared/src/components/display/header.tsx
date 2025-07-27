@@ -1,8 +1,6 @@
 import React, { FC } from 'react'
 import { Box } from '@mui/material'
 
-import Image2 from '../../assets/image2.jpeg'
-
 const displayHeaders = {
   1: (
     <Box
@@ -49,14 +47,11 @@ const displayHeaders = {
   ),
   3: (
     <Box
-      component="img"
       sx={{
         gridColumn: '3 / 5',
         height: 75,
         m: 1,
       }}
-      alt="image"
-      src={String(Image2)}
     ></Box>
   ),
   4: (

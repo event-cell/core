@@ -1,50 +1,49 @@
-import { router, TRPCError } from '@trpc/server'
-
-import { event, eventData } from './shared'
+import { initTRPC, TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getCurrentHeat, getHeatInterTableKey } from '../utils'
-import { warn } from 'winston'
+import { setupLogger } from '../utils/index.js'
 
-export const currentCompetitor = router().query('number', {
-  output: z.number().optional(),
-  resolve: async function () {
-    if (!event || !eventData) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Event database not found',
-      })
-    }
+import { event, eventData } from './shared.js'
+import { getCurrentHeat, getHeatInterTableKey } from '../utils/index.js'
 
-    try {
-      const currentHeat = await getCurrentHeat()
-      const heatInterTable = eventData[getHeatInterTableKey(currentHeat)]
+const t = initTRPC.create()
+const logger = setupLogger('currentCompetitor')
 
-      // Find the competitor with the highest C_HOUR2
-      const competitorQuery = await heatInterTable.findMany({
-        select: {
-          C_NUM: true,
-          C_HOUR2: true,
-        },
-        where: {
-          OR: [
-            {
-              C_STATUS: 0,
-            },
-            {
-              C_STATUS: 65536,
-            },
-          ],
-          C_NUM: { not: 0 },
-        },
-        orderBy: {
-          C_HOUR2: 'desc',
-        },
-        take: 1,
-      })
+export async function getCurrentCompetitor() {
+  if (!event || !eventData) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Event database not found',
+    })
+  }
 
-      return competitorQuery[0].C_NUM || undefined
-    } catch (e) {
-      warn(`Error getting current competitor: ${e}`)
-    }
-  },
+  try {
+    const currentHeat = await getCurrentHeat()
+    const heatInterTable = eventData[getHeatInterTableKey(currentHeat)]
+
+    const competitorQuery = await (heatInterTable as any).findMany({
+      select: {
+        C_NUM: true,
+        C_HOUR2: true,
+      },
+      where: {
+        OR: [{ C_STATUS: 0 }, { C_STATUS: 65536 }],
+        C_NUM: { not: 0 },
+      },
+      orderBy: {
+        C_HOUR2: 'desc',
+      },
+      take: 1,
+    })
+
+    return competitorQuery[0]?.C_NUM || 1
+  } catch (e) {
+    logger.warn(`Error getting current competitor: ${e}`)
+    return 1
+  }
+}
+
+export const currentCompetitor = t.router({
+  number: t.procedure.output(z.number()).query(() => getCurrentCompetitor()),
 })
+
+export type GetCurrentCompetitorReturn = number

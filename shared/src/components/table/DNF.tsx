@@ -1,16 +1,16 @@
 import React, { FC } from 'react'
 
 import { Chip } from '@mui/material'
-import Grid2 from '@mui/material/Unstable_Grid2'
+import Grid from '@mui/material/Grid'
 import CarCrash from '@mui/icons-material/CarCrash'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index'
+import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index.js'
 
 export const DNF: FC<{
   sector1: string
   sector2: string
 }> = ({ sector1, sector2 }) => (
-  <Grid2
+  <Grid
     container
     spacing={0.25}
     sx={{
@@ -18,7 +18,7 @@ export const DNF: FC<{
       width: MAIN_WIDTH,
     }}
   >
-    <Grid2 xs={12} display="flex" justifyContent="center" alignItems="center">
+    <Grid size={{xs:12}} display="flex" justifyContent="center" alignItems="center">
       <Chip
         label="DNF"
         variant="outlined"
@@ -26,12 +26,12 @@ export const DNF: FC<{
         size="small"
         icon={<CarCrash />}
       />
-    </Grid2>
-    <Grid2 xs={6} display="flex" justifyContent="left" alignItems="center">
+    </Grid>
+    <Grid size={{xs:6}} display="flex" justifyContent="left" alignItems="center">
       {sector1}
-    </Grid2>
-    <Grid2 xs={6} display="flex" justifyContent="right" alignItems="center">
+    </Grid>
+    <Grid size={{xs:6}} display="flex" justifyContent="right" alignItems="center">
       {sector2}
-    </Grid2>
-  </Grid2>
+    </Grid>
+  </Grid>
 )

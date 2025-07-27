@@ -1,4 +1,4 @@
-import { CompetitorList } from 'server/src/router/objects'
+import { CompetitorList } from 'server/src/router/objects.js'
 
 export interface ClassType {
   drivers: CompetitorList
@@ -9,7 +9,8 @@ export const getDisplayNumber = (): number => {
   if (
     typeof window === 'undefined' ||
     window.location.pathname === '/display' ||
-    !window.location.pathname.includes('/display/')
+    !window.location.pathname.includes('/display/') ||
+    window.location.pathname.split('/')[1].includes('-')
   )
     return 0
 
@@ -43,7 +44,8 @@ export function splitDisplay(classesList: ClassType[]) {
   if (
     typeof window == 'undefined' ||
     window.location.pathname === '/display' ||
-    !window.location.pathname.includes('/display/')
+    !window.location.pathname.includes('/display/') ||
+    window.location.pathname.split('/')[1].includes('-')
   )
     return classesList
 
