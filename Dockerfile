@@ -13,9 +13,6 @@ ENV NODE_PATH=/app/node_modules
 ENV PORT=80
 EXPOSE 80
 
-# Copy debug test file
-COPY server/src/debug-test.js ./server/dist/server/debug-test.js
-
-# Temporarily run debug test instead of main server
-CMD [ "node", "./server/dist/server/debug-test.js" ]
+# Run the main server
+CMD [ "node", "./server/dist/server/index.js" ]
 
