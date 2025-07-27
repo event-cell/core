@@ -104,7 +104,7 @@ async function generateEventsMetadata() {
         config.rsyncRemotePath
       ) {
         // Check the website's site-metadata.json file
-        const checkMetadataCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "stat -c %Y ${config.rsyncRemotePath}/site-metadata.json"`
+        const checkMetadataCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "stat -c %Y ${config.rsyncRemotePath}/site-metadata.json"`
         const { stdout } = await execPromise(checkMetadataCommand)
         const metadataTimestamp = parseInt(stdout.trim(), 10) * 1000 // Convert to milliseconds
         const metadataDate = new Date(metadataTimestamp)
@@ -127,7 +127,7 @@ async function generateEventsMetadata() {
               )
             } else {
               // Check the metadata.json file within each event directory
-              const sshCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "stat -c %Y ${config.rsyncRemotePath}/${dir}/metadata.json"`
+              const sshCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "stat -c %Y ${config.rsyncRemotePath}/${dir}/metadata.json"`
               const { stdout } = await execPromise(sshCommand)
               const timestamp = parseInt(stdout.trim(), 10) * 1000 // Convert to milliseconds
 
@@ -194,7 +194,7 @@ async function generateEventsMetadata() {
       config.rsyncRemotePath
     ) {
       const remotePath = join(config.rsyncRemotePath, 'site-metadata.json')
-      const rsyncCommand = `rsync -avz --delete -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no" ${metadataPath} ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${remotePath}`
+      const rsyncCommand = `rsync -avz --delete -e "ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no" ${metadataPath} ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${remotePath}`
 
       try {
         const { stdout, stderr } = await execPromise(rsyncCommand)
@@ -258,7 +258,7 @@ async function syncLiveTimingData() {
       )
 
       // Create remote directories if they don't exist
-      const mkdirCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${eventRemotePath} ${liveTimingRemotePath}"`
+      const mkdirCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${eventRemotePath} ${liveTimingRemotePath}"`
       try {
         await execPromise(mkdirCommand)
         logger.info('Created remote directories if they did not exist')
