@@ -11,8 +11,11 @@ RUN corepack enable
 # Create default config file
 RUN echo '{}' > ./server/dist/config.json
 
+# Change to server directory for proper module resolution
+WORKDIR /app/server
+
 ENV PORT=80
 EXPOSE 80
 
-CMD [ "node", "./server/dist/server/index.js" ]
+CMD [ "node", "./dist/server/index.js" ]
 
