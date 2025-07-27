@@ -14,10 +14,73 @@ import { executeScheduledTasks } from './scheduledTasks/index.js'
 import { getCurrentHeat, setupLogger } from './utils/index.js'
 import { getCompetitorJSON } from './router/shared.js'
 import { getCurrentCompetitor } from './router/currentCompetitor.js'
+import { readFileSync, writeFileSync, chmodSync } from 'fs'
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+
+// Function to setup SSH key with proper permissions
+async function setupSshKey(): Promise<void> {
+  try {
+    const configPath = process.env.CONFIG_PATH || '/data/config.json'
+    if (!existsSync(configPath)) {
+      logger.info('No config file found, skipping SSH key setup')
+      return
+    }
+
+    const config = JSON.parse(readFileSync(configPath, 'utf8')) as { rsyncSshKeyPath?: string }
+    if (!config.rsyncSshKeyPath) {
+      logger.info('No SSH key path in config, skipping SSH key setup')
+      return
+    }
+
+    // Check if the source key file exists
+    if (!existsSync(config.rsyncSshKeyPath)) {
+      logger.warn(`SSH key file not found: ${config.rsyncSshKeyPath}`)
+      return
+    }
+
+    // Create .ssh directory in container
+    const sshDir = '/app/.ssh'
+    if (!existsSync(sshDir)) {
+      const { execSync } = await import('child_process')
+      execSync(`mkdir -p ${sshDir}`)
+      logger.info(`Created SSH directory: ${sshDir}`)
+    }
+
+    // Copy key to container with proper permissions
+    const containerKeyPath = `${sshDir}/id_rsa`
+
+    // Check if we need to copy the key (if it doesn't exist or has wrong permissions)
+    let needsCopy = true
+    if (existsSync(containerKeyPath)) {
+      try {
+        const stats = require('fs').statSync(containerKeyPath)
+        const mode = stats.mode & 0o777
+        if (mode === 0o600) {
+          needsCopy = false
+          logger.info('SSH key already exists with correct permissions')
+        }
+      } catch (error) {
+        logger.warn('Could not check key permissions, will copy anyway')
+      }
+    }
+
+    if (needsCopy) {
+      const keyContent = readFileSync(config.rsyncSshKeyPath, 'utf8')
+      writeFileSync(containerKeyPath, keyContent)
+      chmodSync(containerKeyPath, 0o600) // Set 600 permissions
+      logger.info(`SSH key copied to container and permissions set: ${containerKeyPath}`)
+    }
+
+    // Update config to use the container key path
+    config.rsyncSshKeyPath = containerKeyPath
+    writeFileSync(configPath, JSON.stringify(config, null, 2))
+  } catch (error) {
+    logger.error('Error setting up SSH key:', error)
+  }
+}
 
 const logger = setupLogger('server')
 
@@ -64,6 +127,9 @@ const app = express()
 
   ; (async () => {
     await setup()
+
+    // Setup SSH key with proper permissions
+    await setupSshKey()
 
     // Log working directory and paths
     const workingDir = cwd()
