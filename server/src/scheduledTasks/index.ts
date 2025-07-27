@@ -276,7 +276,7 @@ async function syncLiveTimingData() {
       ]
 
       for (const { source, dest } of paths) {
-        const rsyncCommand = `rsync -avz --delete -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no" ${source}/* ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${dest}/`
+        const rsyncCommand = `rsync -avz --delete -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=yes -o IdentitiesOnly=no" ${source}/* ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${dest}/`
 
         logger.info(`Executing rsync command: ${rsyncCommand}`)
         const { stdout, stderr } = await execPromise(rsyncCommand)
@@ -297,19 +297,19 @@ async function syncLiveTimingData() {
 
           // First ensure the parent directory exists
           const parentDir = path.dirname(displayRemotePath)
-          const mkdirParentCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${parentDir}"`
+          const mkdirParentCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=yes -o IdentitiesOnly=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${parentDir}"`
 
           try {
             await execPromise(mkdirParentCommand)
             logger.info(`Created parent directory at ${parentDir}`)
 
             // Now create the display directory
-            const mkdirDisplayCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${displayRemotePath}"`
+            const mkdirDisplayCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=yes -o IdentitiesOnly=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${displayRemotePath}"`
             await execPromise(mkdirDisplayCommand)
             logger.info(`Created display directory at ${displayRemotePath}`)
 
             // Sync UI files to display directory
-            const uiRsyncCommand = `rsync -avz --delete -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no" ${uiSourcePath}/* ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${displayRemotePath}/`
+            const uiRsyncCommand = `rsync -avz --delete -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PubkeyAuthentication=yes -o IdentitiesOnly=no" ${uiSourcePath}/* ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${displayRemotePath}/`
 
             const { stderr } = await execPromise(uiRsyncCommand)
             if (stderr) {

@@ -80,7 +80,25 @@ const app = express()
     // We only want to serve the UI in production. In development, we will handle it
     // elsewhere
     if (existsSync(uiPath)) {
-      app.use(express.static(uiPath))
+      // Serve static files with cache control headers
+      app.use(express.static(uiPath, {
+        setHeaders: (res, path) => {
+          // HTML files should not be cached
+          if (path.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+            res.setHeader('Pragma', 'no-cache')
+            res.setHeader('Expires', '0')
+          }
+          // Assets with hashes can be cached longer
+          else if (path.includes('-') && (path.endsWith('.js') || path.endsWith('.css'))) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000') // 1 year
+          }
+          // Other assets get shorter cache
+          else {
+            res.setHeader('Cache-Control', 'public, max-age=3600') // 1 hour
+          }
+        }
+      }))
       logger.info('Serving UI from:', uiPath)
     } else {
       logger.info('UI not found, skipping static serving')
