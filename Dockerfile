@@ -17,7 +17,7 @@ COPY server/src/prisma ./server/src/prisma/
 
 # Generate Prisma client
 WORKDIR /app/server
-RUN yarn prismaGenerate
+RUN npx prisma generate --schema=./src/prisma/schemaEvent.prisma && npx prisma generate --schema=./src/prisma/schemaEventData.prisma && npx prisma generate --schema=./src/prisma/schemaRecords.prisma && npx prisma generate --schema=./src/prisma/schemaOnline.prisma
 
 # Copy the built server files from the build artifact
 COPY server/dist ./server/dist
