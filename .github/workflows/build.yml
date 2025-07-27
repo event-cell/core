@@ -86,6 +86,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/event-cell/core:main
+          tags: ghcr.io/event-cell/core:debug
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Test debug image
+        run: |
+          echo "Testing the debug image..."
+          docker run --rm ghcr.io/event-cell/core:debug
