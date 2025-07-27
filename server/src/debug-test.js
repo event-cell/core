@@ -13,6 +13,14 @@ try {
     console.log('❌ express import failed:', error.message)
     console.log('Error code:', error.code)
     console.log('Error stack:', error.stack)
+
+    // Try to manually resolve the module path using import.meta.resolve
+    try {
+        const resolvedPath = await import.meta.resolve('express')
+        console.log('Import.meta.resolve result:', resolvedPath)
+    } catch (resolveError) {
+        console.log('Import.meta.resolve failed:', resolveError.message)
+    }
 }
 
 // Try to import cors with error handling
@@ -40,5 +48,25 @@ console.log('Checking node_modules locations:')
 possiblePaths.forEach(p => {
     console.log(`  ${p}: ${fs.existsSync(p) ? 'EXISTS' : 'NOT FOUND'}`)
 })
+
+// Check if express package.json exists
+const expressPackagePaths = [
+    '/app/node_modules/express/package.json',
+    path.join(process.cwd(), 'node_modules', 'express', 'package.json')
+]
+
+console.log('Checking express package.json:')
+expressPackagePaths.forEach(p => {
+    console.log(`  ${p}: ${fs.existsSync(p) ? 'EXISTS' : 'NOT FOUND'}`)
+})
+
+// Try absolute path import
+try {
+    console.log('Trying absolute path import...')
+    const express = await import('/app/node_modules/express/index.js')
+    console.log('✅ Absolute path import successful')
+} catch (error) {
+    console.log('❌ Absolute path import failed:', error.message)
+}
 
 console.log('=== END WINDOWS DEBUG TEST ===') 
