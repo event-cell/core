@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { existsSync, statSync } from 'fs'
 
 import { PrismaClient as pcEvent } from './prisma/generated/event/index.js'
 import { PrismaClient as pcEventData } from './prisma/generated/eventData/index.js'
@@ -18,14 +19,23 @@ export function getEventDatabases(eventId: string): EventDB {
   let online: EventDB['online'] = null
 
   try {
-    online = new pcOnline({
-      datasources: {
-        db: {
-          url: `file:${join(eventPath, `Online.scdb`)}`,
+    // Check if the Online.scdb file exists and has content
+    const onlineDbPath = join(eventPath, `Online.scdb`)
+
+    if (existsSync(onlineDbPath) && statSync(onlineDbPath).size > 0) {
+      online = new pcOnline({
+        datasources: {
+          db: {
+            url: `file:${onlineDbPath}`,
+          },
         },
-      },
-    })
-  } catch {}
+      })
+    } else {
+      console.warn('Online.scdb file is empty or does not exist, skipping online database connection')
+    }
+  } catch (error) {
+    console.warn('Failed to connect to online database:', error)
+  }
 
   return {
     online,

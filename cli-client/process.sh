@@ -8,7 +8,7 @@
 
 # Process event IDs from 10 to 15 with a custom delay
 echo "Processing event IDs from 10 to 15 with a custom delay..."
-yarn start process-events -s 01 -e 58 -d 2000
+yarn start process-events -s 81 -e 86 -d 2000 -u http://localhost:3000
 # Process event IDs from 20 to 25 with a custom server URL
 # echo "Processing event IDs from 20 to 25 with a custom server URL..."
 # yarn start process-events -s 20 -e 25 -u http://example.com 

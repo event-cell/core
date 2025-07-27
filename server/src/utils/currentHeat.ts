@@ -19,16 +19,24 @@ export const getHeatInterTableKey = (heat: number): HeatInterTableKey => {
 export async function getCurrentHeat() {
   try {
     if (!online) return 1
-    const heatRow = await online.tPARAMETERS.findUnique({
-      where: {
-        C_PARAM: 'HEAT',
-      },
-      select: {
-        C_VALUE: true,
-      },
-    })
-    const currentHeat = parseInt(heatRow?.C_VALUE || '0')
-    return currentHeat
+
+    // Check if the online database has the TPARAMETERS table
+    try {
+      const heatRow = await online.tPARAMETERS.findUnique({
+        where: {
+          C_PARAM: 'HEAT',
+        },
+        select: {
+          C_VALUE: true,
+        },
+      })
+      const currentHeat = parseInt(heatRow?.C_VALUE || '0')
+      return currentHeat
+    } catch (dbError) {
+      // If the table doesn't exist or database is empty, return default heat
+      console.warn('Online database table not available, using default heat 1:', dbError)
+      return 1
+    }
   } catch (e) {
     console.error('Failed to fetch current heat', e)
     return 1
