@@ -107,7 +107,7 @@ async function getEventDirectories(): Promise<string[]> {
     }
 
     // Use SSH to list directories on the remote server
-    const sshCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "ls -la ${config.rsyncRemotePath}/ | grep '^d' | grep -E '^d.*[0-9]{4}-[0-9]{2}-[0-9]{2}$' | awk '{print \\$9}'"`
+    const sshCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "ls -la ${config.rsyncRemotePath}/ | grep '^d' | grep -E '^d.*[0-9]{4}-[0-9]{2}-[0-9]{2}$' | awk '{print \\$9}'"`
 
     logger.info(`Executing SSH command to list directories: ${sshCommand}`)
     const { stdout, stderr } = await execPromise(sshCommand)
@@ -160,7 +160,7 @@ async function getMetadataMap(
         )
         const fetchStartTime = Date.now()
 
-        const sshCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "cat ${config.rsyncRemotePath}/${dateStr}/metadata.json"`
+        const sshCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "cat ${config.rsyncRemotePath}/${dateStr}/metadata.json"`
         const { stdout } = await execPromise(sshCommand)
         metadataMap[dateStr] = JSON.parse(stdout)
 
@@ -262,7 +262,7 @@ async function writeMetadataFile(destinationPath: string, eventId: string) {
         destinationPath,
         'metadata.json',
       )
-      const checkCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "test -f ${remotePath} && echo exists"`
+      const checkCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "test -f ${remotePath} && echo exists"`
 
       const { stdout } = await execPromise(checkCommand)
       if (stdout.trim() === 'exists') {
@@ -317,12 +317,12 @@ async function writeMetadataFile(destinationPath: string, eventId: string) {
         destinationPath,
         'metadata.json',
       )
-      const rsyncCommand = `rsync -avz --delete -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no" ${eventMetadataFilePath} ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${remotePath}`
+      const rsyncCommand = `rsync -avz --delete -e "ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no" ${eventMetadataFilePath} ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${remotePath}`
 
       try {
         // Create remote directory if it doesn't exist
         const remoteDir = dirname(remotePath)
-        const mkdirCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${remoteDir}"`
+        const mkdirCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${remoteDir}"`
         await execPromise(mkdirCommand)
         logger.info(`Created remote directory ${remoteDir} if it did not exist`)
         const { stdout, stderr } = await execPromise(rsyncCommand)

@@ -31,7 +31,7 @@ export class RsyncService {
       // For directories or files with a parent directory, create parent directories
       if (!options.isFile || dirname(destination) !== '.') {
         const parentDir = options.isFile ? dirname(destination) : destination
-        const mkdirCommand = `ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${parentDir}"`
+        const mkdirCommand = `ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no ${config.rsyncRemoteUser}@${config.rsyncRemoteHost} "mkdir -p ${parentDir}"`
         logger.info(`Creating parent directories: ${mkdirCommand}`)
         await execAsync(mkdirCommand)
       }
@@ -59,7 +59,7 @@ export class RsyncService {
       }
 
       // Add SSH options
-      command += ` -e "ssh -i ${config.rsyncSshKeyPath} -o StrictHostKeyChecking=no"`
+      command += ` -e "ssh -i /app/.ssh/id_rsa -o StrictHostKeyChecking=no"`
 
       // Add source and destination
       if (options.isFile) {
