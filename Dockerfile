@@ -5,17 +5,13 @@ WORKDIR /app
 # Copy everything needed (controlled by .dockerignore)
 COPY . .
 
-# Enable Corepack for Yarn 4
-RUN corepack enable
-
 # Create default config file
 RUN echo '{}' > ./server/dist/config.json
 
-# Change to server directory for proper module resolution
-WORKDIR /app/server
-
+# Set NODE_PATH to include root node_modules for proper module resolution
+ENV NODE_PATH=/app/node_modules
 ENV PORT=80
 EXPOSE 80
 
-CMD [ "node", "./dist/server/index.js" ]
+CMD [ "node", "./server/dist/server/index.js" ]
 
