@@ -287,7 +287,7 @@ async function syncLiveTimingData() {
         logger.info(`Successfully synced files to ${dest}`)
 
         // Check and sync UI files to display directory
-        const uiSourcePath = path.join(__dirname, '../../dist/server/ui/')
+        const uiSourcePath = path.join(__dirname, '../ui/')
         if (existsSync(uiSourcePath)) {
           // Construct the display path at the same level as the api directory
           const displayRemotePath = join(

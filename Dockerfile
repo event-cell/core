@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
-# Install rsync for live timing data uploads
-RUN apk add --no-cache rsync
+# Install rsync and openssh-client for live timing data uploads
+RUN apk update && apk add --no-cache rsync openssh
 
 WORKDIR /app
 
