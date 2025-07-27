@@ -262,3 +262,9 @@ client/src/shared
 yarn.lock
 
 web-deploy-config.json
+
+# Event database files
+Events/
+
+# Test data directory
+test-data/

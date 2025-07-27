@@ -1,5 +1,8 @@
 FROM node:22-alpine
 
+# Install rsync for live timing data uploads
+RUN apk add --no-cache rsync
+
 WORKDIR /app
 
 # Copy everything needed (controlled by .dockerignore)
