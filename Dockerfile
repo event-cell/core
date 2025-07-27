@@ -6,6 +6,9 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 COPY server/package.json ./server/
 
+# Enable Corepack for Yarn 4
+RUN corepack enable
+
 # Install dependencies
 RUN yarn install --frozen-lockfile
 
@@ -16,8 +19,8 @@ COPY server/src/prisma ./server/src/prisma/
 WORKDIR /app/server
 RUN yarn prismaGenerate
 
-# Copy the built server files
-COPY server/dist ./dist
+# Copy the built server files from the build artifact
+COPY server/dist ./server/dist
 
 WORKDIR /app
 ENV PORT=80
