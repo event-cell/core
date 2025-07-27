@@ -1,0 +1,6 @@
+{
+  "rsyncRemoteHost": "170.64.246.68",
+  "rsyncRemoteUser": "sdma-web",
+  "rsyncRemotePath": "/home/sdma-web/websites/timing",
+  "rsyncSshKeyPath": "/home/lyall/.ssh/id_rsa_sdma_web"
+}
