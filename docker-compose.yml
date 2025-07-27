@@ -7,11 +7,10 @@ services:
     ports:
       - '80:80'
     volumes:
-      - core-data:/data
+      - type: bind
+        source: "${CORE_DATA}"
+        target: /data
       - type: bind
         source: "${TIMING_DB}"
         target: /app/prisma/Events
         read_only: true
-
-volumes:
-  core-data:
