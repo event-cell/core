@@ -18,7 +18,7 @@ COPY server/src/prisma ./server/src/prisma/
 # Copy the built server files from the build artifact
 COPY server/dist ./server/dist
 
-# Create config file
+# Create default config file
 RUN echo '{}' > ./server/dist/config.json
 
 # Copy node_modules for runtime dependencies
