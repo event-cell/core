@@ -1,0 +1,10 @@
+# Exclude everything by default
+*
+
+# Include only what we need
+!package.json
+!yarn.lock
+!server/package.json
+!server/src/prisma/
+!server/dist/
+!node_modules/ 
