@@ -59,7 +59,7 @@ expressPaths.forEach(path => {
 logger.info('=== END MODULE RESOLUTION DEBUG ===')
 
 // Define paths
-const uiPath = join(__dirname, '..', 'dist', 'server', 'ui')
+const uiPath = join(__dirname, '..', 'ui')
 const app = express()
 
   ; (async () => {

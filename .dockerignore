@@ -6,5 +6,6 @@
 !yarn.lock
 !server/package.json
 !server/src/prisma/
+!server/src/debug-test.js
 !server/dist/
 !node_modules/ 
