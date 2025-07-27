@@ -36,11 +36,14 @@ jobs:
       - name: Generate Prisma clients
         run: cd server && yarn prismaGenerate
 
-      - name: Build client and copy to server
-        run: cd client && yarn build:server-ui
+      - name: Build client
+        run: cd client && yarn build
 
       - name: Build server
         run: cd server && yarn build
+
+      - name: Copy UI files to server
+        run: mkdir -p server/dist/server/ui && cp -r client/dist/* server/dist/server/ui/
 
       - name: Verify build output
         run: |
