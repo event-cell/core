@@ -45,11 +45,17 @@ jobs:
           ls -la server/dist/
           echo "Server dist/server:"
           ls -la server/dist/server/
+          echo "Node modules:"
+          ls -la node_modules/ | head -10
+          echo "Node modules size:"
+          du -sh node_modules/
 
       - uses: actions/upload-artifact@v4
         with:
           name: build
-          path: server/dist
+          path: |
+            server/dist
+            node_modules
 
   docker:
     name: Build Docker File
@@ -66,10 +72,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: build
-          path: server/dist
+          path: .
 
       - name: Display structure of downloaded files
-        run: ls -R
+        run: |
+          echo "Root directory:"
+          ls -la
+          echo "Server dist:"
+          ls -la server/dist/
+          echo "Node modules:"
+          ls -la node_modules/ | head -10
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
