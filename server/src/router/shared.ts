@@ -48,7 +48,7 @@ export async function getCompetitorJSON() {
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
-  const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor) => {
+  const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor: any) => {
     // Check if C_I29 has a value, if not fall back to C_SERIE
     let className = competitor.C_I29 || competitor.C_SERIE || 'N/A';
     
@@ -74,8 +74,8 @@ export async function getCompetitorJSON() {
       }
 
       const run: TimeInfoList = heat
-        .filter((timedRun) => competitors[i].number === timedRun.C_NUM)
-        .map((timedRun) => ({
+        .filter((timedRun: any) => competitors[i].number === timedRun.C_NUM)
+        .map((timedRun: any) => ({
           run: index + 1,
           status: timedRun.C_STATUS || 0,
           ...(timedRun.C_STATUS === 3
