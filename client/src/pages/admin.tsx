@@ -31,8 +31,7 @@ export const Admin = () => {
     eventId: '',
     eventName: '',
     eventDate: '',
-    uploadLiveTiming: false,
-    liveTimingOutputPath: ''
+    uploadLiveTiming: false
   });
 
   // Update newConfig when config.data changes
@@ -42,8 +41,7 @@ export const Admin = () => {
         eventId: config.data.eventId || '',
         eventName: config.data.eventName || '',
         eventDate: config.data.eventDate || '',
-        uploadLiveTiming: config.data.uploadLiveTiming || false,
-        liveTimingOutputPath: config.data.liveTimingOutputPath || ''
+        uploadLiveTiming: config.data.uploadLiveTiming || false
       });
     }
   }, [config.data]);
@@ -58,7 +56,7 @@ export const Admin = () => {
     try {
       // Get the event name from the configuration
       const eventName = config.data?.eventName || '';
-      
+
       // Update the newConfig with the event name
       setNewConfig(prev => ({
         ...prev,
@@ -92,14 +90,13 @@ export const Admin = () => {
     try {
       // Save the configuration and get the updated values
       const result = await setConfig.mutateAsync(newConfig);
-      
+
       // Update the state with the returned values
       setNewConfig({
         eventId: result.eventId,
         eventName: result.eventName,
         eventDate: result.eventDate,
-        uploadLiveTiming: result.uploadLiveTiming,
-        liveTimingOutputPath: result.liveTimingOutputPath
+        uploadLiveTiming: result.uploadLiveTiming
       });
     } catch (error) {
       console.error('Failed to save configuration:', error);
@@ -165,22 +162,7 @@ export const Admin = () => {
           label="Upload Live Timing"
         />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Live Timing Output Path"
-          value={newConfig.liveTimingOutputPath || ''}
-          onChange={(e) =>
-            setNewConfig({
-              ...newConfig,
-              liveTimingOutputPath: e.target.value,
-            })
-          }
-        />
 
-        <Typography variant="body2" color="textSecondary" mt={1}>
-          📁 Preview: {newConfig.liveTimingOutputPath || '/data/live-timing'}/{newConfig.eventDate || dayjs().format('YYYY-MM-DD')}/api/simple/
-        </Typography>
       </Box>
 
       <Box sx={{ m: 1, position: 'relative' }}>
