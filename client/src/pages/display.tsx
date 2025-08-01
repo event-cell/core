@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
 
-import { DisplayCompetitorList, OnTrack } from 'ui-shared'
+import { DisplayCompetitorList, OnTrack, getDisplayNumber } from 'ui-shared'
 
 import { requestWrapper } from '../components/requestWrapper.js'
-import { getDisplayNumber } from 'ui-shared/src/logic/displays.js'
 import { Container } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi.js'
@@ -53,7 +52,7 @@ export const DisplayPage = () => {
   }
 
   const currentDisplayNumber = getDisplayNumber()
-  const shouldDisplayCompetitorList =
+  const shouldDisplayOnTrack =
     currentDisplayNumber === 0 || currentDisplayNumber === 4
 
   // For timing.sdmahillclimb.com.au, if runCount is 0, set it to 1 to ensure competitor list is displayed
@@ -68,7 +67,7 @@ export const DisplayPage = () => {
         />
       )}
 
-      {shouldDisplayCompetitorList && currentCompetitor.data && competitors.data && (
+      {shouldDisplayOnTrack && currentCompetitor.data && competitors.data && (
         <OnTrack
           currentCompetitorId={currentCompetitor.data}
           competitors={competitors.data}

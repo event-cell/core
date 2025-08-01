@@ -73,10 +73,6 @@ async function setupSshKey(): Promise<void> {
       chmodSync(containerKeyPath, 0o600) // Set 600 permissions
       logger.info(`SSH key copied to container and permissions set: ${containerKeyPath}`)
     }
-
-    // Update config to use the container key path
-    config.rsyncSshKeyPath = containerKeyPath
-    writeFileSync(configPath, JSON.stringify(config, null, 2))
   } catch (error) {
     logger.error('Error setting up SSH key:', error)
   }
@@ -146,6 +142,20 @@ const app = express()
     // We only want to serve the UI in production. In development, we will handle it
     // elsewhere
     if (existsSync(uiPath)) {
+      // Serve display assets from the correct location
+      app.use('/display/assets', express.static(join(uiPath, 'assets'), {
+        setHeaders: (res, path) => {
+          // Assets with hashes can be cached longer
+          if (path.includes('-') && (path.endsWith('.js') || path.endsWith('.css'))) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000') // 1 year
+          }
+          // Other assets get shorter cache
+          else {
+            res.setHeader('Cache-Control', 'public, max-age=3600') // 1 hour
+          }
+        }
+      }))
+
       // Serve static files with cache control headers
       app.use(express.static(uiPath, {
         setHeaders: (res, path) => {
@@ -210,6 +220,43 @@ const app = express()
         return
       }
       logger.info('Serving index.html for display route')
+      res.sendFile(join(uiPath, 'index.html'))
+    })
+
+    // Handle specific display routes
+    app.get('/display/1', (req, res) => {
+      if (!existsSync(uiPath)) {
+        res.status(504).send('Server error: The UI has not been built with the server')
+        return
+      }
+      logger.info('Serving index.html for display/1 route')
+      res.sendFile(join(uiPath, 'index.html'))
+    })
+
+    app.get('/display/2', (req, res) => {
+      if (!existsSync(uiPath)) {
+        res.status(504).send('Server error: The UI has not been built with the server')
+        return
+      }
+      logger.info('Serving index.html for display/2 route')
+      res.sendFile(join(uiPath, 'index.html'))
+    })
+
+    app.get('/display/3', (req, res) => {
+      if (!existsSync(uiPath)) {
+        res.status(504).send('Server error: The UI has not been built with the server')
+        return
+      }
+      logger.info('Serving index.html for display/3 route')
+      res.sendFile(join(uiPath, 'index.html'))
+    })
+
+    app.get('/display/4', (req, res) => {
+      if (!existsSync(uiPath)) {
+        res.status(504).send('Server error: The UI has not been built with the server')
+        return
+      }
+      logger.info('Serving index.html for display/4 route')
       res.sendFile(join(uiPath, 'index.html'))
     })
 

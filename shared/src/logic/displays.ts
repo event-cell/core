@@ -33,11 +33,15 @@ export const splitDisplayLogic = ({
   itemsPerScreen: number
 }): ItemizedClassType[] =>
   classesList.filter(
-    (classInfo) =>
-      // If the class was not on the last screen
-      classInfo.startItem >= (screenIndex - 1) * itemsPerScreen &&
-      // If the class is not large enough to be on the next screen
-      classInfo.startItem < screenIndex * itemsPerScreen,
+    (classInfo) => {
+      const classStart = classInfo.startItem
+      const classEnd = classInfo.startItem + classInfo.drivers.length - 1
+      const screenStart = (screenIndex - 1) * itemsPerScreen
+      const screenEnd = screenIndex * itemsPerScreen - 1
+
+      // Check if this class overlaps with the current screen
+      return classStart <= screenEnd && classEnd >= screenStart
+    }
   )
 
 export function splitDisplay(classesList: ClassType[]) {
