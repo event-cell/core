@@ -164,18 +164,7 @@ const displayHeaders = {
           >
             Live Timing
           </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'text.secondary',
-              fontSize: '0.7rem',
-              fontWeight: '500',
-              letterSpacing: '0.3px',
-              opacity: 0.8,
-            }}
-          >
-            Real-time Results
-          </Typography>
+
         </Box>
         <Box
           sx={{
