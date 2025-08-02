@@ -365,7 +365,7 @@ export const RenderInfo: FC<{
                       fontWeight: 500,
                       lineHeight: 1.4,
                       '&::marker': {
-                        content: `"${index + 4}."`,
+                        content: `"${index + 4}. "`,
                         fontWeight: 'bold',
                         color: 'white',
                       },
