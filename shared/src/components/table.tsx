@@ -83,14 +83,18 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
 export const CompetitorTable: FC<{
   data: Competitor[]
   runCount: number
-}> = ({ data, runCount }) => {
-  console.log(data)
-  
+  maxRows?: number
+}> = ({ data, runCount, maxRows }) => {
+
   // Check if there are any valid run times
-  const hasValidRunTimes = data.some(competitor => 
+  const hasValidRunTimes = data.some(competitor =>
     competitor.times.some(time => time && time.time > 0)
-  );
-  
+  )
+
+  // Limit data to maxRows if specified
+  const displayData = maxRows ? data.slice(0, maxRows) : data
+  const hasMoreRows = maxRows && data.length > maxRows
+
   return (
     <TableContainer component={Paper}>
       <MUITable sx={{ minWidth: 640 }} size="small">
@@ -109,7 +113,7 @@ export const CompetitorTable: FC<{
         </TableHead>
 
         <TableBody>
-          {data.map((row) => (
+          {displayData.map((row) => (
             <TableRow key={row.number}>
               <TableCell width={240}>
                 <Box
@@ -192,6 +196,20 @@ export const CompetitorTable: FC<{
               )}
             </TableRow>
           ))}
+
+          {/* Show indicator if more rows exist */}
+          {hasMoreRows && (
+            <TableRow>
+              <TableCell colSpan={hasValidRunTimes ? 2 + runCount : 2} sx={{
+                textAlign: 'center',
+                fontStyle: 'italic',
+                color: 'text.secondary',
+                fontSize: '0.8rem'
+              }}>
+                ... and {data.length - maxRows!} more competitors
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </MUITable>
     </TableContainer>

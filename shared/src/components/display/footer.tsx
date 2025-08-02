@@ -26,7 +26,7 @@ const liveTimingBanner = (
                 sx={{
                     fontWeight: '800',
                     color: 'primary.main',
-                    fontSize: '1.4rem',
+                    fontSize: '2.8rem',
                     letterSpacing: '0.5px',
                     textTransform: 'uppercase',
                     textShadow: '0 1px 2px rgba(25, 118, 210, 0.2)',
@@ -52,16 +52,16 @@ const liveTimingBanner = (
                 },
             }}
         >
-                         <QRCodeSVG
-                 value="https://timing.sdmahillclimb.com.au"
-                 size={120}
-                 level="M"
-                 includeMargin={true}
-                 style={{
-                     borderRadius: '8px',
-                     boxShadow: '0 4px 12px rgba(25, 118, 210, 0.15)',
-                 }}
-             />
+            <QRCodeSVG
+                value="https://timing.sdmahillclimb.com.au"
+                size={120}
+                level="M"
+                includeMargin={true}
+                style={{
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.15)',
+                }}
+            />
         </Box>
     </Box>
 )

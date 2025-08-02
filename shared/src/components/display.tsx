@@ -29,6 +29,7 @@ import { Competitor, CompetitorList } from 'server/src/router/objects.js'
 
 export * from './display/CompetitorList.js'
 export * from './display/OnTrack.js'
+export * from './display/footer.js'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -85,8 +86,8 @@ function RenderSector({
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
         {time > 0 &&
-        sectorPB !== defaultBest &&
-        sectorPB - defaultBest !== deltaPB
+          sectorPB !== defaultBest &&
+          sectorPB - defaultBest !== deltaPB
           ? deltaPB > 0
             ? '+' + (deltaPB / 1000).toFixed(2)
             : (deltaPB / 1000).toFixed(2)
@@ -94,8 +95,8 @@ function RenderSector({
       </TableCell>
       <TableCell sx={{ fontSize: tableFontSizeLarge }}>
         {time > 0 &&
-        bestSector !== defaultBest &&
-        bestSector - defaultBest !== deltaClassLeader
+          bestSector !== defaultBest &&
+          bestSector - defaultBest !== deltaClassLeader
           ? deltaClassLeader > 0
             ? '+' + (deltaClassLeader / 1000).toFixed(2)
             : (deltaClassLeader / 1000).toFixed(2)
@@ -115,7 +116,7 @@ export const RenderInfo: FC<{
 
   // Check if there are any times
   const hasTimes = currentRun.times.length > 0;
-  
+
   // Only calculate times if there are any
   let times = { sector1: 0, sector2: 0, sector3: 0, finish: 0 };
   if (hasTimes) {
@@ -123,7 +124,7 @@ export const RenderInfo: FC<{
     const splits = currentRun.times[idx]!;
     times = calculateTimes(splits);
   }
-  
+
   const personalBest = getPersonalBestSectors(currentRun)
   const classBest = getClassBestSectors(classIndex, allRuns)
 

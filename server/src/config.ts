@@ -25,6 +25,10 @@ export const ConfigType = z
     rsyncRemoteUser: z.string().optional(),
     rsyncRemotePath: z.string().optional(),
     rsyncSshKeyPath: z.string().optional(),
+    // Display distribution configuration
+    displayDistribution: z.object({
+      maxRowsPerDisplay: z.number().min(1).optional(),
+    }).optional(),
   })
   .deepPartial()
 export type ConfigType = z.infer<typeof ConfigType>
@@ -44,6 +48,11 @@ class Config {
   public rsyncRemoteUser = ''
   public rsyncRemotePath = ''
   public rsyncSshKeyPath = '/data/.ssh/id_rsa'
+
+  // Display distribution configuration defaults
+  public displayDistribution = {
+    maxRowsPerDisplay: 20,
+  }
 
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
@@ -115,6 +124,14 @@ class Config {
     if (config.rsyncRemoteUser) this.rsyncRemoteUser = config.rsyncRemoteUser
     if (config.rsyncRemotePath) this.rsyncRemotePath = config.rsyncRemotePath
     if (config.rsyncSshKeyPath) this.rsyncSshKeyPath = config.rsyncSshKeyPath
+
+    // Set display distribution configuration
+    if (config.displayDistribution) {
+      if (typeof config.displayDistribution.maxRowsPerDisplay === 'number') {
+        this.displayDistribution.maxRowsPerDisplay = config.displayDistribution.maxRowsPerDisplay
+        logger.info(`Display distribution max rows per display set to ${config.displayDistribution.maxRowsPerDisplay}`)
+      }
+    }
   }
 
   public asJSON() {
@@ -128,6 +145,7 @@ class Config {
       rsyncRemoteUser: this.rsyncRemoteUser,
       rsyncRemotePath: this.rsyncRemotePath,
       rsyncSshKeyPath: this.rsyncSshKeyPath,
+      displayDistribution: this.displayDistribution,
     }
   }
 

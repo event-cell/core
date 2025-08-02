@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { DisplayCompetitorList, OnTrack, getDisplayNumber } from 'ui-shared'
+import { DisplayCompetitorList, OnTrack, getDisplayNumber, DisplayFooter } from 'ui-shared'
 
 import { requestWrapper } from '../components/requestWrapper.js'
 import { Container } from '@mui/material'
@@ -64,13 +64,7 @@ export const DisplayPage = () => {
         <DisplayCompetitorList
           competitors={competitors.data}
           runCount={effectiveRunCount}
-        />
-      )}
-
-      {shouldDisplayOnTrack && currentCompetitor.data && competitors.data && (
-        <OnTrack
-          currentCompetitorId={currentCompetitor.data}
-          competitors={competitors.data}
+          currentCompetitor={currentCompetitor.data}
         />
       )}
     </Container>

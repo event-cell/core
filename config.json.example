@@ -1,0 +1,15 @@
+{
+  "eventId": "001",
+  "eventName": "Sample Event",
+  "eventDatabasePath": "/app/prisma/Events",
+  "recordsDatabasePath": "/data/records",
+  "uploadLiveTiming": false,
+  "liveTimingOutputPath": "/data/live-timing",
+  "rsyncRemoteHost": "",
+  "rsyncRemoteUser": "",
+  "rsyncRemotePath": "",
+  "rsyncSshKeyPath": "/data/.ssh/id_rsa",
+  "displayDistribution": {
+    "maxRowsPerDisplay": 20
+  }
+} 

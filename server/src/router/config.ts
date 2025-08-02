@@ -115,6 +115,45 @@ export const configRoute = t.router({
       }
     }),
 
+  getDisplayDistribution: t.procedure
+    .output(
+      z.object({
+        maxRowsPerDisplay: z.number(),
+      }),
+    )
+    .query(() => {
+      logger.info('Getting display distribution configuration')
+      return config.displayDistribution
+    }),
+
+  setDisplayDistribution: t.procedure
+    .input(
+      z.object({
+        maxRowsPerDisplay: z.number().min(1).optional(),
+      }),
+    )
+    .output(
+      z.object({
+        maxRowsPerDisplay: z.number(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      logger.info('Setting display distribution configuration', input)
+
+      // Update the config with new values
+      config.set({
+        displayDistribution: {
+          ...config.displayDistribution,
+          ...input,
+        },
+      })
+
+      // Save to disk
+      config.storeConfig()
+
+      return config.displayDistribution
+    }),
+
   set: t.procedure
     .input(ConfigType)
     .output(
