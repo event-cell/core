@@ -28,6 +28,7 @@ import {
 import { Competitor, CompetitorList } from 'server/src/router/objects.js'
 
 export * from './display/CompetitorList.js'
+export * from './display/MainDisplay.js'
 export * from './display/OnTrack.js'
 export * from './display/footer.js'
 
@@ -247,8 +248,8 @@ export const RenderInfo: FC<{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    width: 160,
-                    height: 160,
+                    width: 200,
+                    height: 200,
                     backgroundColor: 'background.paper',
                     borderRadius: '8px',
                     border: '2px solid #C0C0C0',
@@ -263,8 +264,11 @@ export const RenderInfo: FC<{
                   <Typography variant="h5" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontWeight: 'bold', mb: 0.5 }}>
                     {(getBestN(allRuns, 3)[1]!.time / 1000).toFixed(2)}
                   </Typography>
-                  <Typography variant="body1" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5 }}>
-                    {getBestN(allRuns, 3)[1]!.name}
+                  <Typography variant="body1" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5, lineHeight: 1.2 }}>
+                    {getBestN(allRuns, 3)[1]!.name.split(' ').slice(0, -1).join(' ')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5, lineHeight: 1.2 }}>
+                    {getBestN(allRuns, 3)[1]!.name.split(' ').slice(-1).join(' ')}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontStyle: 'italic', fontSize: '0.8rem' }}>
                     {getBestN(allRuns, 3)[1]!.car}
@@ -279,8 +283,8 @@ export const RenderInfo: FC<{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    width: 180,
-                    height: 180,
+                    width: 220,
+                    height: 220,
                     backgroundColor: 'background.paper',
                     borderRadius: '8px',
                     border: '2px solid #FFD700',
@@ -296,8 +300,11 @@ export const RenderInfo: FC<{
                   <Typography variant="h5" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontWeight: 'bold', mb: 0.5 }}>
                     {(getBestN(allRuns, 3)[0]!.time / 1000).toFixed(2)}
                   </Typography>
-                  <Typography variant="body1" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5 }}>
-                    {getBestN(allRuns, 3)[0]!.name}
+                  <Typography variant="body1" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5, lineHeight: 1.2 }}>
+                    {getBestN(allRuns, 3)[0]!.name.split(' ').slice(0, -1).join(' ')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5, lineHeight: 1.2 }}>
+                    {getBestN(allRuns, 3)[0]!.name.split(' ').slice(-1).join(' ')}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontStyle: 'italic', fontSize: '0.8rem' }}>
                     {getBestN(allRuns, 3)[0]!.car}
@@ -312,8 +319,8 @@ export const RenderInfo: FC<{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    width: 160,
-                    height: 144,
+                    width: 200,
+                    height: 180,
                     backgroundColor: 'background.paper',
                     borderRadius: '8px',
                     border: '2px solid #CD7F32',
@@ -328,8 +335,11 @@ export const RenderInfo: FC<{
                   <Typography variant="h5" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontWeight: 'bold', mb: 0.5 }}>
                     {(getBestN(allRuns, 3)[2]!.time / 1000).toFixed(2)}
                   </Typography>
-                  <Typography variant="body1" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5 }}>
-                    {getBestN(allRuns, 3)[2]!.name}
+                  <Typography variant="body1" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5, lineHeight: 1.2 }}>
+                    {getBestN(allRuns, 3)[2]!.name.split(' ').slice(0, -1).join(' ')}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5, lineHeight: 1.2 }}>
+                    {getBestN(allRuns, 3)[2]!.name.split(' ').slice(-1).join(' ')}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontStyle: 'italic', fontSize: '0.8rem' }}>
                     {getBestN(allRuns, 3)[2]!.car}

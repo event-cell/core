@@ -45,7 +45,7 @@ export const demonstrateDynamicAllocation = (): void => {
 
     console.log('\n📺 Estimated Display Distribution:')
     analysis.estimatedDisplayDistribution.forEach(display => {
-        console.log(`  Display ${display.display}: ~${display.itemsOnDisplay} items`)
+        console.log(`  Display ${display.display}: ~${display.estimatedItems} items`)
     })
 
     // Show optimized distribution

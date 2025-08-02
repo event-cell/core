@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { DisplayCompetitorList, OnTrack, getDisplayNumber, DisplayFooter } from 'ui-shared'
+import { DisplayCompetitorList, MainDisplay, OnTrack, getDisplayNumber, DisplayFooter } from 'ui-shared'
 
 import { requestWrapper } from '../components/requestWrapper.js'
 import { Container } from '@mui/material'
@@ -52,6 +52,7 @@ export const DisplayPage = () => {
   }
 
   const currentDisplayNumber = getDisplayNumber()
+  const isMainDisplay = window.location.pathname === '/display' || window.location.pathname === '/live-timing/display/'
   const shouldDisplayOnTrack =
     currentDisplayNumber === 0 || currentDisplayNumber === 4
 
@@ -61,11 +62,19 @@ export const DisplayPage = () => {
   return (
     <Container>
       {competitors.data && runCount.data && (
-        <DisplayCompetitorList
-          competitors={competitors.data}
-          runCount={effectiveRunCount}
-          currentCompetitor={currentCompetitor.data}
-        />
+        isMainDisplay ? (
+          <MainDisplay
+            competitors={competitors.data}
+            runCount={effectiveRunCount}
+            currentCompetitor={currentCompetitor.data}
+          />
+        ) : (
+          <DisplayCompetitorList
+            competitors={competitors.data}
+            runCount={effectiveRunCount}
+            currentCompetitor={currentCompetitor.data}
+          />
+        )
       )}
     </Container>
   )

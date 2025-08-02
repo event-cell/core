@@ -287,8 +287,34 @@ async function syncLiveTimingData() {
         logger.info(`Successfully synced files to ${dest}`)
 
         // Check and sync UI files to display directory
-        const uiSourcePath = path.join(__dirname, '../ui/')
-        if (existsSync(uiSourcePath)) {
+        // Use the same path resolution as the main server
+        const uiSourcePath = path.join(__dirname, 'ui')
+        const absoluteUiPath = path.resolve(process.cwd(), path.join(__dirname, 'ui'))
+        logger.info(`Checking for UI files at: ${uiSourcePath}`)
+        logger.info(`Absolute UI path: ${absoluteUiPath}`)
+        logger.info(`Current directory (__dirname): ${__dirname}`)
+        logger.info(`Working directory: ${process.cwd()}`)
+
+        // Try multiple possible UI paths
+        const possibleUiPaths = [
+          uiSourcePath,
+          absoluteUiPath,
+          path.join(__dirname, '../ui/'), // Original path
+          path.resolve(__dirname, '../ui/'),
+          path.join(__dirname, '../../ui/'), // Try going up two levels
+          path.resolve(__dirname, '../../ui/')
+        ]
+
+        let foundUiPath = null
+        for (const uiPath of possibleUiPaths) {
+          if (existsSync(uiPath)) {
+            foundUiPath = uiPath
+            logger.info(`Found UI files at: ${uiPath}`)
+            break
+          }
+        }
+
+        if (foundUiPath) {
           // Construct the display path at the same level as the api directory
           const displayRemotePath = join(
             path.dirname(path.dirname(dest)),
@@ -309,7 +335,7 @@ async function syncLiveTimingData() {
             logger.info(`Created display directory at ${displayRemotePath}`)
 
             // Sync UI files to display directory
-            const uiRsyncCommand = `rsync -avz --delete -e "ssh -i /app/.ssh/id_rsa" ${uiSourcePath}/* ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${displayRemotePath}/`
+            const uiRsyncCommand = `rsync -avz --delete -e "ssh -i /app/.ssh/id_rsa" ${foundUiPath}/* ${config.rsyncRemoteUser}@${config.rsyncRemoteHost}:${displayRemotePath}/`
 
             const { stderr } = await execPromise(uiRsyncCommand)
             if (stderr) {
