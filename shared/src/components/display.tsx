@@ -236,15 +236,146 @@ export const RenderInfo: FC<{
       <Grid>
         <PrimaryPaper>
           <Grid sx={{ fontSize: tableFontSizeLarge }}>
-            <Typography variant="h4">Fastest Times</Typography>
-            <ol>
-              {getBestN(allRuns, 10).map((finish) => (
-                <li>
-                  {(finish.time / 1000).toFixed(2)} : {finish.name} [
-                  {finish.car}]{' '}
-                </li>
-              ))}
-            </ol>
+            <Typography variant="h4" sx={{ mb: 2 }}>Fastest Times</Typography>
+
+            {/* Podium Layout for Top 3 */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, gap: 2, position: 'relative', alignItems: 'flex-end' }}>
+              {/* 2nd Place */}
+              {getBestN(allRuns, 3)[1] && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: 160,
+                    height: 160,
+                    backgroundColor: 'background.paper',
+                    borderRadius: '8px',
+                    border: '2px solid #C0C0C0',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    p: 1,
+                  }}
+                >
+                  <Typography variant="h4" sx={{ color: '#C0C0C0', fontWeight: 'bold', mb: 1 }}>
+                    2nd
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontWeight: 'bold', mb: 0.5 }}>
+                    {(getBestN(allRuns, 3)[1]!.time / 1000).toFixed(2)}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5 }}>
+                    {getBestN(allRuns, 3)[1]!.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#C0C0C0', textAlign: 'center', px: 1, fontStyle: 'italic', fontSize: '0.8rem' }}>
+                    {getBestN(allRuns, 3)[1]!.car}
+                  </Typography>
+                </Box>
+              )}
+
+              {/* 1st Place */}
+              {getBestN(allRuns, 3)[0] && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: 180,
+                    height: 180,
+                    backgroundColor: 'background.paper',
+                    borderRadius: '8px',
+                    border: '2px solid #FFD700',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    zIndex: 1,
+                    p: 1,
+                  }}
+                >
+                  <Typography variant="h4" sx={{ color: '#FFD700', fontWeight: 'bold', mb: 1 }}>
+                    1st
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontWeight: 'bold', mb: 0.5 }}>
+                    {(getBestN(allRuns, 3)[0]!.time / 1000).toFixed(2)}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5 }}>
+                    {getBestN(allRuns, 3)[0]!.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#FFD700', textAlign: 'center', px: 1, fontStyle: 'italic', fontSize: '0.8rem' }}>
+                    {getBestN(allRuns, 3)[0]!.car}
+                  </Typography>
+                </Box>
+              )}
+
+              {/* 3rd Place */}
+              {getBestN(allRuns, 3)[2] && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: 160,
+                    height: 144,
+                    backgroundColor: 'background.paper',
+                    borderRadius: '8px',
+                    border: '2px solid #CD7F32',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    p: 1,
+                  }}
+                >
+                  <Typography variant="h4" sx={{ color: '#CD7F32', fontWeight: 'bold', mb: 1 }}>
+                    3rd
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontWeight: 'bold', mb: 0.5 }}>
+                    {(getBestN(allRuns, 3)[2]!.time / 1000).toFixed(2)}
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontWeight: 500, mb: 0.5 }}>
+                    {getBestN(allRuns, 3)[2]!.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#CD7F32', textAlign: 'center', px: 1, fontStyle: 'italic', fontSize: '0.8rem' }}>
+                    {getBestN(allRuns, 3)[2]!.car}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            {/* List for positions 4-10 */}
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="h5" sx={{ mb: 2, color: 'text.primary', fontWeight: 'bold' }}>
+                Remaining Top 10
+              </Typography>
+              <Box component="ol" sx={{ pl: 3, m: 0, counterReset: 'list-counter' }}>
+                {getBestN(allRuns, 10).slice(3).map((finish, index) => (
+                  <Box
+                    component="li"
+                    key={index + 4}
+                    sx={{
+                      fontSize: '1.1rem',
+                      mb: 1,
+                      color: 'text.primary',
+                      fontWeight: 500,
+                      lineHeight: 1.4,
+                      '&::marker': {
+                        content: `"${index + 4}."`,
+                        fontWeight: 'bold',
+                        color: 'white',
+                      },
+                    }}
+                  >
+                    <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                      {(finish.time / 1000).toFixed(2)}
+                    </Box>
+                    {' : '}
+                    <Box component="span" sx={{ fontWeight: 500 }}>
+                      {finish.name}
+                    </Box>
+                    {' • '}
+                    <Box component="span" sx={{ fontStyle: 'italic', color: 'text.secondary', fontSize: '0.9rem' }}>
+                      {finish.car}
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
           </Grid>
         </PrimaryPaper>
       </Grid>

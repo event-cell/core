@@ -49,7 +49,7 @@ export class DisplayConfigService {
         throw new Error(`Failed to fetch display config: ${response.statusText}`)
       }
 
-      const responseData = await response.json()
+      const responseData = await response.json() as any
       console.log(`DisplayConfigService - received config data:`, responseData)
 
       // Extract the actual config data from the nested response
@@ -96,7 +96,7 @@ export class DisplayConfigService {
         throw new Error(`Failed to update display config: ${response.statusText}`)
       }
 
-      const responseData = await response.json()
+      const responseData = await response.json() as any
       console.log(`DisplayConfigService - received update response:`, responseData)
 
       // Extract the actual config data from the nested response
