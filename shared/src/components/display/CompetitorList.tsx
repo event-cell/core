@@ -4,6 +4,7 @@ import React, { FC, useMemo } from 'react'
 import { CompetitorList } from 'server/src/router/objects.js'
 import { CompetitorTable } from '../table.js'
 import { DisplayHeader } from './header.js'
+import { DisplayFooter } from './footer.js'
 import { getDisplayNumber, splitDisplay } from '../../logic/displays.js'
 import { getPersonalBestSectors } from '../../logic/index.js'
 
@@ -103,6 +104,8 @@ export const DisplayCompetitorList: FC<{
             />
           </div>
         ))}
+
+        <DisplayFooter display={displayNumber} />
       </>
     )
   } else {

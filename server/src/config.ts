@@ -60,7 +60,18 @@ class Config {
   }
 
   private get configPath() {
-    if (process.env.CONFIG_DIR) return process.env.CONFIG_DIR
+    if (process.env.CONFIG_DIR) {
+      const configDir = process.env.CONFIG_DIR
+      const configFile = join(configDir, 'config.json')
+
+      // Create config file if it doesn't exist
+      if (!existsSync(configFile)) {
+        logger.info(`Creating config file in ${configDir}`)
+        writeFileSync(configFile, '{}')
+      }
+
+      return configFile
+    }
 
     // /data/ should be the default location for the persistent volume for this
     // app, if it exists. If the folder exists, but there is no config file, we
