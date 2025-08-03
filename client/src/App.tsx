@@ -42,25 +42,22 @@ function getRouterPrefix() {
 
 function App() {
   // Create QueryClient with better configuration for real-time data
-  const [queryClient] = useState(() => {
-    const client = new QueryClient({
-      defaultOptions: {
-        queries: {
-          // Stale time of 0 means data is considered stale immediately
-          staleTime: 0,
-          // Cache time of 5 minutes
-          gcTime: 5 * 60 * 1000,
-          // Retry failed requests 3 times
-          retry: 3,
-          // Don't refetch on window focus for real-time displays
-          refetchOnWindowFocus: false,
-          // Don't refetch on reconnect for real-time displays
-          refetchOnReconnect: false,
-        },
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        // Stale time of 0 means data is considered stale immediately
+        staleTime: 0,
+        // Cache time of 5 minutes
+        gcTime: 5 * 60 * 1000,
+        // Retry failed requests 3 times
+        retry: 3,
+        // Don't refetch on window focus for real-time displays
+        refetchOnWindowFocus: false,
+        // Don't refetch on reconnect for real-time displays
+        refetchOnReconnect: false,
       },
-    })
-    return client
-  })
+    },
+  }) as any)
 
   const trpcClient = useTrpcClient()
   const root = useMemo(getRouterPrefix, [])
