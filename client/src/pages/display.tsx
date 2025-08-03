@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 
 import { DisplayCompetitorList, MainDisplay, OnTrack, getDisplayNumber, DisplayFooter } from 'ui-shared'
 
@@ -29,16 +29,19 @@ export const DisplayPage = () => {
     displayRefresh = 5
   }
 
+  // Create a stable refetch function
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      currentCompetitor.refetch(),
+      competitors.refetch(),
+      runCount.refetch(),
+    ])
+  }, [currentCompetitor.refetch, competitors.refetch, runCount.refetch])
+
   useEffect(() => {
-    const timeout = setTimeout(async () => {
-      await Promise.all([
-        currentCompetitor.refetch(),
-        competitors.refetch(),
-        runCount.refetch(),
-      ])
-    }, 1000 * displayRefresh)
+    const timeout = setTimeout(refetchAll, 1000 * displayRefresh)
     return () => clearTimeout(timeout)
-  }, [currentCompetitor, competitors, runCount])
+  }, [refetchAll, displayRefresh])
 
   const requestErrors = requestWrapper(
     { currentCompetitor, allRuns: competitors, runCount },

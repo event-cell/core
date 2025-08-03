@@ -1,6 +1,6 @@
 // announcer.tsx
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import Timer from '@mui/icons-material/Timer';
 import {
   Alert,
@@ -33,11 +33,11 @@ const PrimaryPaperCenter = styled(Paper)(({ theme }) => ({
 }));
 
 const RenderClassList = ({
-                           classes,
-                           allRuns,
-                           currentClassIndex,
-                           runCount,
-                         }: {
+  classes,
+  allRuns,
+  currentClassIndex,
+  runCount,
+}: {
   classes: { classIndex: number; class: string }[];
   allRuns: CompetitorList;
   currentClassIndex: number;
@@ -91,17 +91,20 @@ export const Announcer = () => {
   const competitorList = trpc.competitors.list.useQuery(undefined);
   const runCount = trpc.runs.count.useQuery(undefined);
 
+  // Create a stable refetch function
+  const refetchAll = useCallback(async () => {
+    await Promise.all([
+      currentCompetitorId.refetch(),
+      competitorList.refetch(),
+      runCount.refetch(),
+    ]);
+  }, [currentCompetitorId.refetch, competitorList.refetch, runCount.refetch]);
+
   // Refresh the data every 2 seconds
   useEffect(() => {
-    const timeout = setTimeout(async () => {
-      await Promise.all([
-        currentCompetitorId.refetch(),
-        competitorList.refetch(),
-        runCount.refetch(),
-      ]);
-    }, 1000 * 2);
+    const timeout = setTimeout(refetchAll, 1000 * 2);
     return () => clearTimeout(timeout);
-  }, [currentCompetitorId, competitorList, runCount]);
+  }, [refetchAll]);
 
   const requestErrors = requestWrapper({
     currentCompetitorId,
@@ -160,7 +163,7 @@ export const Announcer = () => {
           rowSpacing={1}
           columnSpacing={{ xs: 1, sm: 1, md: 2, lg: 4, xl: 4 }}
         >
-          <Grid size={{xs:4}}>
+          <Grid size={{ xs: 4 }}>
             <PrimaryPaper sx={{ fontSize: 24, height: 96 }}>
               {currentCompetitor.number}: {currentCompetitor.firstName}{' '}
               {currentCompetitor.lastName}, {currentCompetitor.vehicle}
@@ -168,23 +171,23 @@ export const Announcer = () => {
               {currentCompetitor.class}
             </PrimaryPaper>
           </Grid>
-          <Grid size={{xs:4}}>
+          <Grid size={{ xs: 4 }}>
             <PrimaryPaperCenter sx={{ fontSize: 48, fontWeight: 500, height: 96 }}>
               {currentCompetitor.special}
             </PrimaryPaperCenter>
           </Grid>
-          <Grid size={{xs:4}}>
+          <Grid size={{ xs: 4 }}>
             <PrimaryPaperCenter sx={{ fontSize: 48, fontWeight: 500, height: 96 }}>
               Run {runCount.data}
             </PrimaryPaperCenter>
           </Grid>
-          <Grid size={{xs:4}}>
+          <Grid size={{ xs: 4 }}>
             <RenderInfo
               currentRun={currentCompetitor}
               allRuns={normalizedCompetitorList}
             />
           </Grid>
-          <Grid size={{xs:8}}>
+          <Grid size={{ xs: 8 }}>
             <RenderClassList
               classes={classes}
               allRuns={normalizedCompetitorList}
