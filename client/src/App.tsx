@@ -42,7 +42,7 @@ function getRouterPrefix() {
 
 function App() {
   // Create QueryClient with better configuration for real-time data
-  const [queryClient] = useState(() => new QueryClient({
+  const [queryClient] = useState<QueryClient>(() => new QueryClient({
     defaultOptions: {
       queries: {
         // Stale time of 0 means data is considered stale immediately
