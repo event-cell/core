@@ -91,19 +91,23 @@ export const Announcer = () => {
   const competitorList = trpc.competitors.list.useQuery(undefined);
   const runCount = trpc.runs.count.useQuery(undefined);
 
-  // Create a stable refetch function
+  // Create a stable refetch function with error handling
   const refetchAll = useCallback(async () => {
-    await Promise.all([
-      currentCompetitorId.refetch(),
-      competitorList.refetch(),
-      runCount.refetch(),
-    ]);
+    try {
+      await Promise.all([
+        currentCompetitorId.refetch(),
+        competitorList.refetch(),
+        runCount.refetch(),
+      ]);
+    } catch (error) {
+      console.error('Refetch failed:', error);
+    }
   }, [currentCompetitorId.refetch, competitorList.refetch, runCount.refetch]);
 
   // Refresh the data every 2 seconds
   useEffect(() => {
-    const timeout = setTimeout(refetchAll, 1000 * 2);
-    return () => clearTimeout(timeout);
+    const interval = setInterval(refetchAll, 1000 * 2);
+    return () => clearInterval(interval);
   }, [refetchAll]);
 
   const requestErrors = requestWrapper({

@@ -57,7 +57,7 @@ function App() {
         refetchOnReconnect: false,
       },
     },
-  }) as any)
+  }))
 
   const trpcClient = useTrpcClient()
   const root = useMemo(getRouterPrefix, [])

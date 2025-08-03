@@ -29,18 +29,22 @@ export const DisplayPage = () => {
     displayRefresh = 5
   }
 
-  // Create a stable refetch function
+  // Create a stable refetch function with error handling
   const refetchAll = useCallback(async () => {
-    await Promise.all([
-      currentCompetitor.refetch(),
-      competitors.refetch(),
-      runCount.refetch(),
-    ])
+    try {
+      await Promise.all([
+        currentCompetitor.refetch(),
+        competitors.refetch(),
+        runCount.refetch(),
+      ])
+    } catch (error) {
+      console.error('Refetch failed:', error)
+    }
   }, [currentCompetitor.refetch, competitors.refetch, runCount.refetch])
 
   useEffect(() => {
-    const timeout = setTimeout(refetchAll, 1000 * displayRefresh)
-    return () => clearTimeout(timeout)
+    const interval = setInterval(refetchAll, 1000 * displayRefresh)
+    return () => clearInterval(interval)
   }, [refetchAll, displayRefresh])
 
   const requestErrors = requestWrapper(

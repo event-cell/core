@@ -1,7 +1,7 @@
 import { Box, Container, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import CarCrash from '@mui/icons-material/CarCrash';
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 
 import { trpc } from '../App.js';
 import { requestWrapper } from '../components/requestWrapper.js';
@@ -15,8 +15,6 @@ import {
 import { TimeInfo } from '../../../server/src/router/objects.js';
 
 import type { Competitor } from '../../../server/src/router/objects.js';
-
-let displayInterval: NodeJS.Timeout;
 
 function getLatestSector({
   finish,
@@ -77,20 +75,21 @@ export const TrackDisplay = () => {
   const currentCompetitorId = trpc.currentcompetitor.number.useQuery(undefined);
   const competitors = trpc.competitors.list.useQuery(undefined);
 
-  // Create a stable refetch function
+  // Create a stable refetch function with error handling
   const refetchAll = useCallback(async () => {
-    await Promise.all([
-      currentCompetitorId.refetch(),
-      competitors.refetch(),
-    ])
+    try {
+      await Promise.all([
+        currentCompetitorId.refetch(),
+        competitors.refetch(),
+      ])
+    } catch (error) {
+      console.error('Refetch failed:', error)
+    }
   }, [currentCompetitorId.refetch, competitors.refetch])
 
   useEffect(() => {
-    if (displayInterval) clearTimeout(displayInterval);
-    displayInterval = setTimeout(refetchAll, 1000 * 2);
-    return () => {
-      if (displayInterval) clearTimeout(displayInterval);
-    }
+    const interval = setInterval(refetchAll, 1000 * 2);
+    return () => clearInterval(interval);
   }, [refetchAll]);
 
   const requestErrors = requestWrapper({
