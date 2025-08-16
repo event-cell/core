@@ -11,5 +11,14 @@
   "rsyncSshKeyPath": "/data/.ssh/id_rsa",
   "displayDistribution": {
     "maxRowsPerDisplay": 20
+  },
+  "refreshIntervals": {
+    "display1": 15,
+    "display2": 15,
+    "display3": 15,
+    "display4": 5,
+    "trackDisplay": 2,
+    "announcer": 2,
+    "fallbackInterval": 300
   }
 } 

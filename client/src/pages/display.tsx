@@ -6,6 +6,7 @@ import { requestWrapper } from '../components/requestWrapper.js'
 import { Container } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { getCompetitors, getCurrentCompetitor, getRunCount } from '../simpleApi.js'
+import { refreshConfigService } from 'ui-shared'
 
 export const DisplayPage = () => {
   const currentCompetitor = useQuery({
@@ -21,21 +22,33 @@ export const DisplayPage = () => {
     queryFn: getRunCount
   })
 
-  let displayRefresh = 15
+  // Dynamic refresh intervals from configuration
+  const [displayRefresh, setDisplayRefresh] = React.useState(15)
+  const [fallbackInterval, setFallbackInterval] = React.useState(300)
 
-  if (window.location.pathname === '/display/4') {
-    displayRefresh = 5
-  }
-
-  // Log refresh configuration on startup
+  // Load refresh configuration on startup
   useEffect(() => {
-    const displayNum = getDisplayNumber() || 'main'
-    console.log(`🚀 [STARTUP] Display ${displayNum} refresh configuration:`)
-    console.log(`   - Primary refresh: ${displayRefresh} seconds (React Query)`)
-    console.log(`   - Secondary refresh: 300 seconds (5 minutes fallback)`)
-    console.log(`   - Health check: 30 seconds (responsiveness monitoring)`)
-    console.log(`   - Error-based refresh: enabled (automatic error recovery)`)
-  }, [displayRefresh])
+    const loadRefreshConfig = async () => {
+      try {
+        const currentPath = window.location.pathname
+        const primaryInterval = await refreshConfigService.getRefreshIntervalForRoute(currentPath)
+        const fallback = await refreshConfigService.getFallbackInterval()
+
+        setDisplayRefresh(primaryInterval)
+        setFallbackInterval(fallback)
+
+        console.log(`🚀 [STARTUP] Display ${getDisplayNumber() || 'main'} refresh configuration:`)
+        console.log(`   - Primary refresh: ${primaryInterval} seconds (React Query)`)
+        console.log(`   - Secondary refresh: ${fallback} seconds (${Math.round(fallback / 60)} minutes fallback)`)
+        console.log(`   - Error-based refresh: enabled (automatic error recovery)`)
+      } catch (error) {
+        console.warn('Failed to load refresh configuration, using defaults:', error)
+        // Keep default values if configuration fails to load
+      }
+    }
+
+    loadRefreshConfig()
+  }, [])
 
   // Create a stable refetch function with error handling
   const refetchAll = useCallback(async () => {
@@ -59,17 +72,17 @@ export const DisplayPage = () => {
   useEffect(() => {
     const interval = setInterval(refetchAll, 1000 * displayRefresh)
     return () => clearInterval(interval)
-  }, [refetchAll, displayRefresh])
+  }, [refetchAll, displayRefresh, fallbackInterval])
 
-  // Secondary refresh: Fallback full page refresh every 5 minutes
+  // Secondary refresh: Fallback full page refresh
   useEffect(() => {
-    const fallbackInterval = setInterval(() => {
-      console.log(`🔄 [SECONDARY] Fallback refresh - Display ${getDisplayNumber() || 'main'} (5-minute interval)`)
+    const interval = setInterval(() => {
+      console.log(`🔄 [SECONDARY] Fallback refresh - Display ${getDisplayNumber() || 'main'} (${Math.round(fallbackInterval / 60)}-minute interval)`)
       window.location.reload()
-    }, 5 * 60 * 1000) // 5 minutes
+    }, 1000 * fallbackInterval) // Use configured interval
 
-    return () => clearInterval(fallbackInterval)
-  }, [])
+    return () => clearInterval(interval)
+  }, [fallbackInterval])
 
   // Tertiary refresh: Error-based refresh for unhandled errors
   useEffect(() => {
@@ -93,37 +106,7 @@ export const DisplayPage = () => {
     }
   }, [])
 
-  // Health check: Refresh if app becomes unresponsive (no activity for 2 minutes)
-  useEffect(() => {
-    let lastActivity = Date.now()
 
-    const checkHealth = () => {
-      const now = Date.now()
-      if (now - lastActivity > 2 * 60 * 1000) { // 2 minutes of inactivity
-        console.log(`🔄 [HEALTH] Responsiveness refresh - Display ${getDisplayNumber() || 'main'} (No activity for 2+ minutes)`)
-        window.location.reload()
-      }
-    }
-
-    const updateActivity = () => {
-      lastActivity = Date.now()
-    }
-
-    // Update activity on user interaction
-    window.addEventListener('click', updateActivity)
-    window.addEventListener('keydown', updateActivity)
-    window.addEventListener('mousemove', updateActivity)
-
-    // Check health every 30 seconds
-    const healthInterval = setInterval(checkHealth, 30 * 1000)
-
-    return () => {
-      clearInterval(healthInterval)
-      window.removeEventListener('click', updateActivity)
-      window.removeEventListener('keydown', updateActivity)
-      window.removeEventListener('mousemove', updateActivity)
-    }
-  }, [])
 
   const requestErrors = requestWrapper(
     { currentCompetitor, allRuns: competitors, runCount },

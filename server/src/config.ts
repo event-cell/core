@@ -29,6 +29,16 @@ export const ConfigType = z
     displayDistribution: z.object({
       maxRowsPerDisplay: z.number().min(1).optional(),
     }).optional(),
+    // Refresh intervals configuration
+    refreshIntervals: z.object({
+      display1: z.number().min(1).max(300).optional(),
+      display2: z.number().min(1).max(300).optional(),
+      display3: z.number().min(1).max(300).optional(),
+      display4: z.number().min(1).max(300).optional(),
+      trackDisplay: z.number().min(1).max(300).optional(),
+      announcer: z.number().min(1).max(300).optional(),
+      fallbackInterval: z.number().min(60).max(1800).optional(),
+    }).optional(),
   })
   .deepPartial()
 export type ConfigType = z.infer<typeof ConfigType>
@@ -54,11 +64,43 @@ class Config {
     maxRowsPerDisplay: 20,
   }
 
+  // Refresh intervals configuration defaults
+  public refreshIntervals = {
+    display1: 15,
+    display2: 15,
+    display3: 15,
+    display4: 5,
+    trackDisplay: 2,
+    announcer: 2,
+    fallbackInterval: 300, // 5 minutes
+  }
+
   constructor() {
     const fileContents = readFileSync(this.configPath, 'utf8')
     const parsedContents = JSON.parse(fileContents)
     const config = ConfigType.parse(parsedContents)
     this.set(config)
+
+    // Auto-save default refresh intervals if they don't exist
+    if (!config.refreshIntervals) {
+      logger.info('Refresh intervals not found in config, saving defaults')
+      this.storeConfig()
+    } else {
+      // Check if any individual refresh interval properties are missing and save defaults
+      const hasAllProperties = config.refreshIntervals &&
+        typeof config.refreshIntervals.display1 === 'number' &&
+        typeof config.refreshIntervals.display2 === 'number' &&
+        typeof config.refreshIntervals.display3 === 'number' &&
+        typeof config.refreshIntervals.display4 === 'number' &&
+        typeof config.refreshIntervals.trackDisplay === 'number' &&
+        typeof config.refreshIntervals.announcer === 'number' &&
+        typeof config.refreshIntervals.fallbackInterval === 'number'
+
+      if (!hasAllProperties) {
+        logger.info('Some refresh interval properties missing, saving defaults')
+        this.storeConfig()
+      }
+    }
 
     // Force uploadLiveTiming to false on startup
     if (this.uploadLiveTiming) {
@@ -132,6 +174,39 @@ class Config {
         logger.info(`Display distribution max rows per display set to ${config.displayDistribution.maxRowsPerDisplay}`)
       }
     }
+
+    // Set refresh intervals configuration
+    if (config.refreshIntervals) {
+      const intervals = config.refreshIntervals
+      if (typeof intervals.display1 === 'number') {
+        this.refreshIntervals.display1 = intervals.display1
+        logger.info(`Display 1 refresh interval set to ${intervals.display1} seconds`)
+      }
+      if (typeof intervals.display2 === 'number') {
+        this.refreshIntervals.display2 = intervals.display2
+        logger.info(`Display 2 refresh interval set to ${intervals.display2} seconds`)
+      }
+      if (typeof intervals.display3 === 'number') {
+        this.refreshIntervals.display3 = intervals.display3
+        logger.info(`Display 3 refresh interval set to ${intervals.display3} seconds`)
+      }
+      if (typeof intervals.display4 === 'number') {
+        this.refreshIntervals.display4 = intervals.display4
+        logger.info(`Display 4 refresh interval set to ${intervals.display4} seconds`)
+      }
+      if (typeof intervals.trackDisplay === 'number') {
+        this.refreshIntervals.trackDisplay = intervals.trackDisplay
+        logger.info(`TrackDisplay refresh interval set to ${intervals.trackDisplay} seconds`)
+      }
+      if (typeof intervals.announcer === 'number') {
+        this.refreshIntervals.announcer = intervals.announcer
+        logger.info(`Announcer refresh interval set to ${intervals.announcer} seconds`)
+      }
+      if (typeof intervals.fallbackInterval === 'number') {
+        this.refreshIntervals.fallbackInterval = intervals.fallbackInterval
+        logger.info(`Fallback refresh interval set to ${intervals.fallbackInterval} seconds`)
+      }
+    }
   }
 
   public asJSON() {
@@ -139,6 +214,7 @@ class Config {
       eventId: this.eventId,
       eventName: this.eventName,
       eventDatabasePath: this.eventDatabasePath,
+      recordsDatabasePath: this.recordsDatabasePath,
       uploadLiveTiming: this.uploadLiveTiming,
       liveTimingOutputPath: this.liveTimingOutputPath,
       rsyncRemoteHost: this.rsyncRemoteHost,
@@ -146,6 +222,7 @@ class Config {
       rsyncRemotePath: this.rsyncRemotePath,
       rsyncSshKeyPath: this.rsyncSshKeyPath,
       displayDistribution: this.displayDistribution,
+      refreshIntervals: this.refreshIntervals,
     }
   }
 

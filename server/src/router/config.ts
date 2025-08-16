@@ -121,8 +121,9 @@ export const configRoute = t.router({
         maxRowsPerDisplay: z.number(),
       }),
     )
-    .query(() => {
+    .query(async () => {
       logger.info('Getting display distribution configuration')
+
       return config.displayDistribution
     }),
 
@@ -152,6 +153,64 @@ export const configRoute = t.router({
       config.storeConfig()
 
       return config.displayDistribution
+    }),
+
+  getRefreshIntervals: t.procedure
+    .output(
+      z.object({
+        display1: z.number(),
+        display2: z.number(),
+        display3: z.number(),
+        display4: z.number(),
+        trackDisplay: z.number(),
+        announcer: z.number(),
+        fallbackInterval: z.number(),
+      }),
+    )
+    .query(async () => {
+      logger.info('Getting refresh intervals configuration')
+
+      return config.refreshIntervals
+    }),
+
+  setRefreshIntervals: t.procedure
+    .input(
+      z.object({
+        display1: z.number().min(1).max(300).optional(),
+        display2: z.number().min(1).max(300).optional(),
+        display3: z.number().min(1).max(300).optional(),
+        display4: z.number().min(1).max(300).optional(),
+        trackDisplay: z.number().min(1).max(300).optional(),
+        announcer: z.number().min(1).max(300).optional(),
+        fallbackInterval: z.number().min(60).max(1800).optional(),
+      }),
+    )
+    .output(
+      z.object({
+        display1: z.number(),
+        display2: z.number(),
+        display3: z.number(),
+        display4: z.number(),
+        trackDisplay: z.number(),
+        announcer: z.number(),
+        fallbackInterval: z.number(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      logger.info('Setting refresh intervals configuration', input)
+
+      // Update the config with new values
+      config.set({
+        refreshIntervals: {
+          ...config.refreshIntervals,
+          ...input,
+        },
+      })
+
+      // Save to disk
+      config.storeConfig()
+
+      return config.refreshIntervals
     }),
 
   set: t.procedure

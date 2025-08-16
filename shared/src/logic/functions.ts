@@ -110,8 +110,6 @@ export function getBestN(
     }))
     .filter((run) => run.best !== undefined)
 
-  console.log('bestruns', competitorBestRuns)
-
   return competitorBestRuns
     .sort((a, b) => a.best.time - b.best.time)
     .slice(0, count)
