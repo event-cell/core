@@ -14,7 +14,7 @@ import {
 import Grid from '@mui/material/Grid';
 
 import { trpc } from '../App.js';
-import { RenderInfo, CompetitorTable } from 'ui-shared';
+import { RenderInfo, CompetitorTable, TriSeriesPoints } from 'ui-shared';
 import { requestWrapper } from '../components/requestWrapper.js';
 import { refreshConfigService } from 'ui-shared';
 import { CompetitorList } from '../../../server/src/router/objects.js';
@@ -268,6 +268,14 @@ export const Announcer = () => {
           </Grid>
         </Grid>
       </Typography>
+
+      {/* Tri-Series Points Display */}
+      <Box sx={{ mt: 2 }}>
+        <TriSeriesPoints
+          competitors={normalizedCompetitorList}
+          maxDisplay={8}
+        />
+      </Box>
     </Container>
   );
 };

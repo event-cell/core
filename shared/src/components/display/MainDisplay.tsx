@@ -8,6 +8,7 @@ import { DisplayFooter } from './footer.js'
 import { getDisplayNumber } from '../../logic/displays.js'
 import { getPersonalBestSectors } from '../../logic/index.js'
 import { OnTrack } from './OnTrack.js'
+import { TriSeriesPoints } from './TriSeriesPoints.js'
 
 export const MainDisplay: FC<{
     competitors: CompetitorList
@@ -147,6 +148,12 @@ export const MainDisplay: FC<{
                             competitors={competitors}
                         />
                     )}
+
+                    {/* Tri-Series Points section */}
+                    <TriSeriesPoints
+                        competitors={competitors}
+                        maxDisplay={8}
+                    />
                 </Box>
 
                 {/* Position footer at bottom */}

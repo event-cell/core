@@ -67,7 +67,7 @@ const liveTimingBanner = (
 )
 
 export const DisplayFooter: FC<{ display: number }> = ({ display }) => {
-    if (display == 0) return <div />
+    if (display === 0) return <div />
 
     if (display >= 1 && display <= 4) return liveTimingBanner
 

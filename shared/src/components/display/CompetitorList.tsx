@@ -8,6 +8,7 @@ import { DisplayFooter } from './footer.js'
 import { getDisplayNumber, splitDisplay, DEFAULT_DISPLAY_CONFIG, DisplayDistributionConfig, ItemizedClassType, ClassType } from '../../logic/displays.js'
 import { getPersonalBestSectors } from '../../logic/index.js'
 import { OnTrack } from './OnTrack.js'
+import { TriSeriesPoints } from './TriSeriesPoints.js'
 
 export const DisplayCompetitorList: FC<{
   competitors: CompetitorList
@@ -146,6 +147,14 @@ export const DisplayCompetitorList: FC<{
           <OnTrack
             currentCompetitorId={currentCompetitor}
             competitors={competitors}
+          />
+        )}
+
+        {/* Tri-Series Points section - only for display 4 */}
+        {displayNumber === 4 && (
+          <TriSeriesPoints
+            competitors={competitors}
+            maxDisplay={8}
           />
         )}
 

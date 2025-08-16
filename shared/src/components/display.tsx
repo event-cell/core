@@ -31,6 +31,8 @@ export * from './display/CompetitorList.js'
 export * from './display/MainDisplay.js'
 export * from './display/OnTrack.js'
 export * from './display/footer.js'
+export * from './display/ClubPointsDisplay.js'
+export * from './display/TriSeriesPoints.js'
 
 const PrimaryPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -386,6 +388,7 @@ export const RenderInfo: FC<{
                 ))}
               </Box>
             </Box>
+
           </Grid>
         </PrimaryPaper>
       </Grid>
