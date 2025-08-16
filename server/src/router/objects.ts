@@ -24,6 +24,7 @@ export const Competitor = z.object({
   classIndex: z.number(),
   vehicle: z.string(),
   classRecord: z.string(),
+  club: z.optional(z.string()),
   special: z.optional(z.string()),
   miscAward: z.optional(z.string()),
   times: TimeInfoList,

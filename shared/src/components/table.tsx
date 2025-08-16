@@ -145,6 +145,32 @@ export const CompetitorTable: FC<{
                   >
                     {row.firstName} {row.lastName}
                   </Box>
+                  {row.club && (
+                    <Box
+                      sx={{
+                        fontSize: '0.7rem',
+                        fontWeight: '400',
+                        textAlign: 'center',
+                        color: 'text.secondary',
+                        gridRow: '2',
+                        gridColumn: '1',
+                      }}
+                    >
+                      {row.club}
+                    </Box>
+                  )}
+                  {row.club && (
+                    <Box
+                      sx={{
+                        textAlign: 'left',
+                        fontSize: '0.9rem',
+                        gridRow: '2',
+                        gridColumn: '2/5',
+                      }}
+                    >
+                      {row.vehicle}
+                    </Box>
+                  )}
                   {row.special ? (
                     <Box
                       sx={{
@@ -155,7 +181,7 @@ export const CompetitorTable: FC<{
                         fontSize: '0.8rem',
                         fontWeight: '500',
                         textAlign: 'center',
-                        gridRow: '2',
+                        gridRow: row.club ? '3' : '2',
                         gridColumn: '1',
                       }}
                     >
@@ -163,16 +189,18 @@ export const CompetitorTable: FC<{
                     </Box>
                   ) : null}
 
-                  <Box
-                    sx={{
-                      textAlign: 'left',
-                      fontSize: '0.9rem',
-                      gridRow: '2',
-                      gridColumn: '2/5',
-                    }}
-                  >
-                    {row.vehicle}
-                  </Box>
+                  {!row.club && (
+                    <Box
+                      sx={{
+                        textAlign: 'left',
+                        fontSize: '0.9rem',
+                        gridRow: '2',
+                        gridColumn: '2/5',
+                      }}
+                    >
+                      {row.vehicle}
+                    </Box>
+                  )}
                 </Box>
               </TableCell>
 

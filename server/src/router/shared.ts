@@ -46,12 +46,12 @@ export async function getCompetitorJSON() {
     heats.push(await eventData.tTIMEINFOS_HEAT8.findMany())
     heats.push(await eventData.tTIMEINFOS_HEAT9.findMany())
     // eslint-disable-next-line no-empty
-  } catch (e) {}
+  } catch (e) { }
 
   const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor: any) => {
     // Check if C_I29 has a value, if not fall back to C_SERIE
     let className = competitor.C_I29 || competitor.C_SERIE || 'N/A';
-    
+
     return {
       number: competitor.C_NUM || -1,
       lastName: competitor.C_FIRST_NAME || 'N/A',
@@ -60,6 +60,7 @@ export async function getCompetitorJSON() {
       classIndex: competitor.C_I21 || 0,
       vehicle: competitor.C_COMMITTEE || 'N/A',
       classRecord: competitor.C_TEAM || '0.00',
+      club: nullToUndefined(competitor.C_CLUB),
       special: nullToUndefined(competitor.C_I28),
       miscAward: nullToUndefined(competitor.C_I30),
       times: [],
@@ -81,10 +82,10 @@ export async function getCompetitorJSON() {
           ...(timedRun.C_STATUS === 3
             ? { time: 0, split1: 0, split2: 0 }
             : {
-                time: timedRun.C_TIME || 0,
-                split1: timedRun.C_INTER1 || 0,
-                split2: timedRun.C_INTER2 || 0,
-              }),
+              time: timedRun.C_TIME || 0,
+              split1: timedRun.C_INTER1 || 0,
+              split2: timedRun.C_INTER2 || 0,
+            }),
         }))
       competitors[i].times = [...competitors[i].times, ...run]
     })
