@@ -34,6 +34,11 @@ export class RefreshConfigService {
     /**
      * Get the refresh intervals configuration from the server
      * Uses cached version if available and not expired
+     * 
+     * Fallback order:
+     * 1. API call (most up-to-date configuration)
+     * 2. Local JSON file (for live-timing website at /live-timing/api/simple/refreshConfig.json)
+     * 3. Default configuration
      */
     public async getRefreshIntervalsConfig(): Promise<RefreshIntervalsConfig> {
         const now = Date.now()
@@ -44,38 +49,81 @@ export class RefreshConfigService {
         }
 
         try {
-            const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
-            const baseUrl = isDevelopment
-                ? `http://${typeof window !== 'undefined' ? window.location.hostname : 'timingserver.local'}:8080/api/v1`
-                : '/api/v1'
+            // Tier 1: Try API call first (most up-to-date)
+            try {
+                const isDevelopment = !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
+                const baseUrl = isDevelopment
+                    ? `http://${typeof window !== 'undefined' ? window.location.hostname : 'timingserver.local'}:8080/api/v1`
+                    : '/api/v1'
 
-            const response = await fetch(`${baseUrl}/config.getRefreshIntervals`)
+                const response = await fetch(`${baseUrl}/config.getRefreshIntervals`)
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch refresh config: ${response.statusText}`)
+                if (response.ok) {
+                    const responseData = await response.json() as any
+
+                    // Extract the actual config data from the nested response
+                    const configData = responseData.result?.data || responseData
+
+                    this.config = {
+                        display1: configData.display1 || DEFAULT_REFRESH_CONFIG.display1,
+                        display2: configData.display2 || DEFAULT_REFRESH_CONFIG.display2,
+                        display3: configData.display3 || DEFAULT_REFRESH_CONFIG.display3,
+                        display4: configData.display4 || DEFAULT_REFRESH_CONFIG.display4,
+                        trackDisplay: configData.trackDisplay || DEFAULT_REFRESH_CONFIG.trackDisplay,
+                        announcer: configData.announcer || DEFAULT_REFRESH_CONFIG.announcer,
+                        fallbackInterval: configData.fallbackInterval || DEFAULT_REFRESH_CONFIG.fallbackInterval,
+                    }
+
+                    this.lastFetch = now
+                    return this.config
+                }
+            } catch (apiError) {
+                // Silently continue to local JSON fallback
+                console.debug('API call failed, falling back to local JSON:', apiError)
             }
 
-            const responseData = await response.json() as any
+            // Tier 2: Fallback to local JSON file (for live-timing website)
+            try {
+                const localResponse = await fetch('/live-timing/api/simple/refreshConfig.json')
+                if (localResponse.ok) {
+                    const localConfig = await localResponse.json() as RefreshIntervalsConfig
 
-            // Extract the actual config data from the nested response
-            const configData = responseData.result?.data || responseData
-
-            this.config = {
-                display1: configData.display1 || DEFAULT_REFRESH_CONFIG.display1,
-                display2: configData.display2 || DEFAULT_REFRESH_CONFIG.display2,
-                display3: configData.display3 || DEFAULT_REFRESH_CONFIG.display3,
-                display4: configData.display4 || DEFAULT_REFRESH_CONFIG.display4,
-                trackDisplay: configData.trackDisplay || DEFAULT_REFRESH_CONFIG.trackDisplay,
-                announcer: configData.announcer || DEFAULT_REFRESH_CONFIG.announcer,
-                fallbackInterval: configData.fallbackInterval || DEFAULT_REFRESH_CONFIG.fallbackInterval,
+                    // Validate the config has all required fields
+                    if (this.isValidRefreshConfig(localConfig)) {
+                        this.config = localConfig
+                        this.lastFetch = now
+                        return this.config
+                    }
+                }
+            } catch (localError) {
+                // Silently continue to default fallback
+                console.debug('Local refresh config not available, falling back to defaults:', localError)
             }
 
-            this.lastFetch = now
-            return this.config
+            // Tier 3: Default configuration
+            console.warn('Both API and local JSON failed, using default configuration')
+            return DEFAULT_REFRESH_CONFIG
+
         } catch (error) {
             console.warn('Failed to load refresh intervals config, using defaults:', error)
             return DEFAULT_REFRESH_CONFIG
         }
+    }
+
+    /**
+     * Validate that a refresh config object has all required fields
+     */
+    private isValidRefreshConfig(config: any): config is RefreshIntervalsConfig {
+        return (
+            typeof config === 'object' &&
+            typeof config.display1 === 'number' &&
+            typeof config.display2 === 'number' &&
+            typeof config.display3 === 'number' &&
+            typeof config.display4 === 'number' &&
+            typeof config.trackDisplay === 'number' &&
+            typeof config.announcer === 'number' &&
+            typeof config.fallbackInterval === 'number'
+        )
     }
 
     /**

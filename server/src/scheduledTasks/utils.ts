@@ -393,9 +393,41 @@ async function exportLiveTimingData() {
       'date.json',
     )
 
+    // Export refresh configuration to refreshConfig.json
+    await safeWriteFile(
+      getLiveTimingJsonFilePath('refreshConfig.json'),
+      config.refreshIntervals,
+      'refreshConfig.json',
+    )
+
     logger.info(`Exported live timing data to ${liveTimingJsonDir}`)
   } catch (error) {
     logger.error('Failed to export live timing data:', error)
+  }
+}
+
+/**
+ * Export only the refresh configuration to JSON file
+ * This can be called when refresh config is updated through admin interface
+ */
+async function exportRefreshConfig() {
+  try {
+    // Ensure the live-timing JSON directory exists
+    const liveTimingJsonDir = getLiveTimingJsonDir()
+    if (!existsSync(liveTimingJsonDir)) {
+      mkdirSync(liveTimingJsonDir, { recursive: true })
+    }
+
+    // Export refresh configuration to refreshConfig.json
+    await safeWriteFile(
+      getLiveTimingJsonFilePath('refreshConfig.json'),
+      config.refreshIntervals,
+      'refreshConfig.json',
+    )
+
+    logger.info(`Exported refresh configuration to ${liveTimingJsonDir}`)
+  } catch (error) {
+    logger.error('Failed to export refresh configuration:', error)
   }
 }
 
@@ -435,6 +467,7 @@ export const scheduledTasks = {
   getEventDate,
   writeMetadataFile,
   exportLiveTimingData,
+  exportRefreshConfig,
 }
 
 // Re-export the main functions for direct import
@@ -447,4 +480,5 @@ export {
   getEventDate,
   writeMetadataFile,
   exportLiveTimingData,
+  exportRefreshConfig,
 }

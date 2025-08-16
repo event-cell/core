@@ -11,6 +11,7 @@ import {
   generateEventsMetadata,
 } from '../scheduledTasks/index.js'
 import dayjs from 'dayjs'
+import { exportRefreshConfig } from '../scheduledTasks/utils.js'
 
 // ✅ Initialize tRPC
 const t = initTRPC.create()
@@ -209,6 +210,15 @@ export const configRoute = t.router({
 
       // Save to disk
       config.storeConfig()
+
+      // Export refresh configuration to JSON for live-timing website
+      try {
+        await exportRefreshConfig()
+        logger.info('Successfully exported refresh configuration to JSON')
+      } catch (error) {
+        logger.error('Failed to export refresh configuration:', error)
+        // Don't fail the request if export fails
+      }
 
       return config.refreshIntervals
     }),
