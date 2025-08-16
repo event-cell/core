@@ -30,7 +30,13 @@ export const OnTrack = ({
           height: 130,
         }}
       >
-        <PrimaryPaper>
+        <PrimaryPaper
+          sx={{
+            borderRadius: 2,
+            border: '1px solid rgba(0, 0, 0, 0.12)',
+            background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+          }}
+        >
           ON TRACK
           <br />
           {currentRun.number}: {currentRun.firstName} {currentRun.lastName}
@@ -40,7 +46,7 @@ export const OnTrack = ({
           {currentRun.class}
         </PrimaryPaper>
       </Grid>
-      <Grid size={{ xs:4 }}>
+      <Grid size={{ xs: 4 }}>
         <RenderInfo currentRun={currentRun} allRuns={competitors} />
       </Grid>
     </Grid>

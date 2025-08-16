@@ -58,7 +58,13 @@ const RenderClassList = ({
   }, [classes, allRuns, currentClassIndex]);
 
   return (
-    <PrimaryPaper>
+    <PrimaryPaper
+      sx={{
+        borderRadius: 2,
+        border: '1px solid rgba(0, 0, 0, 0.12)',
+        background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+      }}
+    >
       {currentClassList.map((eventClass) => (
         <Box key={eventClass.carClass.class} textAlign="left">
           <Box fontWeight="fontWeightMedium" display="inline" lineHeight="3">
@@ -235,7 +241,15 @@ export const Announcer = () => {
           columnSpacing={{ xs: 1, sm: 1, md: 2, lg: 4, xl: 4 }}
         >
           <Grid size={{ xs: 4 }}>
-            <PrimaryPaper sx={{ fontSize: 24, height: 96 }}>
+            <PrimaryPaper
+              sx={{
+                fontSize: 24,
+                height: 96,
+                borderRadius: 2,
+                border: '1px solid rgba(0, 0, 0, 0.12)',
+                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+              }}
+            >
               {currentCompetitor.number}: {currentCompetitor.firstName}{' '}
               {currentCompetitor.lastName}, {currentCompetitor.vehicle}
               <br />
@@ -243,12 +257,30 @@ export const Announcer = () => {
             </PrimaryPaper>
           </Grid>
           <Grid size={{ xs: 4 }}>
-            <PrimaryPaperCenter sx={{ fontSize: 48, fontWeight: 500, height: 96 }}>
+            <PrimaryPaperCenter
+              sx={{
+                fontSize: 48,
+                fontWeight: 500,
+                height: 96,
+                borderRadius: 2,
+                border: '1px solid rgba(0, 0, 0, 0.12)',
+                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+              }}
+            >
               {currentCompetitor.special}
             </PrimaryPaperCenter>
           </Grid>
           <Grid size={{ xs: 4 }}>
-            <PrimaryPaperCenter sx={{ fontSize: 48, fontWeight: 500, height: 96 }}>
+            <PrimaryPaperCenter
+              sx={{
+                fontSize: 48,
+                fontWeight: 500,
+                height: 96,
+                borderRadius: 2,
+                border: '1px solid rgba(0, 0, 0, 0.12)',
+                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+              }}
+            >
               Run {runCount.data}
             </PrimaryPaperCenter>
           </Grid>

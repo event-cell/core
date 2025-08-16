@@ -96,7 +96,14 @@ export const CompetitorTable: FC<{
   const hasMoreRows = maxRows && data.length > maxRows
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        borderRadius: 2,
+        border: '1px solid rgba(0, 0, 0, 0.12)',
+        background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+      }}
+    >
       <MUITable sx={{ minWidth: 640 }} size="small">
         <TableHead>
           <TableRow sx={{ height: 10, m: 0, p: 0 }}>

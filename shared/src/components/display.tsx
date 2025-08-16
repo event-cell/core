@@ -165,7 +165,13 @@ export const RenderInfo: FC<{
   return (
     <Grid>
       <Grid>
-        <PrimaryPaper>
+        <PrimaryPaper
+          sx={{
+            borderRadius: 2,
+            border: '1px solid rgba(0, 0, 0, 0.12)',
+            background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+          }}
+        >
           <MUITable sx={{ minWidth: 200 }} size="small">
             <TableHead>
               <TableRow>
@@ -237,7 +243,13 @@ export const RenderInfo: FC<{
         }}
       ></Grid>
       <Grid>
-        <PrimaryPaper>
+        <PrimaryPaper
+          sx={{
+            borderRadius: 2,
+            border: '1px solid rgba(0, 0, 0, 0.12)',
+            background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+          }}
+        >
           <Grid sx={{ fontSize: tableFontSizeLarge }}>
             <Typography variant="h4" sx={{ mb: 2 }}>Fastest Times</Typography>
 
