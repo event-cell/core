@@ -75,22 +75,104 @@ export const TrackDisplay = () => {
   const currentCompetitorId = trpc.currentcompetitor.number.useQuery(undefined);
   const competitors = trpc.competitors.list.useQuery(undefined);
 
+  // TrackDisplay refresh interval (2 seconds for real-time updates)
+  const trackDisplayRefresh = 2
+
+  // Log refresh configuration on startup
+  useEffect(() => {
+    console.log(`🚀 [STARTUP] TrackDisplay refresh configuration:`)
+    console.log(`   - Primary refresh: ${trackDisplayRefresh} seconds (React Query)`)
+    console.log(`   - Secondary refresh: 300 seconds (5 minutes fallback)`)
+    console.log(`   - Health check: 30 seconds (responsiveness monitoring)`)
+    console.log(`   - Error-based refresh: enabled (automatic error recovery)`)
+  }, [trackDisplayRefresh])
+
   // Create a stable refetch function with error handling
   const refetchAll = useCallback(async () => {
     try {
+      console.log(`🔄 [PRIMARY] React Query refetch - TrackDisplay`)
       await Promise.all([
         currentCompetitorId.refetch(),
         competitors.refetch(),
       ])
+      console.log(`✅ [PRIMARY] React Query refetch completed successfully`)
     } catch (error) {
-      console.error('Refetch failed:', error)
+      console.error('❌ [PRIMARY] Refetch failed:', error)
+      // If refetch fails, trigger a full page refresh
+      console.log('🔄 [ERROR-FALLBACK] Refetch failed, performing full page refresh')
+      window.location.reload()
     }
   }, [currentCompetitorId.refetch, competitors.refetch])
 
+  // Primary refresh: React Query refetch at track display intervals
   useEffect(() => {
-    const interval = setInterval(refetchAll, 1000 * 2);
+    const interval = setInterval(refetchAll, 1000 * trackDisplayRefresh);
     return () => clearInterval(interval);
-  }, [refetchAll]);
+  }, [refetchAll, trackDisplayRefresh]);
+
+  // Secondary refresh: Fallback full page refresh every 5 minutes
+  useEffect(() => {
+    const fallbackInterval = setInterval(() => {
+      console.log(`🔄 [SECONDARY] Fallback refresh - TrackDisplay (5-minute interval)`)
+      window.location.reload()
+    }, 5 * 60 * 1000) // 5 minutes
+
+    return () => clearInterval(fallbackInterval)
+  }, [])
+
+  // Tertiary refresh: Error-based refresh for unhandled errors
+  useEffect(() => {
+    const handleError = () => {
+      console.log(`🔄 [TERTIARY] Error-based refresh - TrackDisplay (JavaScript error detected)`)
+      window.location.reload()
+    }
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.log(`🔄 [TERTIARY] Error-based refresh - TrackDisplay (Unhandled promise rejection)`)
+      event.preventDefault() // Prevent default browser error handling
+      window.location.reload()
+    }
+
+    window.addEventListener('error', handleError)
+    window.addEventListener('unhandledrejection', handleUnhandledRejection)
+
+    return () => {
+      window.removeEventListener('error', handleError)
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection)
+    }
+  }, [])
+
+  // Health check: Refresh if app becomes unresponsive (no activity for 2 minutes)
+  useEffect(() => {
+    let lastActivity = Date.now()
+
+    const checkHealth = () => {
+      const now = Date.now()
+      if (now - lastActivity > 2 * 60 * 1000) { // 2 minutes of inactivity
+        console.log(`🔄 [HEALTH] Responsiveness refresh - TrackDisplay (No activity for 2+ minutes)`)
+        window.location.reload()
+      }
+    }
+
+    const updateActivity = () => {
+      lastActivity = Date.now()
+    }
+
+    // Update activity on user interaction
+    window.addEventListener('click', updateActivity)
+    window.addEventListener('keydown', updateActivity)
+    window.addEventListener('mousemove', updateActivity)
+
+    // Check health every 30 seconds
+    const healthInterval = setInterval(checkHealth, 30 * 1000)
+
+    return () => {
+      clearInterval(healthInterval)
+      window.removeEventListener('click', updateActivity)
+      window.removeEventListener('keydown', updateActivity)
+      window.removeEventListener('mousemove', updateActivity)
+    }
+  }, [])
 
   const requestErrors = requestWrapper({
     currentCompetitor: currentCompetitorId,

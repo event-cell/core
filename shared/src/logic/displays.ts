@@ -158,14 +158,6 @@ let lastDistribution: {
 } | null = null
 
 export async function splitDisplay(classesList: ClassType[], config?: DisplayDistributionConfig) {
-  console.log(`splitDisplay called - pathname: ${typeof window !== 'undefined' ? window.location.pathname : 'server'}, classes: ${classesList.length}, hasConfig: ${!!config}, timestamp: ${Date.now()}`)
-
-  console.log(`splitDisplay - checking pathname: ${window.location.pathname}`)
-  console.log(`splitDisplay - pathname === '/display': ${window.location.pathname === '/display'}`)
-  console.log(`splitDisplay - includes('/display/'): ${window.location.pathname.includes('/display/')}`)
-  console.log(`splitDisplay - first segment: ${window.location.pathname.split('/')[1]}`)
-  console.log(`splitDisplay - first segment includes '-': ${window.location.pathname.split('/')[1]?.includes('-')}`)
-
   if (
     typeof window === 'undefined' ||
     window.location.pathname === '/display' ||
@@ -173,7 +165,6 @@ export async function splitDisplay(classesList: ClassType[], config?: DisplayDis
     (!window.location.pathname.includes('/display/') && !window.location.pathname.includes('display/')) ||
     window.location.pathname.split('/')[1]?.includes('-')
   ) {
-    console.log(`splitDisplay early return - pathname: ${window.location.pathname}, showing all classes`)
     return classesList
   }
 
@@ -186,12 +177,9 @@ export async function splitDisplay(classesList: ClassType[], config?: DisplayDis
   let displayConfig: DisplayDistributionConfig
   if (config && config.maxRowsPerDisplay !== undefined) {
     displayConfig = config
-    console.log(`splitDisplay - using provided config:`, displayConfig)
   } else {
     try {
-      console.log(`splitDisplay - fetching config from service...`)
       displayConfig = await displayConfigService.getDisplayDistributionConfig()
-      console.log(`splitDisplay - loaded config from service:`, displayConfig)
     } catch (error) {
       console.warn('splitDisplay - failed to load config, using defaults:', error)
       displayConfig = DEFAULT_DISPLAY_CONFIG
@@ -209,7 +197,6 @@ export async function splitDisplay(classesList: ClassType[], config?: DisplayDis
       cls.drivers.length === classesList[i].drivers.length
     ) &&
     lastDistribution.config.maxRowsPerDisplay === displayConfig.maxRowsPerDisplay) {
-    console.log('splitDisplay using cached distribution')
     const screenIndex = Number.parseInt(window.location.pathname.replace(/^\/?display\//, ''))
     return getOptimizedDisplayClasses(lastDistribution.result, screenIndex, displayConfig)
   }
@@ -227,8 +214,6 @@ export async function splitDisplay(classesList: ClassType[], config?: DisplayDis
 
   try {
     const screenIndex = Number.parseInt(window.location.pathname.replace(/^\/?display\//, ''))
-    console.log(`splitDisplay - screenIndex: ${screenIndex}`)
-
     return getOptimizedDisplayClasses(optimized, screenIndex, displayConfig)
   } catch (e) {
     console.warn('splitDisplay error — falling back to full list', e)
@@ -241,53 +226,35 @@ export function getOptimizedDisplayClasses(
   screenIndex: number,
   config: DisplayDistributionConfig
 ): ItemizedClassType[] {
-  console.log(`getOptimizedDisplayClasses - received config:`, config)
-  console.log(`getOptimizedDisplayClasses - config.maxRowsPerDisplay: ${config.maxRowsPerDisplay}`)
-
   // Use default config if the passed config is invalid
   const displayConfig = (config && config.maxRowsPerDisplay !== undefined) ? config : DEFAULT_DISPLAY_CONFIG
-  console.log(`getOptimizedDisplayClasses - using displayConfig:`, displayConfig)
 
   const displayAssignments: ItemizedClassType[][] = [[], [], []]
   const display4: ItemizedClassType[] = []
   const displayRowCounts = [0, 0, 0]
 
-  console.log(`getOptimizedDisplayClasses - maxRowsPerDisplay: ${displayConfig.maxRowsPerDisplay}`)
-  console.log(`getOptimizedDisplayClasses - total classes: ${optimizedClasses.length}`)
-
   // Distribute classes sequentially starting from display 1
   for (const classType of optimizedClasses) {
     const classRows = 1 + classType.drivers.length
-    console.log(`getOptimizedDisplayClasses - class ${classType.carClass.class} has ${classType.drivers.length} drivers, ${classRows} rows`)
     let placed = false
 
     // Try to place on displays 1, 2, 3 in order
     for (let i = 0; i < 3; i++) {
-      console.log(`getOptimizedDisplayClasses - trying display ${i + 1}, current rows: ${displayRowCounts[i]}, would add: ${classRows}, max: ${displayConfig.maxRowsPerDisplay}`)
       if (displayRowCounts[i] + classRows <= displayConfig.maxRowsPerDisplay) {
         displayAssignments[i].push(classType)
         displayRowCounts[i] += classRows
         placed = true
-        console.log(`getOptimizedDisplayClasses - placed on display ${i + 1}`)
         break
-      } else {
-        console.log(`getOptimizedDisplayClasses - display ${i + 1} would exceed max rows`)
       }
     }
 
     // If no space on displays 1-3, place on display 4
     if (!placed) {
       display4.push(classType)
-      console.log(`getOptimizedDisplayClasses - placed on display 4`)
     }
   }
 
-  console.log(
-    'Final distribution:',
-    displayAssignments.map(
-      (d, i) => `Display ${i + 1}: ${d.length} classes, ${d.reduce((s, c) => s + 1 + c.drivers.length, 0)} rows`
-    )
-  )
+
 
   if (screenIndex >= 1 && screenIndex <= 3) {
     // Sort classes by classIndex within the display

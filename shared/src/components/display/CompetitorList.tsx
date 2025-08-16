@@ -56,9 +56,7 @@ export const DisplayCompetitorList: FC<{
     const loadDisplayContent = async () => {
       try {
         setIsLoading(true)
-        console.log('CompetitorList - calling splitDisplay...')
         const content = await splitDisplay(classesList)
-        console.log('CompetitorList - received display content:', content)
         setDisplayContent(content)
       } catch (error) {
         console.error('CompetitorList - failed to load display content:', error)

@@ -41,20 +41,16 @@ export class DisplayConfigService {
         ? `http://${typeof window !== 'undefined' ? window.location.hostname : 'timingserver.local'}:8080/api/v1`
         : '/api/v1'
 
-      console.log(`DisplayConfigService - fetching from: ${baseUrl}/config.getDisplayDistribution`)
       const response = await fetch(`${baseUrl}/config.getDisplayDistribution`)
 
-      console.log(`DisplayConfigService - response status: ${response.status}`)
       if (!response.ok) {
         throw new Error(`Failed to fetch display config: ${response.statusText}`)
       }
 
       const responseData = await response.json() as any
-      console.log(`DisplayConfigService - received config data:`, responseData)
 
       // Extract the actual config data from the nested response
       const configData = responseData.result?.data || responseData
-      console.log(`DisplayConfigService - extracted config data:`, configData)
 
       // Convert to our internal format
       this.config = {
@@ -97,7 +93,6 @@ export class DisplayConfigService {
       }
 
       const responseData = await response.json() as any
-      console.log(`DisplayConfigService - received update response:`, responseData)
 
       // Extract the actual config data from the nested response
       const configData = responseData.result?.data || responseData
