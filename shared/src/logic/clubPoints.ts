@@ -68,43 +68,58 @@ function getClassPositions(
         return aBestTime - bBestTime
     })
 
-    return sortedCompetitors.map((competitor, index) => ({
-        competitor,
-        position: index + 1,
-        points: calculatePoints(index + 1, classCompetitors.length)
-    }))
+    const positions = sortedCompetitors.map((competitor, index) => {
+        const position = index + 1
+        const points = calculatePoints(position, classCompetitors.length)
+
+        return {
+            competitor,
+            position,
+            points
+        }
+    })
+
+    return positions
 }
 
 /**
  * Calculate club points across all classes
  */
 export function calculateClubPoints(competitors: CompetitorList): ClubPoints[] {
+    // Filter out competitors in "Non TriSeries" class
+    const eligibleCompetitors = competitors.filter(c => c.class !== 'Non TriSeries')
+
     const clubPointsMap = new Map<string, { points: number; competitors: number }>()
 
-    // Get unique class indices
-    const classIndices = [...new Set(competitors.map(c => c.classIndex))]
+    // Get unique class indices from eligible competitors only
+    const classIndices = [...new Set(eligibleCompetitors.map(c => c.classIndex))]
 
     // Calculate points for each class
     classIndices.forEach(classIndex => {
-        const classPositions = getClassPositions(competitors, classIndex)
+        const classPositions = getClassPositions(eligibleCompetitors, classIndex)
 
-        classPositions.forEach(({ competitor, points }) => {
+        classPositions.forEach(({ competitor, position, points }) => {
             if (competitor.club) {
                 const existing = clubPointsMap.get(competitor.club) || { points: 0, competitors: 0 }
+                const newPoints = existing.points + points
+                const newCompetitors = existing.competitors + 1
+
                 clubPointsMap.set(competitor.club, {
-                    points: existing.points + points,
-                    competitors: existing.competitors + 1
+                    points: newPoints,
+                    competitors: newCompetitors
                 })
             }
         })
     })
 
     // Convert to array and sort by points (descending)
-    return Array.from(clubPointsMap.entries())
+    const result = Array.from(clubPointsMap.entries())
         .map(([club, data]) => ({
             club,
             points: data.points,
             competitors: data.competitors
         }))
         .sort((a, b) => b.points - a.points)
+
+    return result
 }
