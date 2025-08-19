@@ -260,6 +260,21 @@ export const TrackDisplay = () => {
   const personalBest = getPersonalBestSectors(currentCompetitor);
   const times = calculateTimes(splits);
 
+  // Explanation of color bar calculation:
+  // 1) Build bests:
+  //    - classBest = best sector and finish times among all competitors in the current class.
+  //    - personalBest = best sector and finish times for the current competitor.
+  // 2) Build current segment times from the latest run:
+  //    - times = { sector1: split1,
+  //               sector2: split2 - split1,
+  //               sector3: time - split2,
+  //               finish: time }
+  // 3) getSectorColors(classBest, personalBest, times) computes colors per segment with this rule:
+  //    - 'purple' when the segment/finish time <= class best (class record or equal).
+  //    - 'green' when <= personal best (but slower than class best).
+  //    - 'yellow' when > personal best.
+  //    - 'background.default' when the time is 0 or missing (segment not yet recorded).
+  // Returned keys map to visible bars: first, second, third -> sector bars; finish -> finish indicator.
   const {
     first: sector1Colour,
     second: sector2Colour,
@@ -269,10 +284,7 @@ export const TrackDisplay = () => {
 
   const { sector1, sector2, sector3 } = times;
 
-  const finishColor = [sector1Colour, sector2Colour, sector3Colour].reduce(
-    (accum, current) => (current !== 'background.default' ? current : accum),
-    finishPartial
-  );
+  const finishColor = finishPartial;
 
   // Calculate competitor text (name only)
   const competitorText = `${currentCompetitor.firstName} ${currentCompetitor.lastName}`.toUpperCase();

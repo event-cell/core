@@ -307,25 +307,11 @@ export const PersonalHistoryPage: FC = () => {
   };
 
   // Update filtered events when search query changes
+  // Only reset to all events when the search is cleared. Avoid per-keystroke filtering to improve performance.
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setFilteredEvents(allEvents);
-      return;
     }
-    
-    const searchLower = searchTerm.toLowerCase();
-    const filtered = allEvents.map(event => {
-      const filteredCompetitors = event.competitors.filter(competitor => 
-        `${competitor.firstName} ${competitor.lastName}`.toLowerCase().includes(searchLower)
-      );
-      
-      return {
-        ...event,
-        competitors: filteredCompetitors
-      };
-    }).filter(event => event.competitors.length > 0);
-    
-    setFilteredEvents(filtered);
   }, [searchTerm, allEvents]);
 
   // Memoize personal best calculations
