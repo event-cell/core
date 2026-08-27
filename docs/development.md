@@ -47,14 +47,26 @@ group.
   `.scdb` files across from the workstation:
   `rsync -av <mac-user>@<mac-host>:~/IdeaProjects/core/Events/ ./Events/`
 
-### Config location for native runs
+### Two configs: container vs native
 
-Outside a container there is no `/data/`, so point the server at the seeded config with
+The paths inside a config file are only valid in one place at a time, so `setup-linux.sh` seeds
+two of them:
+
+| File | Used by | Paths |
+|------|---------|-------|
+| `test-data/config.json` | `test-docker.sh` — mounted as `/data`, read as `/data/config.json` inside the container | Container: `/app/prisma/Events`, `/data/records`, `/data/live-timing` |
+| `dev-config/config.json` | Native runs via `CONFIG_DIR` | Host: `<repo>/Events`, `<repo>/test-data/...` |
+
+Outside a container there is no `/data/`, so point the server at the native config with
 `CONFIG_DIR`:
 
 ```bash
-CONFIG_DIR=$(pwd)/test-data yarn server:dev
+CONFIG_DIR=$(pwd)/dev-config yarn server:dev
 ```
+
+**Do not put host paths in `test-data/config.json`.** The container cannot see them, and Prisma
+fails with `Error code 14: Unable to open the database file` even though the bind mounts are
+correct. Verify a mount with `docker exec <container> ls -la /app/prisma/Events`.
 
 See [Configuration](configuration.md) for how the path is resolved.
 

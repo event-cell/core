@@ -255,6 +255,17 @@ echo ""
 # The server resolves its config via CONFIG_DIR first, then /data/, then a path
 # relative to the server dist (see server/src/config.ts). CONFIG_DIR is the
 # clean lever for running natively outside a container.
+#
+# Two configs are seeded, because the paths inside a config file are only valid
+# in one place at a time:
+#
+#   test-data/config.json  test-docker.sh mounts test-data/ as /data, so the
+#                          server reads this as /data/config.json from inside
+#                          the container. It must use container paths
+#                          (/app/prisma/Events, /data/...) — host paths here
+#                          produce "Error code 14: Unable to open the database
+#                          file", because they do not exist in the container.
+#   dev-config/config.json Used by native runs via CONFIG_DIR. Host paths.
 
 if [ ! -d "test-data" ]; then
     echo "📁 Creating test-data directory..."
@@ -264,7 +275,17 @@ fi
 if [ -f "test-data/config.json" ]; then
     echo "✅ test-data/config.json already exists, leaving it alone"
 else
-    echo "📝 Seeding test-data/config.json from config.json.example..."
+    echo "📝 Seeding test-data/config.json (container paths) from config.json.example..."
+    # config.json.example already carries the container paths, so it is copied as-is
+    cp config.json.example test-data/config.json
+    mkdir -p test-data/records test-data/live-timing
+fi
+
+if [ -f "dev-config/config.json" ]; then
+    echo "✅ dev-config/config.json already exists, leaving it alone"
+else
+    echo "📝 Seeding dev-config/config.json (host paths) from config.json.example..."
+    mkdir -p dev-config
     # Written as .cjs so it stays CommonJS regardless of "type": "module"
     cat > .seed-config.cjs <<'NODE_EOF'
 const { readFileSync, writeFileSync } = require('fs')
@@ -280,7 +301,7 @@ config.liveTimingOutputPath = join(repoDir, 'test-data', 'live-timing')
 config.rsyncSshKeyPath = join(repoDir, 'test-data', '.ssh', 'id_rsa')
 
 // Written relative to the repo root, which is where this script must be run from
-writeFileSync('test-data/config.json', JSON.stringify(config, null, 2) + '\n')
+writeFileSync('dev-config/config.json', JSON.stringify(config, null, 2) + '\n')
 NODE_EOF
     node .seed-config.cjs "$REPO_DIR"
     rm -f .seed-config.cjs
