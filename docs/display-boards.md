@@ -4,6 +4,7 @@
 
 | Board | URL | Default Refresh | Purpose |
 |-------|-----|----------------|---------|
+| Index | `/` | N/A | Links to every board below |
 | Display 1 | `/display/1` | 15 seconds | Competitor leaderboard, classes A–C |
 | Display 2 | `/display/2` | 15 seconds | Competitor leaderboard, classes D–F |
 | Display 3 | `/display/3` | 15 seconds | Competitor leaderboard, classes G–I |
