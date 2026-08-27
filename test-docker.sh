@@ -36,11 +36,14 @@ fi
 echo "🛑 Stopping any existing container on port 3000..."
 docker ps -q --filter "publish=3000" | xargs -r docker stop
 
-# Get the machine's IP address
-MACHINE_IP=$(hostname -I | awk '{print $1}')
+# Get the machine's IP address (macOS uses ipconfig; hostname -I is GNU/Linux only)
+MACHINE_IP=$(ipconfig getifaddr en0 2>/dev/null \
+  || ipconfig getifaddr en1 2>/dev/null \
+  || hostname -I 2>/dev/null | awk '{print $1}')
+[ -n "$MACHINE_IP" ] || MACHINE_IP="localhost"
 
 echo "🚀 Starting Docker container..."
-echo "   - Events directory mounted to /app/server/dist/prisma/Events"
+echo "   - Events directory mounted to /app/prisma/Events"
 echo "   - Test data directory mounted to /data"
 echo "   - Server will be available at:"
 echo "     Local:  http://localhost:3000"
@@ -51,7 +54,10 @@ echo "Press Ctrl+C to stop the container"
 echo ""
 
 # Run the container
+# The :z suffix relabels the mounted directories so SELinux (enforcing by
+# default on Fedora) lets the container read them. It modifies the labels on
+# the host directories, and is ignored on systems without SELinux.
 docker run --rm -p 0.0.0.0:3000:80 \
-  -v "$(pwd)/Events:/app/prisma/Events" \
-  -v "$(pwd)/test-data:/data" \
+  -v "$(pwd)/Events:/app/prisma/Events:z" \
+  -v "$(pwd)/test-data:/data:z" \
   event-cell-core:local 

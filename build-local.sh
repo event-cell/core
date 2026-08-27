@@ -43,6 +43,13 @@ du -sh node_modules/
 
 echo "🎉 Local build completed successfully!"
 
+# Check the Docker daemon is reachable before attempting a build
+if ! docker info >/dev/null 2>&1; then
+  echo "❌ Docker daemon not reachable. Start it with: sudo systemctl start docker"
+  echo "   If it is already running, check your group membership: newgrp docker"
+  exit 1
+fi
+
 echo "🐳 Building Docker image..."
 docker build -t event-cell-core:local .
 

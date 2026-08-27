@@ -8,6 +8,58 @@
 
 ---
 
+## Development Environment (Fedora 38 VM)
+
+Docker cannot run on the macOS workstation: that macOS install is itself a VM guest, and
+nested virtualisation is only offered to Linux guests, never to macOS guests. Every
+Docker-on-macOS option (Colima, Docker Desktop, Rancher, OrbStack, `podman machine`,
+Apple's `container`) is built on Virtualization.framework or Hypervisor.framework, so none
+of them can start there. Development therefore happens on a Linux VM, where containers are
+a plain kernel feature and need no nested virtualisation at all.
+
+**VM spec:** Fedora 38, ≥4 vCPU, 8 GB RAM, 40 GB disk (`node_modules/` alone is ~560 MB
+before Docker images).
+
+### One-command setup
+
+```bash
+git clone <repo-url> core && cd core
+./setup-linux.sh
+```
+
+`setup-linux.sh` installs Node 22 (via `nvm`), Yarn 4 (via `corepack`), Docker CE, the base
+build tools and the project dependencies, generates the Prisma clients, and seeds a
+development config. It is idempotent, so it is safe to re-run.
+
+Afterwards, log out and back in (or run `newgrp docker`) so your shell picks up the `docker`
+group.
+
+### Things to know
+
+- **Fedora 38 is EOL**, so its mirrors have moved to the Fedora archive. If `dnf` cannot
+  refresh its metadata, the setup script offers to repoint the base and updates repos at
+  `https://dl.fedoraproject.org/pub/archive/fedora/linux/`, backing up the originals first.
+- **SELinux is enforcing.** `test-docker.sh` passes `:z` on its bind mounts so the container
+  can read them. Do not disable SELinux to work around mount errors.
+- **firewalld.** To reach the test container from other machines:
+  `sudo firewall-cmd --add-port=3000/tcp --permanent && sudo firewall-cmd --reload`
+- **Event databases are not in git.** `Events/` and `test-data/` are gitignored, so copy the
+  `.scdb` files across from the workstation:
+  `rsync -av <mac-user>@<mac-host>:~/IdeaProjects/core/Events/ ./Events/`
+
+### Config location for native runs
+
+Outside a container there is no `/data/`, so point the server at the seeded config with
+`CONFIG_DIR`:
+
+```bash
+CONFIG_DIR=$(pwd)/test-data yarn server:dev
+```
+
+See [Configuration](configuration.md) for how the path is resolved.
+
+---
+
 ## Monorepo Structure
 
 The project uses Yarn Workspaces. The five workspaces are:
