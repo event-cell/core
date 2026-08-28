@@ -17,6 +17,8 @@ import { config } from './config.js'
 import { Admin } from './pages/admin.js'
 import { TrackDisplay } from './pages/trackDisplay.js'
 import { Announcer } from './pages/announcer.js'
+import { HomePage } from './pages/home.js'
+import { getRouterPrefix } from './utils/routerPrefix.js'
 
 import type { TRPCRouter } from 'server/src/router/index.js';
 
@@ -33,12 +35,6 @@ export const useTrpcClient = create(() =>
     ],
   })
 );
-
-function getRouterPrefix() {
-  const firstPath = window.location.pathname.split('/')[1]
-  if (firstPath.includes('-')) return firstPath
-  return ''
-}
 
 function App() {
   // Create QueryClient with better configuration for real-time data
@@ -68,6 +64,7 @@ function App() {
         <Theme>
           <Router>
             <Routes>
+              <Route path={root + "/"} element={<HomePage />} />
               <Route path={root + "/admin/"} element={<Admin />} />
               <Route path={root + "/display/"} element={<DisplayPage />} />
               <Route path={root + "/display/1"} element={<DisplayPage />} />

@@ -4,6 +4,7 @@
 
 | Board | URL | Default Refresh | Purpose |
 |-------|-----|----------------|---------|
+| Index | `/` | N/A | Links to every board below |
 | Display 1 | `/display/1` | 15 seconds | Competitor leaderboard, classes A–C |
 | Display 2 | `/display/2` | 15 seconds | Competitor leaderboard, classes D–F |
 | Display 3 | `/display/3` | 15 seconds | Competitor leaderboard, classes G–I |
@@ -78,9 +79,10 @@ Designed to be shown on a large TV at the side of the track. Shows real-time sec
 |   [Finish color bar — full width]                        |  60px
 +----------------------------------------------------------+
 |                                                          |
-|   58.10                          SDMA                    |  240px
-|   (finish time, 280px font)      (club, right column)   |
-|                                                          |
+|   58.10                          121                     |  240px
+|   (finish time, 280px font)      km/h  (radar speed)     |
+|                                  ----------------        |
+|                                  SDMA  (club)            |
 +----------------------------------------------------------+
 |   [20px spacer]                                          |
 +----------------------------------------------------------+
@@ -92,7 +94,23 @@ Designed to be shown on a large TV at the side of the track. Shows real-time sec
 
 The layout uses a CSS Grid with two columns:
 - **Left (2fr):** finish time (left-justified, 280px font)
-- **Right (1fr):** club name (centered, responsive 96–128px font)
+- **Right (1fr):** radar speed above the club name (both centered)
+
+### Radar Speed
+
+The top of the right column shows the maximum speed recorded by the radar for the
+current run, in whole km/h, polled from `speed.current` on the track display's
+refresh interval.
+
+The panel is **blank whenever there is no speed for the run on course** — the radar
+keeps reporting the last pass it saw, so a car that has started a run but not yet
+reached the speed trap would otherwise show the previous car's speed. A reading
+only appears once the car trips the trap, which sits beyond the first split. A
+blank panel is also what an unreachable radar looks like; the rest of the board is
+unaffected.
+
+Each pass is also recorded in `Speeds.db` — see [configuration.md](./configuration.md)
+for the radar settings and the database schema.
 
 ### Sector Color Coding
 

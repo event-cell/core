@@ -47,14 +47,26 @@ group.
   `.scdb` files across from the workstation:
   `rsync -av <mac-user>@<mac-host>:~/IdeaProjects/core/Events/ ./Events/`
 
-### Config location for native runs
+### Two configs: container vs native
 
-Outside a container there is no `/data/`, so point the server at the seeded config with
+The paths inside a config file are only valid in one place at a time, so `setup-linux.sh` seeds
+two of them:
+
+| File | Used by | Paths |
+|------|---------|-------|
+| `test-data/config.json` | `test-docker.sh` — mounted as `/data`, read as `/data/config.json` inside the container | Container: `/app/prisma/Events`, `/data/records`, `/data/live-timing` |
+| `dev-config/config.json` | Native runs via `CONFIG_DIR` | Host: `<repo>/Events`, `<repo>/test-data/...` |
+
+Outside a container there is no `/data/`, so point the server at the native config with
 `CONFIG_DIR`:
 
 ```bash
-CONFIG_DIR=$(pwd)/test-data yarn server:dev
+CONFIG_DIR=$(pwd)/dev-config yarn server:dev
 ```
+
+**Do not put host paths in `test-data/config.json`.** The container cannot see them, and Prisma
+fails with `Error code 14: Unable to open the database file` even though the bind mounts are
+correct. Verify a mount with `docker exec <container> ls -la /app/prisma/Events`.
 
 See [Configuration](configuration.md) for how the path is resolved.
 
@@ -86,7 +98,7 @@ yarn install
 yarn server:setup
 ```
 
-`yarn server:setup` runs `prisma generate` for all four schema files, producing TypeScript clients in `server/src/prisma/generated/`.
+`yarn server:setup` runs `prisma generate` for every schema file, producing TypeScript clients in `server/src/prisma/generated/`.
 
 ---
 
@@ -137,13 +149,15 @@ Or re-run the full setup:
 yarn server:setup
 ```
 
-The four schema files and their outputs:
+The schema files and their outputs:
 
 | Schema file | Output directory | Used for |
 |-------------|-----------------|---------|
 | `schemaOnline.prisma` | `generated/online/` | Online.scdb |
 | `schemaEvent.prisma` | `generated/event/` | Event{id}.scdb |
 | `schemaEventData.prisma` | `generated/eventData/` | Event{id}Ex.scdb |
+| `schemaRecords.prisma` | `generated/records/` | records.sqlite |
+| `schemaSpeeds.prisma` | `generated/speeds/` | Speeds.db — radar speeds |
 
 ---
 
@@ -171,7 +185,18 @@ yarn client:build    # Vite → client/dist/
 yarn server:build    # tsc → server/dist/
 ```
 
-The server build copies the client bundle into `server/dist/server/ui/` so that Express can serve it as static files. This is how the single-port architecture works in production.
+**Neither build copies the client bundle into `server/dist/server/ui/`** — only
+`yarn workspace client build:server-ui` does, and Express serves the display pages from there.
+Without that step the server answers `/`, `/display` and `/admin` with
+`504 The UI has not been built with the server`, while the API keeps working:
+
+```bash
+yarn workspace client build:server-ui   # client → server/dist/server/ui/
+```
+
+Since `Dockerfile` copies the pre-built output rather than building, an image is only as
+current as the last build — always `yarn build` before `docker build`, or it silently ships
+stale code.
 
 ---
 

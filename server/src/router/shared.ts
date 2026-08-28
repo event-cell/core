@@ -2,8 +2,10 @@ import { config } from '../config.js'
 import { EventDB, getEventDatabases } from '../dbUtils.js'
 import { TRPCError } from '@trpc/server'
 import { CompetitorList, TimeInfoList } from './objects.js'
-import { nullToUndefined } from '../utils/index.js'
+import { nullToUndefined, setupLogger } from '../utils/index.js'
 import { getPersonalBestSectors } from '../utils/competitors.js'
+
+const logger = setupLogger('router/shared')
 
 export let { event, eventData, online } = getEventDatabases(config.eventId)
 
@@ -35,18 +37,31 @@ export async function getCompetitorJSON() {
     })
   }
 
-  try {
-    heats.push(await eventData.tTIMEINFOS_HEAT1.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT2.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT3.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT4.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT5.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT6.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT7.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT8.findMany())
-    heats.push(await eventData.tTIMEINFOS_HEAT9.findMany())
-    // eslint-disable-next-line no-empty
-  } catch (e) { }
+  // Each heat is read on its own: an event that has not run all nine heats yet
+  // throws on the missing tables, and sharing one try would silently drop every
+  // heat after the first failure — competitors would come back missing runs.
+  // Typed by the shape used here: the nine delegates are distinct Prisma types,
+  // and their union is not callable
+  const heatTables: { findMany: () => Promise<any[]> }[] = [
+    eventData.tTIMEINFOS_HEAT1,
+    eventData.tTIMEINFOS_HEAT2,
+    eventData.tTIMEINFOS_HEAT3,
+    eventData.tTIMEINFOS_HEAT4,
+    eventData.tTIMEINFOS_HEAT5,
+    eventData.tTIMEINFOS_HEAT6,
+    eventData.tTIMEINFOS_HEAT7,
+    eventData.tTIMEINFOS_HEAT8,
+    eventData.tTIMEINFOS_HEAT9,
+  ]
+
+  for (const [index, table] of heatTables.entries()) {
+    try {
+      heats.push(await table.findMany())
+    } catch (e) {
+      logger.debug(`Heat ${index + 1} unavailable: ${e}`)
+      heats.push([])
+    }
+  }
 
   const competitors: CompetitorList = await Promise.all(tCOMPETITORSTable.map(async (competitor: any) => {
     // Check if C_I29 has a value, if not fall back to C_SERIE

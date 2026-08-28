@@ -33,6 +33,10 @@ const FONT_SIZES = {
   FINISH_TIME: 280,
 };
 
+// The right-hand column is split between speed and the club name
+const SPEED_PANEL_HEIGHT = Math.round(HEIGHTS.FINISH_TIME * 0.6);
+const CLUB_PANEL_HEIGHT = HEIGHTS.FINISH_TIME - SPEED_PANEL_HEIGHT - 8; // 8px gap
+
 // Common styling patterns
 const commonStyles = {
   borderRadius: '4px',
@@ -106,6 +110,9 @@ export const TrackDisplay = () => {
   // ✅ Converted to v10 tRPC usage
   const currentCompetitorId = trpc.currentcompetitor.number.useQuery(undefined);
   const competitors = trpc.competitors.list.useQuery(undefined);
+  // `speed` is null until the car on course trips the radar, so the previous
+  // run's speed is never shown against a new run
+  const speed = trpc.speed.current.useQuery(undefined);
 
   // Dynamic refresh intervals from configuration
   const [trackDisplayRefresh, setTrackDisplayRefresh] = React.useState(2)
@@ -145,6 +152,7 @@ export const TrackDisplay = () => {
       await Promise.all([
         currentCompetitorId.refetch(),
         competitors.refetch(),
+        speed.refetch(),
       ])
       console.log(`✅ [PRIMARY] React Query refetch completed successfully`)
     } catch (error) {
@@ -159,7 +167,7 @@ export const TrackDisplay = () => {
         console.log(`⏳ [ERROR-COOLDOWN] Skipping error refresh, cooldown active (${Math.ceil((ERROR_REFRESH_COOLDOWN - (now - lastErrorRefresh)) / 1000)}s remaining)`)
       }
     }
-  }, [currentCompetitorId.refetch, competitors.refetch, lastErrorRefresh])
+  }, [currentCompetitorId.refetch, competitors.refetch, speed.refetch, lastErrorRefresh])
 
   // Primary refresh: React Query refetch at track display intervals
   useEffect(() => {
@@ -289,6 +297,10 @@ export const TrackDisplay = () => {
   // Calculate competitor text (name only)
   const competitorText = `${currentCompetitor.firstName} ${currentCompetitor.lastName}`.toUpperCase();
 
+  // The radar is optional equipment: a failed or absent speed query simply
+  // leaves the panel blank rather than disturbing the rest of the display
+  const maxSpeed = speed.data?.speed ?? null;
+
   // CSS Grid layout with fixed dimensions
   const layout = {
     display: 'grid',
@@ -348,17 +360,54 @@ export const TrackDisplay = () => {
         </Box>
       </Box>
 
-      {/* Club name - right side */}
-      <Box sx={{ gridColumn: '2 / 3' }}>
+      {/* Speed over club name - right side */}
+      <Box sx={{ gridColumn: '2 / 3', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* Radar speed. Empty (never zero) when no pass belongs to this run, so
+            the panel holds its size and the layout does not shift */}
         <Box sx={{
           ...commonStyles,
           bgcolor: 'background.default',
-          height: HEIGHTS.FINISH_TIME,
+          height: SPEED_PANEL_HEIGHT,
+          flexDirection: 'column',
+        }}>
+          {typeof maxSpeed === 'number' && (
+            <>
+              <Typography
+                sx={{
+                  fontSize: 'clamp(96px, 7vw, 140px)',
+                  fontWeight: '700',
+                  fontFamily: 'Roboto',
+                  color: 'text.primary',
+                  lineHeight: 1,
+                }}
+              >
+                {Math.round(maxSpeed)}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: 'clamp(24px, 2vw, 36px)',
+                  fontWeight: '400',
+                  fontFamily: 'Roboto',
+                  color: 'text.secondary',
+                  lineHeight: 1.4,
+                }}
+              >
+                km/h
+              </Typography>
+            </>
+          )}
+        </Box>
+
+        {/* Club name */}
+        <Box sx={{
+          ...commonStyles,
+          bgcolor: 'background.default',
+          height: CLUB_PANEL_HEIGHT,
           justifyContent: 'center' // Center the club name
         }}>
           <Typography
             sx={{
-              fontSize: 'clamp(96px, 6vw, 128px)', // Responsive font scaling for club name
+              fontSize: 'clamp(48px, 4vw, 72px)', // Responsive font scaling for club name
               fontWeight: '700',
               fontFamily: 'Roboto',
               textAlign: 'center',

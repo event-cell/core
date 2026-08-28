@@ -28,6 +28,11 @@ export function setupLogger(name: string) {
       new winston.transports.File({
         filename: 'logfile.log',
         format: logfileFormat,
+        // An event day runs unattended: without a cap the log grows until the
+        // disk does. Keeps the most recent ~50 MB.
+        maxsize: 10 * 1024 * 1024,
+        maxFiles: 5,
+        tailable: true,
       }),
     ],
   })

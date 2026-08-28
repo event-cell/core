@@ -268,3 +268,6 @@ Events/
 
 # Test data directory
 test-data/
+
+# Native-run config (machine-specific absolute paths)
+dev-config/

@@ -17,6 +17,7 @@
     "client:build": "cd client && yarn build",
     "setup": "yarn client:setup && yarn server:setup",
     "build": "yarn client:build && yarn server:build",
+    "test": "tsx server/src/radar/radar.test.ts",
     "lint": "eslint ."
   },
   "resolutions": {

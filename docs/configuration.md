@@ -57,6 +57,10 @@ All fields are optional. Missing fields use the defaults shown below.
     "maxRowsPerDisplay": 20
   },
 
+  // Radar speed monitor — see "Speed Monitoring" below
+  "speedMonitorUrl": "http://radar1.local/radar/two.html",
+  "speedDatabasePath": "/data/speeds",
+
   // Refresh interval settings (all values in seconds)
   "refreshIntervals": {
     "display1": 15,        // React Query refetch for /display/1
@@ -69,6 +73,57 @@ All fields are optional. Missing fields use the defaults shown below.
   }
 }
 ```
+
+---
+
+## Speed Monitoring
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `speedMonitorUrl` | `http://radar1.local/radar/two.html` | The radar's status page |
+| `speedDatabasePath` | `/app/prisma/Events/Speeds.db` | The speeds database, beside the event databases |
+
+**The socket is derived from the URL, not configured separately.** The radar publishes
+speeds at `ws://<host>/ws/radar1-slow/`, so only the host of `speedMonitorUrl` matters —
+`http://radar1.local/radar/two.html` becomes `ws://radar1.local/ws/radar1-slow/`. To
+override the path, set `speedMonitorUrl` to a `ws://` or `wss://` URL and it is used as-is.
+
+An internet-exposed radar is available for testing: `http://www.dd.id.au//radar/two.html`.
+
+The server holds one connection and reconnects on its own; connections drop routinely
+(observed: close code 1006 after ~9s), and an attempt that hangs without failing is
+abandoned after 10s. A connection that goes silent for 120s is recycled, since the radar
+emits continuously even when idle. An unreachable radar costs nothing but a blank speed
+panel, so `radar1.local` being absent off-site is harmless.
+
+### Speeds.db
+
+The server owns `Speeds.db`, which lives with the event databases and uses the schema
+that was already in service before the server took over writing it:
+
+```sql
+speeds(event, time_t, speed)          -- every pass, attributed or not
+car_speeds(event, heat, car, speed)   -- best speed per competitor per heat
+```
+
+`speed` is an integer in **tenths of a km/h** (1273 = 127.3 km/h), `event` is the numeric
+event id, and `time_t` is a Unix timestamp in seconds. History from before this code is
+therefore still readable by the displays.
+
+`car_speeds` is kept at one row per `(event, heat, car)`, updated when a faster pass
+arrives. Its unique constraint spans the speed column too, so a blind insert would
+accumulate a row per pass — reads use `MAX(speed)` grouped by car, which also copes with
+the legacy rows that did.
+
+The directory holding it must already exist — it is created one level deep at most, because
+Node's recursive directory creation can spin forever on a path the kernel refuses, which would
+hang the server rather than fail. A wrong path is reported once and retried every 60 seconds.
+
+**The `Events` directory is mounted read-write** in `docker-compose.yml` for this reason.
+The timing software still owns the `.scdb` files and the server never writes to them; if
+you would rather keep the directory read-only, bind-mount `Speeds.db` on its own as
+read-write instead. The file and tables are created on first use, and an unwritable path
+simply means no speeds are recorded — the live display is unaffected.
 
 ---
 

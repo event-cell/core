@@ -21,6 +21,7 @@ Event Cell Core is a Docker-containerized real-time timing display system. It co
 
 | URL | Purpose | Location |
 |-----|---------|----------|
+| `/` | Index of all available screens | Any browser |
 | `/display/1` | Competitor leaderboard — board 1 | Cafe |
 | `/display/2` | Competitor leaderboard — board 2 | Cafe |
 | `/display/3` | Competitor leaderboard — board 3 | Cafe |

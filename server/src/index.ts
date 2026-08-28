@@ -14,7 +14,9 @@ import { executeScheduledTasks } from './scheduledTasks/index.js'
 import { getCurrentHeat, setupLogger } from './utils/index.js'
 import { getCompetitorJSON } from './router/shared.js'
 import { getCurrentCompetitor } from './router/currentCompetitor.js'
-import { readFileSync, writeFileSync, chmodSync } from 'fs'
+import { radarClient } from './radar/client.js'
+import { closeStore } from './radar/store.js'
+import { readFileSync, writeFileSync, chmodSync, statSync } from 'fs'
 
 // Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url)
@@ -56,7 +58,7 @@ async function setupSshKey(): Promise<void> {
     let needsCopy = true
     if (existsSync(containerKeyPath)) {
       try {
-        const stats = require('fs').statSync(containerKeyPath)
+        const stats = statSync(containerKeyPath)
         const mode = stats.mode & 0o777
         if (mode === 0o600) {
           needsCopy = false
@@ -126,6 +128,10 @@ const app = express()
 
     // Setup SSH key with proper permissions
     await setupSshKey()
+
+    // Connect to the radar speed monitor. This keeps retrying in the background
+    // and never throws, so an unreachable radar does not hold up the server.
+    radarClient.start()
 
     // Log working directory and paths
     const workingDir = cwd()
@@ -204,85 +210,48 @@ const app = express()
 
     logger.info('gets defined')
 
-    // Pass all unfound routes to the UI for react-router to handle
-    app.get('/admin', (req, res) => {
+    // Pass all unfound routes to the UI for react-router to handle. A catch-all
+    // rather than a list of eight, so bookmarked variants (`/announcer/`) and any
+    // route added to the client later work without a matching server change.
+    app.get(/.*/, (req, res) => {
       if (!existsSync(uiPath)) {
         res.status(504).send('Server error: The UI has not been built with the server')
         return
       }
-      logger.info('Serving index.html for admin route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
 
-    app.get('/display', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for display route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
-
-    // Handle specific display routes
-    app.get('/display/1', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for display/1 route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
-
-    app.get('/display/2', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for display/2 route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
-
-    app.get('/display/3', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for display/3 route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
-
-    app.get('/display/4', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for display/4 route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
-
-    app.get('/trackdisplay', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for trackdisplay route')
-      res.sendFile(join(uiPath, 'index.html'))
-    })
-
-    app.get('/announcer', (req, res) => {
-      if (!existsSync(uiPath)) {
-        res.status(504).send('Server error: The UI has not been built with the server')
-        return
-      }
-      logger.info('Serving index.html for announcer route')
+      logger.debug(`Serving index.html for ${req.path}`)
       res.sendFile(join(uiPath, 'index.html'))
     })
 
     const serverPort = process.env.PORT || 8080
 
-    app.listen(serverPort, () =>
+    const httpServer = app.listen(serverPort, () =>
       logger.info(`Server listening on port ${serverPort}`),
     )
+
+    // `docker stop` sends SIGTERM. Without this the process is killed mid-write,
+    // which risks leaving a half-finished transaction in the speeds database.
+    let shuttingDown = false
+    const shutdown = async (signal: string) => {
+      if (shuttingDown) return
+      shuttingDown = true
+      logger.info(`Received ${signal}, shutting down`)
+
+      httpServer.close()
+      radarClient.stop()
+
+      try {
+        await closeStore()
+      } catch (error) {
+        logger.warn(`Error closing the speed database: ${error}`)
+      }
+
+      logger.info('Shutdown complete')
+      process.exit(0)
+    }
+
+    process.on('SIGTERM', () => void shutdown('SIGTERM'))
+    process.on('SIGINT', () => void shutdown('SIGINT'))
 
     const mins = 1
     // Start Immediately
