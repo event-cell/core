@@ -8,7 +8,14 @@ import { getCurrentHeat, getHeatInterTableKey } from '../utils/index.js'
 const t = initTRPC.create()
 const logger = setupLogger('currentCompetitor')
 
-export async function getCurrentCompetitor() {
+/**
+ * The competitor currently on course, or null when that cannot be determined.
+ *
+ * Callers that must show something use `getCurrentCompetitor()`, which falls back
+ * to competitor 1. Callers that record data use this instead, so a database
+ * failure is never mistaken for a genuine reading of competitor 1.
+ */
+export async function getCurrentCompetitorOrNull(): Promise<number | null> {
   if (!event || !eventData) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
@@ -35,11 +42,15 @@ export async function getCurrentCompetitor() {
       take: 1,
     })
 
-    return competitorQuery[0]?.C_NUM || 1
+    return competitorQuery[0]?.C_NUM || null
   } catch (e) {
     logger.warn(`Error getting current competitor: ${e}`)
-    return 1
+    return null
   }
+}
+
+export async function getCurrentCompetitor() {
+  return (await getCurrentCompetitorOrNull()) ?? 1
 }
 
 export const currentCompetitor = t.router({

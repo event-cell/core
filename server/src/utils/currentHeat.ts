@@ -16,9 +16,16 @@ export const getHeatInterTableKey = (heat: number): HeatInterTableKey => {
   return `tTIMERECORDS_HEAT${heat}_INTER1` as HeatInterTableKey
 }
 
-export async function getCurrentHeat() {
+/**
+ * The heat currently running, or null when that cannot be determined.
+ *
+ * Callers that must show something use `getCurrentHeat()`, which falls back to
+ * heat 1. Callers that record data use this instead, so a database failure is
+ * never mistaken for a genuine reading of heat 1.
+ */
+export async function getCurrentHeatOrNull(): Promise<number | null> {
   try {
-    if (!online) return 1
+    if (!online) return null
 
     // Check if the online database has the TPARAMETERS table
     try {
@@ -31,14 +38,18 @@ export async function getCurrentHeat() {
         },
       })
       const currentHeat = parseInt(heatRow?.C_VALUE || '0')
-      return currentHeat
+      return Number.isFinite(currentHeat) ? currentHeat : null
     } catch (dbError) {
-      // If the table doesn't exist or database is empty, return default heat
-      console.warn('Online database table not available, using default heat 1:', dbError)
-      return 1
+      // If the table doesn't exist or database is empty, the heat is unknown
+      console.warn('Online database table not available:', dbError)
+      return null
     }
   } catch (e) {
     console.error('Failed to fetch current heat', e)
-    return 1
+    return null
   }
+}
+
+export async function getCurrentHeat() {
+  return (await getCurrentHeatOrNull()) ?? 1
 }

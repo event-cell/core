@@ -8,5 +8,6 @@
     "noEmit": false // Create JS files from TS files
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  // Test files are run directly with tsx, so they are kept out of the build
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts"]
 }

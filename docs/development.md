@@ -98,7 +98,7 @@ yarn install
 yarn server:setup
 ```
 
-`yarn server:setup` runs `prisma generate` for all four schema files, producing TypeScript clients in `server/src/prisma/generated/`.
+`yarn server:setup` runs `prisma generate` for every schema file, producing TypeScript clients in `server/src/prisma/generated/`.
 
 ---
 
@@ -149,13 +149,15 @@ Or re-run the full setup:
 yarn server:setup
 ```
 
-The four schema files and their outputs:
+The schema files and their outputs:
 
 | Schema file | Output directory | Used for |
 |-------------|-----------------|---------|
 | `schemaOnline.prisma` | `generated/online/` | Online.scdb |
 | `schemaEvent.prisma` | `generated/event/` | Event{id}.scdb |
 | `schemaEventData.prisma` | `generated/eventData/` | Event{id}Ex.scdb |
+| `schemaRecords.prisma` | `generated/records/` | records.sqlite |
+| `schemaSpeeds.prisma` | `generated/speeds/` | Speeds.db — radar speeds |
 
 ---
 
@@ -183,7 +185,18 @@ yarn client:build    # Vite → client/dist/
 yarn server:build    # tsc → server/dist/
 ```
 
-The server build copies the client bundle into `server/dist/server/ui/` so that Express can serve it as static files. This is how the single-port architecture works in production.
+**Neither build copies the client bundle into `server/dist/server/ui/`** — only
+`yarn workspace client build:server-ui` does, and Express serves the display pages from there.
+Without that step the server answers `/`, `/display` and `/admin` with
+`504 The UI has not been built with the server`, while the API keeps working:
+
+```bash
+yarn workspace client build:server-ui   # client → server/dist/server/ui/
+```
+
+Since `Dockerfile` copies the pre-built output rather than building, an image is only as
+current as the last build — always `yarn build` before `docker build`, or it silently ships
+stale code.
 
 ---
 
