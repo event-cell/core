@@ -5,13 +5,15 @@ const logger = setupLogger('router/config')
 
 import { config, ConfigType } from '../config.js'
 import { getEventDatabases } from '../dbUtils.js'
-import { setNewEvent } from '../router/shared.js'
+import { setNewEvent, event, eventData, online } from '../router/shared.js'
 import {
   syncLiveTimingData,
   generateEventsMetadata,
 } from '../scheduledTasks/index.js'
 import dayjs from 'dayjs'
 import { exportRefreshConfig } from '../scheduledTasks/utils.js'
+import { radarClient } from '../radar/client.js'
+import { resetStore } from '../radar/store.js'
 
 // ✅ Initialize tRPC
 const t = initTRPC.create()
@@ -19,8 +21,8 @@ const t = initTRPC.create()
 // Helper function to get event date in YYYY-MM-DD format
 async function getEventDateFormatted() {
   try {
-    // Get the event database
-    const { event } = getEventDatabases(config.eventId)
+    // The shared client, rather than getEventDatabases(): that constructs three
+    // Prisma clients per call and nothing disconnects them
 
     // Query the TPARAMETERS table for the DATE parameter
     const dateParam = await event.tPARAMETERS.findFirst({
@@ -59,6 +61,7 @@ export const configRoute = t.router({
         eventDate: z.string(),
         uploadLiveTiming: z.boolean(),
         liveTimingOutputPath: z.string(),
+        speedMonitorUrl: z.string(),
       }),
     )
     .query(async () => {
@@ -68,9 +71,6 @@ export const configRoute = t.router({
       // Format the event name with date first
       let formattedEventName = ''
       try {
-        // Get the event database
-        const { event } = getEventDatabases(config.eventId)
-
         // Query the TPARAMETERS table for the DATE parameter
         const dateParam = await event.tPARAMETERS.findFirst({
           where: { C_PARAM: 'DATE' },
@@ -113,6 +113,7 @@ export const configRoute = t.router({
         eventDate: eventDate,
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath,
+        speedMonitorUrl: config.speedMonitorUrl,
       }
     }),
 
@@ -232,6 +233,7 @@ export const configRoute = t.router({
         eventDate: z.string(),
         uploadLiveTiming: z.boolean(),
         liveTimingOutputPath: z.string(),
+        speedMonitorUrl: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -239,18 +241,36 @@ export const configRoute = t.router({
 
       const wasUploadEnabled = config.uploadLiveTiming
       const oldEventId = config.eventId
+      const oldSpeedMonitorUrl = config.speedMonitorUrl
+      const oldSpeedDatabasePath = config.speedDatabasePath
 
       config.set(input)
       config.storeConfig()
+
+      // Reconnect the radar when it has been pointed somewhere else
+      if (config.speedMonitorUrl !== oldSpeedMonitorUrl) {
+        logger.info(
+          `Speed monitor URL changed to ${config.speedMonitorUrl}, reconnecting radar`,
+        )
+        radarClient.restart()
+      }
+
+      if (config.speedDatabasePath !== oldSpeedDatabasePath) {
+        logger.info(`Speed database path changed to ${config.speedDatabasePath}`)
+        resetStore()
+      }
+
+      // Opened once and reused below for setNewEvent(), rather than constructing
+      // a second set of clients that nothing would ever disconnect
+      const newDatabases = input.eventId ? getEventDatabases(input.eventId) : null
 
       // Get the event name
       let eventName = ''
       let eventDate = ''
       try {
         // Check if eventId is defined before calling getEventDatabases
-        if (input.eventId) {
-          // Get the event database
-          const { event } = getEventDatabases(input.eventId)
+        if (newDatabases) {
+          const { event } = newDatabases
 
           // Query the TPARAMETERS table for the DATE parameter
           const dateParam = await event.tPARAMETERS.findFirst({
@@ -299,17 +319,27 @@ export const configRoute = t.router({
         eventName = `${currentDate}`
       }
 
-      // Check if eventId was changed
-      if (input.eventId && input.eventId !== oldEventId) {
-        logger.info(
-          `Event ID changed from ${oldEventId} to ${input.eventId}, recreating directory and triggering sync`,
-        )
+      // Replacing the shared databases: disconnect the outgoing clients so a
+      // long-running server does not accumulate them
+      const disconnectPrevious = async () => {
+        for (const client of [event, eventData, online]) {
+          try {
+            await client?.$disconnect()
+          } catch (error) {
+            logger.warn(`Failed to disconnect a previous event database: ${error}`)
+          }
+        }
+      }
 
-        // Set new event database
-        setNewEvent(getEventDatabases(input.eventId))
-      } else if (input.eventId) {
-        // Just set the new event database without recreating directory
-        setNewEvent(getEventDatabases(input.eventId))
+      if (newDatabases) {
+        if (input.eventId !== oldEventId) {
+          logger.info(
+            `Event ID changed from ${oldEventId} to ${input.eventId}, recreating directory and triggering sync`,
+          )
+        }
+
+        await disconnectPrevious()
+        setNewEvent(newDatabases)
       }
 
       return {
@@ -318,6 +348,7 @@ export const configRoute = t.router({
         eventDate: eventDate,
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath,
+        speedMonitorUrl: config.speedMonitorUrl,
       }
     }),
 })

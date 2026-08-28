@@ -19,6 +19,8 @@ export const ConfigType = z
     eventName: z.string(),
     eventDatabasePath: z.string(),
     recordsDatabasePath: z.string(),
+    speedDatabasePath: z.string(),
+    speedMonitorUrl: z.string(),
     uploadLiveTiming: z.boolean().optional(),
     liveTimingOutputPath: z.string().optional(),
     rsyncRemoteHost: z.string().optional(),
@@ -51,7 +53,17 @@ class Config {
   public eventName = 'Unnamed Event'
   public eventDatabasePath = join(__dirname, '..', 'prisma/Events')
   public recordsDatabasePath = '/data/records'
+  /**
+   * Speeds.db, which sits beside the event databases. The directory is mounted
+   * read-write for this reason — see docker-compose.yml.
+   */
+  public speedDatabasePath = '/app/prisma/Events/Speeds.db'
   public resultsPath = '/data/results'
+  /**
+   * The radar speed monitor page. Its host is used to derive the WebSocket the
+   * radar publishes speeds on — see `getRadarSocketUrl()` in `radar/client.ts`.
+   */
+  public speedMonitorUrl = 'http://radar1.local/radar/two.html'
   public uploadLiveTiming = false
   public liveTimingOutputPath = '/data/live-timing'
   public rsyncRemoteHost = ''
@@ -152,6 +164,14 @@ class Config {
       this.eventDatabasePath = config.eventDatabasePath
     if (config.recordsDatabasePath)
       this.recordsDatabasePath = config.recordsDatabasePath
+    if (config.speedDatabasePath)
+      this.speedDatabasePath = config.speedDatabasePath
+    if (config.speedMonitorUrl) {
+      if (this.speedMonitorUrl !== config.speedMonitorUrl) {
+        logger.info(`speedMonitorUrl set to ${config.speedMonitorUrl}`)
+      }
+      this.speedMonitorUrl = config.speedMonitorUrl
+    }
     if (typeof config.uploadLiveTiming === 'boolean') {
       if (this.uploadLiveTiming !== config.uploadLiveTiming) {
         logger.info(`uploadLiveTiming changed to ${config.uploadLiveTiming}`)
@@ -215,6 +235,8 @@ class Config {
       eventName: this.eventName,
       eventDatabasePath: this.eventDatabasePath,
       recordsDatabasePath: this.recordsDatabasePath,
+      speedDatabasePath: this.speedDatabasePath,
+      speedMonitorUrl: this.speedMonitorUrl,
       uploadLiveTiming: this.uploadLiveTiming,
       liveTimingOutputPath: this.liveTimingOutputPath,
       rsyncRemoteHost: this.rsyncRemoteHost,

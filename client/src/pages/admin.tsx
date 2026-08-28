@@ -26,6 +26,8 @@ export const Admin = () => {
   const setConfig = trpc.config.set.useMutation();
   const loading = setConfig.isPending;
   const config = trpc.config.get.useQuery(undefined);
+  // Polled so the connection state is live while the radar is being set up
+  const speedStatus = trpc.speed.status.useQuery(undefined, { refetchInterval: 5000 });
   const [isEndOfDayLoading, setIsEndOfDayLoading] = useState(false);
   const [isLoadingEventDate, setIsLoadingEventDate] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
@@ -55,7 +57,8 @@ export const Admin = () => {
     eventId: '',
     eventName: '',
     eventDate: '',
-    uploadLiveTiming: false
+    uploadLiveTiming: false,
+    speedMonitorUrl: ''
   });
 
   // Load display configuration using tRPC
@@ -103,7 +106,8 @@ export const Admin = () => {
         eventId: config.data.eventId || '',
         eventName: config.data.eventName || '',
         eventDate: config.data.eventDate || '',
-        uploadLiveTiming: config.data.uploadLiveTiming || false
+        uploadLiveTiming: config.data.uploadLiveTiming || false,
+        speedMonitorUrl: config.data.speedMonitorUrl || ''
       });
     }
   }, [config.data]);
@@ -158,7 +162,8 @@ export const Admin = () => {
         eventId: result.eventId,
         eventName: result.eventName,
         eventDate: result.eventDate,
-        uploadLiveTiming: result.uploadLiveTiming
+        uploadLiveTiming: result.uploadLiveTiming,
+        speedMonitorUrl: result.speedMonitorUrl
       });
     } catch (error) {
       console.error('Failed to save configuration:', error);
@@ -262,6 +267,39 @@ export const Admin = () => {
             }
             label="Upload Live Timing"
           />
+        </Box>
+
+        {/* Speed Monitoring */}
+        <Box sx={{ p: 3, border: 1, borderColor: 'divider', borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Speed Monitoring
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              fullWidth
+              label="Radar Monitor URL"
+              value={newConfig.speedMonitorUrl || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMonitorUrl: e.target.value });
+              }}
+              helperText="The radar's status page. Its host is used to reach the speed WebSocket."
+            />
+            <Alert severity={speedStatus.data?.connected ? 'success' : 'warning'}>
+              {speedStatus.data
+                ? speedStatus.data.connected
+                  ? `Connected to ${speedStatus.data.url}`
+                  : `Not connected to ${speedStatus.data.url || 'the radar'}` +
+                    (speedStatus.data.lastError ? ` — ${speedStatus.data.lastError}` : '')
+                : 'Checking radar connection…'}
+              {speedStatus.data?.lastMessageAt
+                ? ` (last reading ${dayjs(speedStatus.data.lastMessageAt).format('HH:mm:ss')})`
+                : ''}
+            </Alert>
+            <Typography variant="caption" color="text.secondary">
+              Speed is saved with the rest of the event configuration below.
+            </Typography>
+          </Box>
         </Box>
 
         {/* Display Configuration */}

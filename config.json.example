@@ -3,6 +3,8 @@
   "eventName": "Sample Event",
   "eventDatabasePath": "/app/prisma/Events",
   "recordsDatabasePath": "/data/records",
+  "speedDatabasePath": "/app/prisma/Events/Speeds.db",
+  "speedMonitorUrl": "http://radar1.local/radar/two.html",
   "uploadLiveTiming": false,
   "liveTimingOutputPath": "/data/live-timing",
   "rsyncRemoteHost": "",
@@ -21,4 +23,4 @@
     "announcer": 2,
     "fallbackInterval": 300
   }
-} 
+}

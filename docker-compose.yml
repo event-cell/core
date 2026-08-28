@@ -10,7 +10,8 @@ services:
       - type: bind
         source: "${CORE_DATA}"
         target: /data
+      # Writable: the timing software owns the .scdb files, but the server
+      # writes radar speeds to Speeds.db in this directory
       - type: bind
         source: "${TIMING_DB}"
         target: /app/prisma/Events
-        read_only: true

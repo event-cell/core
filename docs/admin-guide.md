@@ -41,6 +41,21 @@ Click **Save Display Configuration** to persist.
 
 ---
 
+## Speed Monitoring
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| Radar Monitor URL | `http://radar1.local/radar/two.html` | The radar's status page; its host is used to reach the speed WebSocket |
+
+Below the field is a live connection status, polled every 5 seconds: green when the
+server is connected to the radar, amber when it is not, with the derived socket URL and
+the time of the last reading. Use it to confirm the radar is reachable before an event.
+
+The value is saved with the rest of the event configuration (**Save**), and the server
+reconnects to the new address immediately — no restart needed.
+
+---
+
 ## Refresh Configuration
 
 Individual sliders for each display's refresh interval:

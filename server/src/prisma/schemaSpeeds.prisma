@@ -1,0 +1,35 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "./generated/speeds"
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("SPEED_DB")
+}
+
+// Radar speeds, stored alongside the event databases in Speeds.db. The schema
+// matches the file already in use, so existing history stays readable.
+//
+// Speeds are integers in tenths of a km/h: 1273 is 127.3 km/h.
+// The datasource URL is supplied at runtime from config.speedDatabasePath.
+
+/// Every recorded pass, whether or not it could be attributed to a car
+model speeds {
+  event  Int
+  time_t Int
+  speed  Int
+
+  @@unique([event, time_t, speed], map: "Tuple")
+}
+
+/// Best speed per competitor per heat, which is what the displays read
+model car_speeds {
+  event Int
+  heat  Int
+  car   Int
+  speed Int
+
+  @@unique([event, heat, car, speed], map: "CarTuple")
+}
