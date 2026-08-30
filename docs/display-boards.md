@@ -68,7 +68,8 @@ Within each display, classes are then sorted by `classIndex` (ascending) for con
 ### Display 4 Extras
 
 Display 4 also shows:
-- **On Track** panel: shows the competitor currently on course (from `currentcompetitor.number`)
+- **On Track** panel: shows the competitor currently on course (from `currentcompetitor.number`),
+  including the speed recorded for the run they are on, or `-- kph` when there is none
 - **Tri-Series Points** panel: club championship points table
 
 ### Refresh Rate
@@ -172,6 +173,11 @@ Default: 2 seconds (React Query refetch). Configurable via admin page.
 **Source:** `client/src/pages/announcer.tsx`
 
 Shown on a screen at the announcer's desk. Provides richer context for commentary.
+
+A **SPEED** panel across the top states the speed for the car on course outright, rather than
+leaving it to be read out of the class table: the live pass if the car is on the trap now,
+otherwise the speed recorded for the run they are on. It never falls back to an earlier run — a
+stale number read aloud as current is worse than `--`.
 
 ### Content
 
