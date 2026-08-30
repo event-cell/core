@@ -17,7 +17,8 @@
   "rsyncRemotePath": "",
   "rsyncSshKeyPath": "/data/.ssh/id_rsa",
   "displayDistribution": {
-    "maxRowsPerDisplay": 20
+    "maxRowsPerDisplay": 25,
+    "classOrder": []
   },
   "refreshIntervals": {
     "display1": 15,
