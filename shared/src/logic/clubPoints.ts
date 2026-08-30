@@ -16,6 +16,9 @@ export interface ClassPosition {
  * Calculate points for a position based on class size
  */
 function calculatePoints(position: number, classSize: number): number {
+    return Math.max(0, 11 - position)
+/**
+ *  Pointscore for 2025
     if (classSize >= 7) {
         // Standard points system for 7+ competitors
         if (position === 1) return 7
@@ -46,6 +49,7 @@ function calculatePoints(position: number, classSize: number): number {
         return 2
     }
     return 0
+ */
 }
 
 /**
