@@ -55,7 +55,14 @@ export async function getCurrentRun(): Promise<CurrentRun | null> {
 
     const runKey = `${heat}:${competitor}`
 
-    if (!current || current.runKey !== runKey) {
+    if (!current) {
+      // The first run we see has not "changed" — we have no idea when it began.
+      // Timestamping it now would withhold the speed of a pass already under
+      // way, which is every first car after a restart, so treat it as
+      // long-standing instead.
+      current = { heat, competitor, runKey, changedAt: 0 }
+      logger.info(`Run on course: heat ${heat}, competitor ${competitor}`)
+    } else if (current.runKey !== runKey) {
       current = { heat, competitor, runKey, changedAt: Date.now() }
       logger.info(`Run changed to heat ${heat}, competitor ${competitor}`)
     }
