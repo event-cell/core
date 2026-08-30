@@ -60,7 +60,11 @@ export const Admin = () => {
     uploadLiveTiming: false,
     speedMonitorUrl: '',
     speedMqttUrl: '',
-    speedMqttTopic: ''
+    speedMqttTopic: '',
+    speedMqttUsername: '',
+    speedMqttClientId: '',
+    // Write-only: never populated from the server, sent only when retyped
+    speedMqttPassword: ''
   });
 
   // Load display configuration using tRPC
@@ -111,7 +115,10 @@ export const Admin = () => {
         uploadLiveTiming: config.data.uploadLiveTiming || false,
         speedMonitorUrl: config.data.speedMonitorUrl || '',
         speedMqttUrl: config.data.speedMqttUrl || '',
-        speedMqttTopic: config.data.speedMqttTopic || ''
+        speedMqttTopic: config.data.speedMqttTopic || '',
+        speedMqttUsername: config.data.speedMqttUsername || '',
+        speedMqttClientId: config.data.speedMqttClientId || '',
+        speedMqttPassword: ''
       });
     }
   }, [config.data]);
@@ -159,7 +166,13 @@ export const Admin = () => {
   const handleSave = async () => {
     try {
       // Save the configuration and get the updated values
-      const result = await setConfig.mutateAsync(newConfig);
+      // An empty password means "leave the stored one alone", so it is not sent
+      const { speedMqttPassword, ...rest } = newConfig;
+      const payload = speedMqttPassword
+        ? { ...rest, speedMqttPassword }
+        : rest;
+
+      const result = await setConfig.mutateAsync(payload);
 
       // Update the state with the returned values
       setNewConfig({
@@ -169,7 +182,11 @@ export const Admin = () => {
         uploadLiveTiming: result.uploadLiveTiming,
         speedMonitorUrl: result.speedMonitorUrl,
         speedMqttUrl: result.speedMqttUrl,
-        speedMqttTopic: result.speedMqttTopic
+        speedMqttTopic: result.speedMqttTopic,
+        speedMqttUsername: result.speedMqttUsername,
+        speedMqttClientId: result.speedMqttClientId,
+        // Cleared after saving, so it is never held in the page
+        speedMqttPassword: ''
       });
     } catch (error) {
       console.error('Failed to save configuration:', error);
@@ -302,6 +319,37 @@ export const Admin = () => {
             />
             <TextField
               fullWidth
+              label="MQTT Username"
+              value={newConfig.speedMqttUsername || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttUsername: e.target.value });
+              }}
+            />
+            <TextField
+              fullWidth
+              type="password"
+              label="MQTT Password"
+              value={newConfig.speedMqttPassword || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttPassword: e.target.value });
+              }}
+              placeholder={config.data?.speedMqttPasswordSet ? '•••••••• (stored)' : 'not set'}
+              helperText="Write-only: the stored password is never sent back to this page. Leave blank to keep it."
+            />
+            <TextField
+              fullWidth
+              label="MQTT Client ID"
+              value={newConfig.speedMqttClientId || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttClientId: e.target.value });
+              }}
+              helperText="Must be unique on the broker — a repeated id disconnects the other client."
+            />
+            <TextField
+              fullWidth
               label="Radar Monitor URL (fallback)"
               value={newConfig.speedMonitorUrl || ''}
               onChange={(e) => {
@@ -333,8 +381,7 @@ export const Admin = () => {
               {speedStatus.data?.websocket.lastError ? ` (${speedStatus.data.websocket.lastError})` : ''}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              Broker credentials live in config.json and are not editable here. Speed settings are
-              saved with the rest of the event configuration below.
+              Speed settings are saved with the rest of the event configuration below.
             </Typography>
           </Box>
         </Box>

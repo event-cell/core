@@ -43,16 +43,53 @@ Click **Save Display Configuration** to persist.
 
 ## Speed Monitoring
 
+Speeds come from the radar's MQTT broker, with the radar's own WebSocket as a fallback.
+
 | Field | Default | Description |
 |-------|---------|-------------|
-| Radar Monitor URL | `http://radar1.local/radar/two.html` | The radar's status page; its host is used to reach the speed WebSocket |
+| Radar MQTT Broker | `wss://www.dd.id.au:443/mqtt` | Broker publishing radar readings — the preferred source |
+| MQTT Topic | `radar/#` | Topic to subscribe to |
+| MQTT Username | *(blank)* | Broker username |
+| MQTT Password | *(blank)* | Broker password — see below |
+| MQTT Client ID | `event-cell-core` | Must be unique on the broker |
+| Radar Monitor URL (fallback) | `http://radar1.local/radar/two.html` | The radar's status page; its host is where the WebSocket lives |
 
-Below the field is a live connection status, polled every 5 seconds: green when the
-server is connected to the radar, amber when it is not, with the derived socket URL and
-the time of the last reading. Use it to confirm the radar is reachable before an event.
+Values are saved with the rest of the event configuration (**Save**), and the server
+reconnects to the new settings immediately — no restart needed.
 
-The value is saved with the rest of the event configuration (**Save**), and the server
-reconnects to the new address immediately — no restart needed.
+### The password field is write-only
+
+Typing a password and saving stores it. Reading the page never shows it back: the field
+displays `•••••••• (stored)` when one is set, and the server does not return the value at all.
+
+**Leave it blank to keep the stored password.** Only a non-empty value replaces it. To remove a
+password entirely, edit `config.json` — the page cannot clear it.
+
+This is deliberate. `/admin` has no authentication, so anything the page can display, anyone
+who can reach the server can read.
+
+### Client ID
+
+Brokers evict an existing session when a second client connects with the same id, so two
+clients sharing an id disconnect each other in a loop. If the older python harness
+(`samples/radar_sink_db`, which uses `Radar_Sink`) is running anywhere, this must differ from it.
+
+### Connection status
+
+Below the fields, polled every 5 seconds:
+
+| Colour | Meaning |
+|--------|---------|
+| Green | Using MQTT — connected to the broker |
+| Amber | Fallen back to the WebSocket radar; the broker is unreachable, with the reason shown |
+| Red | No speed source is running |
+
+A line underneath reports both sources independently, plus the time of the last MQTT reading.
+Use it to confirm the radar is reachable before an event.
+
+**A quiet feed is not a fault.** The broker publishes only when a car passes the speed trap, so
+between runs there is nothing to send and the last-reading time simply stops advancing. Failover
+is decided by the connection, not by silence.
 
 ---
 

@@ -78,7 +78,13 @@ radar's protocol, with `/mode?mode=hold|idle|cycle` to hold a pass open or end i
 `scripts/check-trackdisplay.mjs` drives Chromium (Playwright) against a running server and
 asserts what the board actually paints, with screenshots written to `$SHOT_DIR`.
 
+`scripts/fake-broker.mjs` does the same job for the MQTT source: a local broker plus a
+publisher, with `/publish?speed=&daySecs=&time=` for one reading and `/burst?count=` for a
+backlog arriving at once. Passing an explicit `time` republishes a byte-identical message, which
+is how a broker redelivery is tested.
+
 ```bash
+node scripts/fake-broker.mjs         # mqtt://127.0.0.1:1883, control on :1884
 yarn fake-radar                      # terminal 1: ws://127.0.0.1:8899/ws/radar1-slow/
 # point speedMonitorUrl at it, start the server or container, then:
 yarn check:display http://localhost:3002

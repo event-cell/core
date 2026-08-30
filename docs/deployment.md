@@ -28,7 +28,7 @@ services:
       - type: bind
         source: "${TIMING_DB}"
         target: /app/prisma/Events
-        read_only: true
+
 ```
 
 ### Environment Variables
@@ -80,7 +80,10 @@ This directory is persisted across container restarts and contains:
 
 ### /app/prisma/Events Volume
 
-Points to the directory where Msport Pro writes its `.scdb` files. Mounted **read-only** to ensure the timing software is never affected by the container.
+Points to the directory where Msport Pro writes its `.scdb` files. Mounted **read-write**, because the
+server owns `Speeds.db` in the same directory — see [Configuration](configuration.md). The server
+never writes to the `.scdb` files themselves; if you would rather keep the directory read-only,
+bind-mount `Speeds.db` on its own as read-write instead.
 
 The files expected:
 - `Online.scdb` — updated live during the event

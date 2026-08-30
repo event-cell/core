@@ -16,13 +16,13 @@ Event Cell Core reads live timing data produced by Msport Pro software and distr
          | writes to SQLite files
          v
   +-----------------------------------------+
-  |  /app/prisma/Events/  (read-only mount)  |
+  |  /app/prisma/Events/  (read-write mount) |
   |   Online.scdb                            |
   |   Event{id}.scdb                         |
   |   Event{id}Ex.scdb                       |
   +-----------------------------------------+
          |
-         | Prisma ORM (read-only queries)
+         | Prisma ORM (reads .scdb, writes Speeds.db)
          v
   +--------------------------------------------------+
   |          Docker Container (Event Cell Core)       |
@@ -103,7 +103,7 @@ core/
    - TTIMEINFOS_HEAT{n}: C_INTER1/C_INTER2/C_TIME/C_STATUS updated
    - TPARAMETERS (Online.scdb): C_PARAM='HEAT' updated with current heat number
         |
-3. Prisma reads the SQLite files (read-only, no locking risk)
+3. Prisma reads the `.scdb` files and never writes them, so the timing software is unaffected
         |
 4. tRPC endpoint processes the data:
    - Joins competitor metadata with timing data

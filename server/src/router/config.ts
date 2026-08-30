@@ -64,6 +64,12 @@ export const configRoute = t.router({
         speedMonitorUrl: z.string(),
         speedMqttUrl: z.string(),
         speedMqttTopic: z.string(),
+        speedMqttUsername: z.string(),
+        speedMqttClientId: z.string(),
+        // The password itself is deliberately never returned: /admin and this
+        // endpoint are unauthenticated, so a read must not disclose it. The
+        // page reports only whether one is stored.
+        speedMqttPasswordSet: z.boolean(),
       }),
     )
     .query(async () => {
@@ -118,6 +124,9 @@ export const configRoute = t.router({
         speedMonitorUrl: config.speedMonitorUrl,
         speedMqttUrl: config.speedMqttUrl,
         speedMqttTopic: config.speedMqttTopic,
+        speedMqttUsername: config.speedMqttUsername,
+        speedMqttClientId: config.speedMqttClientId,
+        speedMqttPasswordSet: Boolean(config.speedMqttPassword),
       }
     }),
 
@@ -240,6 +249,12 @@ export const configRoute = t.router({
         speedMonitorUrl: z.string(),
         speedMqttUrl: z.string(),
         speedMqttTopic: z.string(),
+        speedMqttUsername: z.string(),
+        speedMqttClientId: z.string(),
+        // The password itself is deliberately never returned: /admin and this
+        // endpoint are unauthenticated, so a read must not disclose it. The
+        // page reports only whether one is stored.
+        speedMqttPasswordSet: z.boolean(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -250,6 +265,9 @@ export const configRoute = t.router({
       const oldSpeedMonitorUrl = config.speedMonitorUrl
       const oldSpeedMqttUrl = config.speedMqttUrl
       const oldSpeedMqttTopic = config.speedMqttTopic
+      const oldSpeedMqttUsername = config.speedMqttUsername
+      const oldSpeedMqttPassword = config.speedMqttPassword
+      const oldSpeedMqttClientId = config.speedMqttClientId
       const oldSpeedDatabasePath = config.speedDatabasePath
 
       config.set(input)
@@ -259,7 +277,10 @@ export const configRoute = t.router({
       if (
         config.speedMonitorUrl !== oldSpeedMonitorUrl ||
         config.speedMqttUrl !== oldSpeedMqttUrl ||
-        config.speedMqttTopic !== oldSpeedMqttTopic
+        config.speedMqttTopic !== oldSpeedMqttTopic ||
+        config.speedMqttUsername !== oldSpeedMqttUsername ||
+        config.speedMqttPassword !== oldSpeedMqttPassword ||
+        config.speedMqttClientId !== oldSpeedMqttClientId
       ) {
         logger.info('Radar configuration changed, reconnecting the speed sources')
         restartSpeedSources()
@@ -361,6 +382,9 @@ export const configRoute = t.router({
         speedMonitorUrl: config.speedMonitorUrl,
         speedMqttUrl: config.speedMqttUrl,
         speedMqttTopic: config.speedMqttTopic,
+        speedMqttUsername: config.speedMqttUsername,
+        speedMqttClientId: config.speedMqttClientId,
+        speedMqttPasswordSet: Boolean(config.speedMqttPassword),
       }
     }),
 })

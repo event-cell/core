@@ -78,10 +78,56 @@ All fields are optional. Missing fields use the defaults shown below.
 
 ## Speed Monitoring
 
+The radar can be read two ways, and the server prefers MQTT.
+
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `speedMonitorUrl` | `http://radar1.local/radar/two.html` | The radar's status page |
+| `speedMqttUrl` | `wss://www.dd.id.au:443/mqtt` | Broker publishing radar readings — the preferred source |
+| `speedMqttTopic` | `radar/#` | Topic to subscribe to |
+| `speedMqttUsername` | *(blank)* | Broker username |
+| `speedMqttPassword` | *(blank)* | Broker password |
+| `speedMqttClientId` | `event-cell-core` | Client id. **Never reuse another client's id** |
+| `speedMonitorUrl` | `http://radar1.local/radar/two.html` | The radar's status page — the fallback source |
 | `speedDatabasePath` | `/app/prisma/Events/Speeds.db` | The speeds database, beside the event databases |
+
+**Credentials belong in `config.json`, not in the repository.** The username and password
+default to blank for that reason. `config.json` lives in the `/data` mount, which is not in
+version control.
+
+**A client id must be unique on the broker.** Brokers evict an existing session when a second
+client connects with the same id, so two clients sharing an id knock each other offline in a
+loop. If the python harness (`samples/radar_sink_db`, client id `Radar_Sink`) is still running
+anywhere, core must not use its id.
+
+### Why MQTT is preferred
+
+The broker publishes one message per completed pass, each carrying its own timestamp:
+
+```
+Time: 1787900000 MaxSpeed: 118.4 Day_secs: 45123
+```
+
+`Time` is Unix seconds, `MaxSpeed` is km/h for the whole pass, and `Day_secs` is seconds since
+local midnight — the same clock the timing database's `C_HOUR2` columns use. Because each
+reading says when it happened, a patchy network delays readings rather than losing them, and a
+message that arrives late is still attributed to the run it belongs to.
+
+Fields are read by label, so extra or reordered fields do not break parsing.
+
+### Falling back to the WebSocket
+
+When the broker cannot be reached the server falls back to the radar's WebSocket after 30
+seconds, and returns to MQTT as soon as the broker is back. Only one source runs at a time, so
+a reading is never recorded twice.
+
+**Failover keys on the connection, not on silence.** The broker publishes only when a car passes
+the trap, so a quiet grid is indistinguishable from a healthy idle feed; treating silence as
+failure would flap to the WebSocket every time the track went quiet.
+
+The WebSocket carries live samples rather than finished passes, so it can show a speed climbing
+during a run — which MQTT cannot, since a pass is only published once it is over. What it cannot
+do is timestamp a reading, so on the fallback a reading can only be attributed to whatever is on
+course at the time.
 
 **The socket is derived from the URL, not configured separately.** The radar publishes
 speeds at `ws://<host>/ws/radar1-slow/`, so only the host of `speedMonitorUrl` matters —
@@ -102,13 +148,38 @@ The server owns `Speeds.db`, which lives with the event databases and uses the s
 that was already in service before the server took over writing it:
 
 ```sql
-speeds(event, time_t, speed)          -- every pass, attributed or not
-car_speeds(event, heat, car, speed)   -- best speed per competitor per heat
+speeds(event, time_t, speed)                  -- every reading, attributed or not
+car_speeds(event, heat, car, speed)           -- best speed per competitor per heat
+run_speeds(event, heat, car, time_t, speed)   -- every attributed reading, in full
 ```
+
+`speeds` and `car_speeds` are the schema the python harness used and keep their original
+meaning, so history collected before this code still reads correctly. `run_speeds` is new: MQTT
+can deliver several readings for one run, and screens that want more than a single number per
+run read from here. Its unique constraint spans the whole row, so a message redelivered after a
+network outage adds nothing.
 
 `speed` is an integer in **tenths of a km/h** (1273 = 127.3 km/h), `event` is the numeric
 event id, and `time_t` is a Unix timestamp in seconds. History from before this code is
 therefore still readable by the displays.
+
+### How a reading is attributed to a run
+
+A reading is placed by asking the timing database which run was under way at *its* timestamp,
+rather than by what is on course when it arrives. For a reading at `Day_secs`:
+
+1. in each heat, find the last first-split (`INTER1`) crossing at or before that moment
+2. check that car's next finish (`FINISH`) falls after it
+3. reject the candidate if the reading sits outside a plausible run — after the finish, or more
+   than 100 seconds past the split
+4. across heats, take the run whose split is closest before the reading
+
+A message delayed by ten minutes therefore still lands on the car that earned it, and a reading
+that matches no run — a warm-up lap, or between runs — is kept in `speeds` unattributed rather
+than being forced onto the wrong car.
+
+On the WebSocket fallback there is no timestamp, so a pass is instead attributed to the run on
+course, and is only shown if it began after that run started.
 
 `car_speeds` is kept at one row per `(event, heat, car)`, updated when a faster pass
 arrives. Its unique constraint spans the speed column too, so a blind insert would
@@ -138,11 +209,10 @@ volumes:
     source: "${CORE_DATA}"      # set in your .env file
     target: /data
 
-  # Msport Pro database files — READ ONLY
+  # Msport Pro database files, plus Speeds.db which the server writes
   - type: bind
     source: "${TIMING_DB}"      # set in your .env file
     target: /app/prisma/Events
-    read_only: true
 ```
 
 **Environment variables to set (in a `.env` file next to `docker-compose.yml`):**
