@@ -70,6 +70,27 @@ correct. Verify a mount with `docker exec <container> ls -la /app/prisma/Events`
 
 See [Configuration](configuration.md) for how the path is resolved.
 
+### Checking a display renders
+
+The boards are only really verified by looking at them, so two scripts do that
+headlessly. `scripts/fake-radar.mjs` is a dependency-free WebSocket server speaking the
+radar's protocol, with `/mode?mode=hold|idle|cycle` to hold a pass open or end it.
+`scripts/check-trackdisplay.mjs` drives Chromium (Playwright) against a running server and
+asserts what the board actually paints, with screenshots written to `$SHOT_DIR`.
+
+```bash
+yarn fake-radar                      # terminal 1: ws://127.0.0.1:8899/ws/radar1-slow/
+# point speedMonitorUrl at it, start the server or container, then:
+yarn check:display http://localhost:3002
+```
+
+It asserts the speed and `km/h` appear while a pass is open, and that both are gone once it
+ends while the rest of the board still renders. Playwright needs its browser once:
+`npx playwright install chromium`.
+
+Note that jsdom cannot be used for this: it silently ignores `<script type="module">`, which
+is what Vite emits, so the page never executes and the root element stays empty.
+
 ---
 
 ## Monorepo Structure
