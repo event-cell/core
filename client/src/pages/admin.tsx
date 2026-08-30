@@ -40,7 +40,7 @@ export const Admin = () => {
     maxRowsPerDisplay: number
     classOrder: number[]
   }>({
-    maxRowsPerDisplay: 20,
+    maxRowsPerDisplay: 25,
     classOrder: [],
   });
   const [displayConfigLoading, setDisplayConfigLoading] = useState(false);

@@ -60,7 +60,7 @@ Each class occupies:
   1 row (header) + N rows (one per driver)
   Total = 1 + N rows per class
 
-maxRowsPerDisplay controls the cutoff (default: 20, range: 15–30)
+maxRowsPerDisplay controls the cutoff (default: 25, range: 15–30)
 ```
 
 Within each display, classes are then sorted by `classIndex` (ascending) for consistent ordering.

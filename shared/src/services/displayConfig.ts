@@ -66,7 +66,7 @@ export class DisplayConfigService {
 
       // Return default configuration if server is unavailable
       return {
-        maxRowsPerDisplay: 20,
+        maxRowsPerDisplay: 25,
       }
     }
   }

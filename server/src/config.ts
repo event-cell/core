@@ -104,7 +104,7 @@ class Config {
 
   // Display distribution configuration defaults
   public displayDistribution: { maxRowsPerDisplay: number; classOrder: number[] } = {
-    maxRowsPerDisplay: 20,
+    maxRowsPerDisplay: 25,
     /** Class indexes in the admin's preferred order; empty means automatic */
     classOrder: [],
   }

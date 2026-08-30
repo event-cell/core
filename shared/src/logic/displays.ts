@@ -16,7 +16,7 @@ export interface DisplayDistributionConfig {
 }
 
 export const DEFAULT_DISPLAY_CONFIG: DisplayDistributionConfig = {
-  maxRowsPerDisplay: 20,
+  maxRowsPerDisplay: 25,
   classOrder: [],
 }
 
