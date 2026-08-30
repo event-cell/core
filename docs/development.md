@@ -238,6 +238,21 @@ The `Dockerfile` uses a single-stage Node 22 Alpine image:
 
 The image does **not** run `yarn build` — the project must be built before building the Docker image.
 
+## Testing a Container
+
+| Script | Image | Use for |
+|--------|-------|---------|
+| `./test-docker.sh` | builds `event-cell-core:local` | testing your working tree |
+| `./test-registry.sh` | pulls `ghcr.io/event-cell/core:main` | testing what the nightly workflow published |
+
+Both mount `Events/` and `test-data/` and publish port 3000 identically, so the only difference
+is which image runs. `test-registry.sh` always pulls, and prints the digest and build time of the
+image it is about to run so there is no doubt which build is under test. Override the image with
+`IMAGE=ghcr.io/event-cell/core:some-tag ./test-registry.sh`.
+
+**Both stop whatever is already published on port 3000**, so take care when something else is
+serving there.
+
 ---
 
 ## TypeScript Configuration
