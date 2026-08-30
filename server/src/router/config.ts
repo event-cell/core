@@ -12,7 +12,7 @@ import {
 } from '../scheduledTasks/index.js'
 import dayjs from 'dayjs'
 import { exportRefreshConfig } from '../scheduledTasks/utils.js'
-import { radarClient } from '../radar/client.js'
+import { restartSpeedSources } from '../radar/source.js'
 import { resetStore } from '../radar/store.js'
 
 // ✅ Initialize tRPC
@@ -62,6 +62,14 @@ export const configRoute = t.router({
         uploadLiveTiming: z.boolean(),
         liveTimingOutputPath: z.string(),
         speedMonitorUrl: z.string(),
+        speedMqttUrl: z.string(),
+        speedMqttTopic: z.string(),
+        speedMqttUsername: z.string(),
+        speedMqttClientId: z.string(),
+        // The password itself is deliberately never returned: /admin and this
+        // endpoint are unauthenticated, so a read must not disclose it. The
+        // page reports only whether one is stored.
+        speedMqttPasswordSet: z.boolean(),
       }),
     )
     .query(async () => {
@@ -114,6 +122,11 @@ export const configRoute = t.router({
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath,
         speedMonitorUrl: config.speedMonitorUrl,
+        speedMqttUrl: config.speedMqttUrl,
+        speedMqttTopic: config.speedMqttTopic,
+        speedMqttUsername: config.speedMqttUsername,
+        speedMqttClientId: config.speedMqttClientId,
+        speedMqttPasswordSet: Boolean(config.speedMqttPassword),
       }
     }),
 
@@ -234,6 +247,14 @@ export const configRoute = t.router({
         uploadLiveTiming: z.boolean(),
         liveTimingOutputPath: z.string(),
         speedMonitorUrl: z.string(),
+        speedMqttUrl: z.string(),
+        speedMqttTopic: z.string(),
+        speedMqttUsername: z.string(),
+        speedMqttClientId: z.string(),
+        // The password itself is deliberately never returned: /admin and this
+        // endpoint are unauthenticated, so a read must not disclose it. The
+        // page reports only whether one is stored.
+        speedMqttPasswordSet: z.boolean(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -242,17 +263,27 @@ export const configRoute = t.router({
       const wasUploadEnabled = config.uploadLiveTiming
       const oldEventId = config.eventId
       const oldSpeedMonitorUrl = config.speedMonitorUrl
+      const oldSpeedMqttUrl = config.speedMqttUrl
+      const oldSpeedMqttTopic = config.speedMqttTopic
+      const oldSpeedMqttUsername = config.speedMqttUsername
+      const oldSpeedMqttPassword = config.speedMqttPassword
+      const oldSpeedMqttClientId = config.speedMqttClientId
       const oldSpeedDatabasePath = config.speedDatabasePath
 
       config.set(input)
       config.storeConfig()
 
-      // Reconnect the radar when it has been pointed somewhere else
-      if (config.speedMonitorUrl !== oldSpeedMonitorUrl) {
-        logger.info(
-          `Speed monitor URL changed to ${config.speedMonitorUrl}, reconnecting radar`,
-        )
-        radarClient.restart()
+      // Reconnect the radar when either source has been pointed somewhere else
+      if (
+        config.speedMonitorUrl !== oldSpeedMonitorUrl ||
+        config.speedMqttUrl !== oldSpeedMqttUrl ||
+        config.speedMqttTopic !== oldSpeedMqttTopic ||
+        config.speedMqttUsername !== oldSpeedMqttUsername ||
+        config.speedMqttPassword !== oldSpeedMqttPassword ||
+        config.speedMqttClientId !== oldSpeedMqttClientId
+      ) {
+        logger.info('Radar configuration changed, reconnecting the speed sources')
+        restartSpeedSources()
       }
 
       if (config.speedDatabasePath !== oldSpeedDatabasePath) {
@@ -349,6 +380,11 @@ export const configRoute = t.router({
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath,
         speedMonitorUrl: config.speedMonitorUrl,
+        speedMqttUrl: config.speedMqttUrl,
+        speedMqttTopic: config.speedMqttTopic,
+        speedMqttUsername: config.speedMqttUsername,
+        speedMqttClientId: config.speedMqttClientId,
+        speedMqttPasswordSet: Boolean(config.speedMqttPassword),
       }
     }),
 })

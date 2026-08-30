@@ -21,7 +21,7 @@ TAG Timing Devices (transponders)
 Msport Pro Software (Windows PC, on-site)
         | writes .scdb files
         v
-SQLite .scdb files ←── read-only Docker volume mount
+SQLite .scdb files ←── Docker volume mount (read by the server, never written)
         |
         v
 Event Cell Core (Docker Container)

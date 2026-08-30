@@ -271,3 +271,6 @@ test-data/
 
 # Native-run config (machine-specific absolute paths)
 dev-config/
+
+# Radar MQTT harness sample — contains broker credentials
+samples/radar_sink_db

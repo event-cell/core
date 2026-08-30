@@ -58,7 +58,13 @@ export const Admin = () => {
     eventName: '',
     eventDate: '',
     uploadLiveTiming: false,
-    speedMonitorUrl: ''
+    speedMonitorUrl: '',
+    speedMqttUrl: '',
+    speedMqttTopic: '',
+    speedMqttUsername: '',
+    speedMqttClientId: '',
+    // Write-only: never populated from the server, sent only when retyped
+    speedMqttPassword: ''
   });
 
   // Load display configuration using tRPC
@@ -107,7 +113,12 @@ export const Admin = () => {
         eventName: config.data.eventName || '',
         eventDate: config.data.eventDate || '',
         uploadLiveTiming: config.data.uploadLiveTiming || false,
-        speedMonitorUrl: config.data.speedMonitorUrl || ''
+        speedMonitorUrl: config.data.speedMonitorUrl || '',
+        speedMqttUrl: config.data.speedMqttUrl || '',
+        speedMqttTopic: config.data.speedMqttTopic || '',
+        speedMqttUsername: config.data.speedMqttUsername || '',
+        speedMqttClientId: config.data.speedMqttClientId || '',
+        speedMqttPassword: ''
       });
     }
   }, [config.data]);
@@ -155,7 +166,13 @@ export const Admin = () => {
   const handleSave = async () => {
     try {
       // Save the configuration and get the updated values
-      const result = await setConfig.mutateAsync(newConfig);
+      // An empty password means "leave the stored one alone", so it is not sent
+      const { speedMqttPassword, ...rest } = newConfig;
+      const payload = speedMqttPassword
+        ? { ...rest, speedMqttPassword }
+        : rest;
+
+      const result = await setConfig.mutateAsync(payload);
 
       // Update the state with the returned values
       setNewConfig({
@@ -163,7 +180,13 @@ export const Admin = () => {
         eventName: result.eventName,
         eventDate: result.eventDate,
         uploadLiveTiming: result.uploadLiveTiming,
-        speedMonitorUrl: result.speedMonitorUrl
+        speedMonitorUrl: result.speedMonitorUrl,
+        speedMqttUrl: result.speedMqttUrl,
+        speedMqttTopic: result.speedMqttTopic,
+        speedMqttUsername: result.speedMqttUsername,
+        speedMqttClientId: result.speedMqttClientId,
+        // Cleared after saving, so it is never held in the page
+        speedMqttPassword: ''
       });
     } catch (error) {
       console.error('Failed to save configuration:', error);
@@ -277,27 +300,88 @@ export const Admin = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
               fullWidth
-              label="Radar Monitor URL"
+              label="Radar MQTT Broker"
+              value={newConfig.speedMqttUrl || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttUrl: e.target.value });
+              }}
+              helperText="Preferred source. Readings carry a timestamp, so a patchy network delays them rather than losing them."
+            />
+            <TextField
+              fullWidth
+              label="MQTT Topic"
+              value={newConfig.speedMqttTopic || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttTopic: e.target.value });
+              }}
+            />
+            <TextField
+              fullWidth
+              label="MQTT Username"
+              value={newConfig.speedMqttUsername || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttUsername: e.target.value });
+              }}
+            />
+            <TextField
+              fullWidth
+              type="password"
+              label="MQTT Password"
+              value={newConfig.speedMqttPassword || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttPassword: e.target.value });
+              }}
+              placeholder={config.data?.speedMqttPasswordSet ? '•••••••• (stored)' : 'not set'}
+              helperText="Write-only: the stored password is never sent back to this page. Leave blank to keep it."
+            />
+            <TextField
+              fullWidth
+              label="MQTT Client ID"
+              value={newConfig.speedMqttClientId || ''}
+              onChange={(e) => {
+                setConfig.reset();
+                setNewConfig({ ...newConfig, speedMqttClientId: e.target.value });
+              }}
+              helperText="Must be unique on the broker — a repeated id disconnects the other client."
+            />
+            <TextField
+              fullWidth
+              label="Radar Monitor URL (fallback)"
               value={newConfig.speedMonitorUrl || ''}
               onChange={(e) => {
                 setConfig.reset();
                 setNewConfig({ ...newConfig, speedMonitorUrl: e.target.value });
               }}
-              helperText="The radar's status page. Its host is used to reach the speed WebSocket."
+              helperText="Used only while the broker is unreachable. Its host is where the speed WebSocket lives."
             />
-            <Alert severity={speedStatus.data?.connected ? 'success' : 'warning'}>
+
+            {/* Which source is live, and why */}
+            <Alert severity={speedStatus.data?.active === 'mqtt' ? 'success' : speedStatus.data?.active === 'websocket' ? 'warning' : 'error'}>
               {speedStatus.data
-                ? speedStatus.data.connected
-                  ? `Connected to ${speedStatus.data.url}`
-                  : `Not connected to ${speedStatus.data.url || 'the radar'}` +
-                    (speedStatus.data.lastError ? ` — ${speedStatus.data.lastError}` : '')
-                : 'Checking radar connection…'}
-              {speedStatus.data?.lastMessageAt
-                ? ` (last reading ${dayjs(speedStatus.data.lastMessageAt).format('HH:mm:ss')})`
+                ? speedStatus.data.active === 'mqtt'
+                  ? `Using MQTT — connected to ${speedStatus.data.mqtt.url}`
+                  : speedStatus.data.active === 'websocket'
+                    ? `Fallen back to the WebSocket radar — the broker is unreachable` +
+                      (speedStatus.data.mqtt.lastError ? ` (${speedStatus.data.mqtt.lastError})` : '')
+                    : 'No speed source is running'
+                : 'Checking the radar sources…'}
+              {speedStatus.data?.mqtt.lastMessageAt
+                ? ` — last reading ${dayjs(speedStatus.data.mqtt.lastMessageAt).format('HH:mm:ss')}`
                 : ''}
             </Alert>
+
             <Typography variant="caption" color="text.secondary">
-              Speed is saved with the rest of the event configuration below.
+              MQTT: {speedStatus.data?.mqtt.connected ? 'connected' : 'not connected'}
+              {' · '}
+              WebSocket fallback: {speedStatus.data?.websocket.connected ? 'connected' : 'not connected'}
+              {speedStatus.data?.websocket.lastError ? ` (${speedStatus.data.websocket.lastError})` : ''}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Speed settings are saved with the rest of the event configuration below.
             </Typography>
           </Box>
         </Box>

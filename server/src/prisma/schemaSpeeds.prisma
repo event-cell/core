@@ -24,6 +24,19 @@ model speeds {
   @@unique([event, time_t, speed], map: "Tuple")
 }
 
+/// Every reading that could be attributed to a run, kept in full so screens can
+/// show more than a single number per run. Unique on the whole row, so a message
+/// replayed after a network outage changes nothing.
+model run_speeds {
+  event  Int
+  heat   Int
+  car    Int
+  time_t Int
+  speed  Int
+
+  @@unique([event, heat, car, time_t, speed], map: "RunTuple")
+}
+
 /// Best speed per competitor per heat, which is what the displays read
 model car_speeds {
   event Int

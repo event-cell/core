@@ -21,6 +21,11 @@ export const ConfigType = z
     recordsDatabasePath: z.string(),
     speedDatabasePath: z.string(),
     speedMonitorUrl: z.string(),
+    speedMqttUrl: z.string(),
+    speedMqttTopic: z.string(),
+    speedMqttUsername: z.string(),
+    speedMqttPassword: z.string(),
+    speedMqttClientId: z.string(),
     uploadLiveTiming: z.boolean().optional(),
     liveTimingOutputPath: z.string().optional(),
     rsyncRemoteHost: z.string().optional(),
@@ -74,6 +79,21 @@ class Config {
    * radar publishes speeds on — see `getRadarSocketUrl()` in `radar/client.ts`.
    */
   public speedMonitorUrl = 'http://radar1.local/radar/two.html'
+  /**
+   * The radar's MQTT broker, which is the preferred source: it publishes a
+   * message per completed pass, each carrying its own timestamp, so readings
+   * survive a patchy network. The monitor URL above is the fallback for when
+   * the broker cannot be reached.
+   *
+   * Credentials are deliberately blank by default — they belong in config.json,
+   * not in the repository.
+   */
+  public speedMqttUrl = 'wss://www.dd.id.au:443/mqtt'
+  public speedMqttTopic = 'radar/#'
+  public speedMqttUsername = ''
+  public speedMqttPassword = ''
+  /** Never `Radar_Sink`: a broker evicts an existing session with the same id */
+  public speedMqttClientId = 'event-cell-core'
   public uploadLiveTiming = false
   public liveTimingOutputPath = '/data/live-timing'
   public rsyncRemoteHost = ''
@@ -182,6 +202,16 @@ class Config {
       }
       this.speedMonitorUrl = config.speedMonitorUrl
     }
+    if (config.speedMqttUrl) {
+      if (this.speedMqttUrl !== config.speedMqttUrl) {
+        logger.info(`speedMqttUrl set to ${config.speedMqttUrl}`)
+      }
+      this.speedMqttUrl = config.speedMqttUrl
+    }
+    if (config.speedMqttTopic) this.speedMqttTopic = config.speedMqttTopic
+    if (config.speedMqttUsername) this.speedMqttUsername = config.speedMqttUsername
+    if (config.speedMqttPassword) this.speedMqttPassword = config.speedMqttPassword
+    if (config.speedMqttClientId) this.speedMqttClientId = config.speedMqttClientId
     if (typeof config.uploadLiveTiming === 'boolean') {
       if (this.uploadLiveTiming !== config.uploadLiveTiming) {
         logger.info(`uploadLiveTiming changed to ${config.uploadLiveTiming}`)
@@ -247,6 +277,11 @@ class Config {
       recordsDatabasePath: this.recordsDatabasePath,
       speedDatabasePath: this.speedDatabasePath,
       speedMonitorUrl: this.speedMonitorUrl,
+      speedMqttUrl: this.speedMqttUrl,
+      speedMqttTopic: this.speedMqttTopic,
+      speedMqttUsername: this.speedMqttUsername,
+      speedMqttPassword: this.speedMqttPassword,
+      speedMqttClientId: this.speedMqttClientId,
       uploadLiveTiming: this.uploadLiveTiming,
       liveTimingOutputPath: this.liveTimingOutputPath,
       rsyncRemoteHost: this.rsyncRemoteHost,

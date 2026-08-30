@@ -2,7 +2,9 @@
 
 ## Overview
 
-Msport Pro timing software creates three SQLite database files per event. All three are mounted **read-only** into the Docker container. The system uses Prisma ORM for typed access, with four separate Prisma schema files (one per database type, plus a records DB).
+Msport Pro timing software creates three SQLite database files per event. The directory holding them
+is mounted **read-write** so the server can own `Speeds.db` alongside them, but the `.scdb` files
+themselves are only ever read. The system uses Prisma ORM for typed access, with four separate Prisma schema files (one per database type, plus a records DB).
 
 ## File Layout
 
