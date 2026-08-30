@@ -51,7 +51,17 @@ export type ConfigType = z.infer<typeof ConfigType>
 class Config {
   public eventId = '001'
   public eventName = 'Unnamed Event'
-  public eventDatabasePath = join(__dirname, '..', 'prisma/Events')
+  /**
+   * Where the timing software's .scdb files are mounted. An absolute container
+   * path, matching docker-compose.yml and config.json.example, so the config
+   * written for a fresh container is correct as it stands.
+   *
+   * It was derived from __dirname, which points at the build layout
+   * (/app/server/dist/prisma/Events) rather than the mount, so every new
+   * container started with an event path that does not exist. Native runs
+   * supply their own path through CONFIG_DIR — see docs/development.md.
+   */
+  public eventDatabasePath = '/app/prisma/Events'
   public recordsDatabasePath = '/data/records'
   /**
    * Speeds.db, which sits beside the event databases. The directory is mounted
