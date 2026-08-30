@@ -4,7 +4,7 @@ import { Chip } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import CarCrash from '@mui/icons-material/CarCrash'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index.js'
+import { MAIN_FONT_SIZE, MAIN_WIDTH, SpeedLine } from './index.js'
 
 export const DNF: FC<{
   sector1: string
@@ -33,5 +33,6 @@ export const DNF: FC<{
     <Grid size={{xs:6}} display="flex" justifyContent="right" alignItems="center">
       {sector2}
     </Grid>
+    <SpeedLine />
   </Grid>
 )

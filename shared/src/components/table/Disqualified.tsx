@@ -4,7 +4,7 @@ import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import Cancel from '@mui/icons-material/Cancel'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index.js'
+import { MAIN_FONT_SIZE, MAIN_WIDTH, SpeedLine } from './index.js'
 
 export const Disqualified = () => (
   <Grid
@@ -24,5 +24,6 @@ export const Disqualified = () => (
         icon={<Cancel />}
       />
     </Grid>
+    <SpeedLine />
   </Grid>
 )

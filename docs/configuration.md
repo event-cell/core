@@ -53,8 +53,14 @@ All fields are optional. Missing fields use the defaults shown below.
   // Display distribution settings
   "displayDistribution": {
     // Maximum rows per display before classes overflow to display 4
-    // Range: 1–∞ (UI restricts to 15–30)
-    "maxRowsPerDisplay": 20
+    // Range: 1–∞ (UI restricts to 15–30). A class costs 1 row for its heading
+    // plus 1 per driver.
+    "maxRowsPerDisplay": 20,
+
+    // Class indexes in the order the admin arranged on /admin. Empty means the
+    // automatic order, smallest class first. Classes not listed follow those
+    // that are.
+    "classOrder": []
   },
 
   // Radar speed monitor — see "Speed Monitoring" below

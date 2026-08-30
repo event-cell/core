@@ -19,6 +19,8 @@ type RunTime = {
   time: number
   split1: number
   split2: number
+  /** Radar speed for this run, km/h; absent when none was recorded */
+  speed?: number
 }
 
 function range(upperBound: number): number[] {
@@ -67,6 +69,7 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
         sector2={sector2}
         sector3={sector3}
         finishTime={finishTime}
+        speed={run.speed}
       />
     )
 
@@ -76,6 +79,7 @@ const DataRowContents: FC<{ run: RunTime; classRecord: number }> = ({
       sector2={sector2}
       sector3={sector3}
       finishTime={finishTime}
+      speed={run.speed}
     />
   )
 }

@@ -2,14 +2,15 @@ import React, { FC } from 'react'
 
 import Grid from '@mui/material/Grid'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index.js'
+import { MAIN_FONT_SIZE, MAIN_WIDTH, SpeedLine } from './index.js'
 
 export const Regular: FC<{
   sector1: string
   sector2: string
   sector3: string
   finishTime: string
-}> = ({ sector1, sector2, sector3, finishTime }) => (
+  speed?: number
+}> = ({ sector1, sector2, sector3, finishTime, speed }) => (
   <Grid
     container
     spacing={0.25}
@@ -38,5 +39,6 @@ export const Regular: FC<{
     <Grid size={{xs:6}} display="flex" justifyContent="right" alignItems="center">
       {sector2}
     </Grid>
+    <SpeedLine speed={speed} />
   </Grid>
 )

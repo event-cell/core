@@ -8,10 +8,50 @@ export interface ClassType {
 
 export interface DisplayDistributionConfig {
   maxRowsPerDisplay: number
+  /**
+   * Class indexes in the order the admin arranged them. Empty means "no manual
+   * order", and the automatic smallest-first packing applies as before.
+   */
+  classOrder?: number[]
 }
 
 export const DEFAULT_DISPLAY_CONFIG: DisplayDistributionConfig = {
   maxRowsPerDisplay: 20,
+  classOrder: [],
+}
+
+/**
+ * Orders classes for packing.
+ *
+ * Classes named in `classOrder` come first, in exactly that order — the admin
+ * has decided how they should group. Anything not named follows in the
+ * automatic order, smallest class first, so a class added mid-event still
+ * appears rather than vanishing because nobody has dragged it yet. An entry
+ * naming a class that no longer exists is simply skipped.
+ *
+ * Pure, so the rules can be tested without a display.
+ */
+export function applyClassOrder(
+  classesList: ClassType[],
+  classOrder: number[] = [],
+): ClassType[] {
+  const automatic = [...classesList].sort((a, b) => {
+    const sizeDiff = a.drivers.length - b.drivers.length
+    if (sizeDiff !== 0) return sizeDiff
+    return a.carClass.classIndex - b.carClass.classIndex
+  })
+
+  if (classOrder.length === 0) return automatic
+
+  const ranked = new Map(classOrder.map((classIndex, position) => [classIndex, position]))
+
+  const ordered = automatic
+    .filter((cls) => ranked.has(cls.carClass.classIndex))
+    .sort((a, b) => ranked.get(a.carClass.classIndex)! - ranked.get(b.carClass.classIndex)!)
+
+  const rest = automatic.filter((cls) => !ranked.has(cls.carClass.classIndex))
+
+  return [...ordered, ...rest]
 }
 
 export const getDisplayNumber = (): number => {
@@ -59,18 +99,14 @@ export const optimizeClassDistribution = (
     return []
   }
 
-  // Sort classes from smallest to largest, then by classIndex for predictable order
-  const sortedClasses = [...classesList].map(cls => ({
-    drivers: [...cls.drivers],
-    carClass: { ...cls.carClass },
-  })).sort((a, b) => {
-    // First sort by class size (smallest to largest)
-    const sizeDiff = a.drivers.length - b.drivers.length
-    if (sizeDiff !== 0) return sizeDiff
-
-    // Then sort by classIndex for predictable order
-    return a.carClass.classIndex - b.carClass.classIndex
-  })
+  // The admin's order if there is one, otherwise smallest class first
+  const sortedClasses = applyClassOrder(
+    classesList.map(cls => ({
+      drivers: [...cls.drivers],
+      carClass: { ...cls.carClass },
+    })),
+    config.classOrder,
+  )
 
   let currentItems = 0
   const optimizedClasses: ItemizedClassType[] = []
