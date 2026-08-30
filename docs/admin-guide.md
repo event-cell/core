@@ -41,6 +41,34 @@ Click **Save Display Configuration** to persist.
 
 ---
 
+## Class Order
+
+Displays 1–3 are filled in turn and whatever does not fit lands on display 4. The automatic order
+is smallest class first, which is not always the arrangement that fits — and it cannot know which
+classes you would rather keep together.
+
+Drag classes into the order you want, or use the up/down buttons (easier on a touch screen, and
+usable by keyboard). Each class shows its driver count and what it costs in rows — a class occupies
+one row for its heading plus one per driver.
+
+Underneath, **Where these land** shows the resulting distribution against the current
+`Maximum Rows Per Display`, updating as you reorder:
+
+```
+Display 1   20/20 rows   Class C Road - AWD 2001-3000cc · Class C Road - AWD over 3000cc · …
+Display 2   16/20 rows   Class A Road - 2WD 1601-2000cc · …
+Display 3   14/20 rows   …
+Display 4   overflow     …
+```
+
+Reorder until displays 1–3 hold what you want on them, then click **Save Class Order**. The boards
+pick the change up on their next refresh.
+
+Classes you have not placed follow the ones you have, still smallest-first, so a class that appears
+mid-event is never lost. An order naming a class that no longer exists is ignored.
+
+---
+
 ## Speed Monitoring
 
 Speeds come from the radar's MQTT broker, with the radar's own WebSocket as a fallback.

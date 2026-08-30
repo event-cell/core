@@ -35,6 +35,7 @@ export const ConfigType = z
     // Display distribution configuration
     displayDistribution: z.object({
       maxRowsPerDisplay: z.number().min(1).optional(),
+      classOrder: z.array(z.number()).optional(),
     }).optional(),
     // Refresh intervals configuration
     refreshIntervals: z.object({
@@ -102,8 +103,10 @@ class Config {
   public rsyncSshKeyPath = '/data/.ssh/id_rsa'
 
   // Display distribution configuration defaults
-  public displayDistribution = {
+  public displayDistribution: { maxRowsPerDisplay: number; classOrder: number[] } = {
     maxRowsPerDisplay: 20,
+    /** Class indexes in the admin's preferred order; empty means automatic */
+    classOrder: [],
   }
 
   // Refresh intervals configuration defaults
@@ -232,6 +235,12 @@ class Config {
       if (typeof config.displayDistribution.maxRowsPerDisplay === 'number') {
         this.displayDistribution.maxRowsPerDisplay = config.displayDistribution.maxRowsPerDisplay
         logger.info(`Display distribution max rows per display set to ${config.displayDistribution.maxRowsPerDisplay}`)
+      }
+      if (Array.isArray(config.displayDistribution.classOrder)) {
+        this.displayDistribution.classOrder = config.displayDistribution.classOrder.filter(
+          (classIndex): classIndex is number => typeof classIndex === 'number',
+        )
+        logger.info(`Class order set: ${this.displayDistribution.classOrder.join(', ') || '(automatic)'}`)
       }
     }
 

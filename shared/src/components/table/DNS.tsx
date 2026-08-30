@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid'
 
 import MeetingRoom from '@mui/icons-material/MeetingRoom'
 
-import { MAIN_FONT_SIZE, MAIN_WIDTH } from './index.js'
+import { MAIN_FONT_SIZE, MAIN_WIDTH, SpeedLine } from './index.js'
 
 export const DNS: FC<Record<string, never>> = () => (
   <Grid
@@ -25,5 +25,6 @@ export const DNS: FC<Record<string, never>> = () => (
         icon={<MeetingRoom />}
       />
     </Grid>
+    <SpeedLine />
   </Grid>
 )

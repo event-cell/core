@@ -15,6 +15,7 @@ import { getCurrentHeat, setupLogger } from './utils/index.js'
 import { getCompetitorJSON } from './router/shared.js'
 import { getCurrentCompetitor } from './router/currentCompetitor.js'
 import { startSpeedSources, stopSpeedSources } from './radar/source.js'
+import { attachSpeeds } from './radar/enrich.js'
 import { closeStore } from './radar/store.js'
 import { readFileSync, writeFileSync, chmodSync, statSync } from 'fs'
 
@@ -203,7 +204,7 @@ const app = express()
       res.json(await getCurrentCompetitor())
     })
     app.get('/api/simple/competitors.json', async (req, res) => {
-      res.json(await getCompetitorJSON())
+      res.json(await attachSpeeds(await getCompetitorJSON()))
     })
     app.get('/api/simple/runs.json', async (req, res) => {
       res.json(await getCurrentHeat())

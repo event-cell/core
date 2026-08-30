@@ -134,6 +134,7 @@ export const configRoute = t.router({
     .output(
       z.object({
         maxRowsPerDisplay: z.number(),
+        classOrder: z.array(z.number()),
       }),
     )
     .query(async () => {
@@ -146,11 +147,13 @@ export const configRoute = t.router({
     .input(
       z.object({
         maxRowsPerDisplay: z.number().min(1).optional(),
+        classOrder: z.array(z.number()).optional(),
       }),
     )
     .output(
       z.object({
         maxRowsPerDisplay: z.number(),
+        classOrder: z.array(z.number()),
       }),
     )
     .mutation(async ({ input }) => {

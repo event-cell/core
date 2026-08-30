@@ -18,6 +18,7 @@ import { trpc, useTrpcClient } from '../App.js';
 import dayjs from 'dayjs';
 
 import { requestWrapper } from '../components/requestWrapper.js';
+import { ClassOrderEditor } from '../components/classOrder.js';
 
 export const Admin = () => {
   const trpcClient = useTrpcClient();
@@ -28,13 +29,19 @@ export const Admin = () => {
   const config = trpc.config.get.useQuery(undefined);
   // Polled so the connection state is live while the radar is being set up
   const speedStatus = trpc.speed.status.useQuery(undefined, { refetchInterval: 5000 });
+  // The classes to order, and their sizes, come from the competitor list
+  const competitorList = trpc.competitors.list.useQuery(undefined);
   const [isEndOfDayLoading, setIsEndOfDayLoading] = useState(false);
   const [isLoadingEventDate, setIsLoadingEventDate] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   // Display configuration state
-  const [displayConfig, setDisplayConfig] = useState({
+  const [displayConfig, setDisplayConfig] = useState<{
+    maxRowsPerDisplay: number
+    classOrder: number[]
+  }>({
     maxRowsPerDisplay: 20,
+    classOrder: [],
   });
   const [displayConfigLoading, setDisplayConfigLoading] = useState(false);
   const [displayConfigError, setDisplayConfigError] = useState<string | null>(null);
@@ -122,6 +129,23 @@ export const Admin = () => {
       });
     }
   }, [config.data]);
+
+  // One entry per class, with how many drivers it holds
+  const classSummaries = React.useMemo(() => {
+    const byClass = new Map<number, { classIndex: number; className: string; drivers: number }>();
+
+    for (const competitor of competitorList.data ?? []) {
+      const existing = byClass.get(competitor.classIndex);
+      if (existing) existing.drivers += 1;
+      else byClass.set(competitor.classIndex, {
+        classIndex: competitor.classIndex,
+        className: competitor.class,
+        drivers: 1,
+      });
+    }
+
+    return [...byClass.values()];
+  }, [competitorList.data]);
 
   const requestErrors = requestWrapper({ config });
   if (requestErrors) return requestErrors;
@@ -452,6 +476,41 @@ export const Admin = () => {
                 }}
               />
             )}
+          </Box>
+        </Box>
+
+        {/* Class Order */}
+        <Box sx={{ p: 3, border: 1, borderColor: 'divider', borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Class Order
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Drag classes into the order they should fill the boards. Displays 1–3 are filled in
+            turn, and whatever does not fit goes to display 4.
+          </Typography>
+
+          {classSummaries.length === 0 ? (
+            <Alert severity="info">
+              No classes to order yet — they appear once competitors have been loaded.
+            </Alert>
+          ) : (
+            <ClassOrderEditor
+              classes={classSummaries}
+              order={displayConfig.classOrder}
+              maxRowsPerDisplay={displayConfig.maxRowsPerDisplay}
+              onChange={(classOrder) => setDisplayConfig({ ...displayConfig, classOrder })}
+            />
+          )}
+
+          <Box sx={{ mt: 3 }}>
+            <Button
+              variant="contained"
+              disabled={displayConfigLoading}
+              onClick={handleSaveDisplayConfig}
+              sx={{ ...(displayConfigLoading && { bgcolor: green[500] }) }}
+            >
+              Save Class Order
+            </Button>
           </Box>
         </Box>
 

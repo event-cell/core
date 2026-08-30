@@ -2,6 +2,7 @@ import { DisplayDistributionConfig } from '../logic/displays.js'
 
 export interface DisplayDistributionConfigResponse {
   maxRowsPerDisplay: number
+  classOrder: number[]
 }
 
 /**
@@ -55,6 +56,7 @@ export class DisplayConfigService {
       // Convert to our internal format
       this.config = {
         maxRowsPerDisplay: configData.maxRowsPerDisplay,
+        classOrder: Array.isArray(configData.classOrder) ? configData.classOrder : [],
       }
 
       this.lastFetch = Date.now()

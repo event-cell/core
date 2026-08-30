@@ -6,6 +6,11 @@ export const TimeInfo = z.object({
   time: z.number(),
   split1: z.number(),
   split2: z.number(),
+  /**
+   * Radar speed for this run, km/h. Optional because a missing reading is
+   * ordinary: events before the radar, runs it missed, or the feed being down.
+   */
+  speed: z.number().optional(),
 })
 
 export const TimeInfoList = z.array(TimeInfo.optional())

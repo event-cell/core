@@ -23,9 +23,26 @@ All boards also use a secondary fallback full-page refresh (default: every 5 min
 
 These four boards collectively show all competitors sorted by class and best time within class. The competitor list is distributed across the four screens so that no single screen is overloaded.
 
+### Speed per run
+
+Each run cell carries a third line under the sector times showing the radar speed for that run,
+left-aligned beneath them and read as `118 kph`. Where no speed was recorded the line reads `--`,
+so a gap never looks like a rendering fault and every cell keeps the same height.
+
+A speed is only shown for a run that stood: `DNF`, `DSQ` and `DNS` runs always read `--`.
+
+Speeds come from `car_speeds` in `Speeds.db`, keyed by heat — which is the run number — so history
+recorded before this feature displays too. See [configuration.md](./configuration.md) for the radar
+and database settings.
+
 ### Class Distribution Algorithm
 
-Classes are assigned to displays 1–3 in sequence, from smallest class to largest. If a class does not fit on displays 1–3 (because adding it would exceed `maxRowsPerDisplay`), it is placed on display 4.
+Classes are assigned to displays 1–3 in sequence. By default they are ordered smallest class to
+largest; if an order has been set on the admin page, that order is used instead. If a class does not
+fit on displays 1–3 (because adding it would exceed `maxRowsPerDisplay`), it is placed on display 4.
+
+Classes not named in a manual order follow the ones that are, still smallest-first, so a class added
+mid-event always appears somewhere.
 
 ```
 All classes (sorted: smallest → largest by driver count)
