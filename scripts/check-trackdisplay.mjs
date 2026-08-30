@@ -37,7 +37,7 @@ if (typeof live.speed !== 'number') { console.log('no live speed to check'); pro
 const expected = String(Math.round(live.speed))
 const shown = await board(`speed present (API says ${live.speed})`, 'trackdisplay-speed.png')
 expect('the rounded speed is painted', shown.includes(expected), `looking for "${expected}"`)
-expect('the km/h label is painted', shown.includes('km/h'))
+expect('the kph label is painted', shown.includes('kph'))
 expect('the rest of the board is live', /[0-9]+\.[0-9]{2}/.test(shown))
 
 // --- negative case: pass closed, so the panel must be blank -----------------
@@ -46,7 +46,7 @@ await page.waitForTimeout(6000)
 const after = await api('/api/v1/speed.current')
 console.log(`\nspeed.current after the pass ends: ${JSON.stringify(after)}`)
 const blank = await board('pass ended', 'trackdisplay-nospeed.png')
-expect('the speed is gone', !blank.includes('km/h'), 'no stale reading left on the board')
+expect('the speed is gone', !blank.includes('kph'), 'no stale reading left on the board')
 expect('the board still renders', blank.length > 0)
 
 await browser.close()

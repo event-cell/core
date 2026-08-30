@@ -404,7 +404,7 @@ export const TrackDisplay = () => {
                   lineHeight: 1.4,
                 }}
               >
-                km/h
+                kph
               </Typography>
             </>
           )}

@@ -90,7 +90,7 @@ yarn fake-radar                      # terminal 1: ws://127.0.0.1:8899/ws/radar1
 yarn check:display http://localhost:3002
 ```
 
-It asserts the speed and `km/h` appear while a pass is open, and that both are gone once it
+It asserts the speed and `kph` appear while a pass is open, and that both are gone once it
 ends while the rest of the board still renders. Playwright needs its browser once:
 `npx playwright install chromium`.
 

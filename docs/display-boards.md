@@ -97,7 +97,7 @@ Designed to be shown on a large TV at the side of the track. Shows real-time sec
 +----------------------------------------------------------+
 |                                                          |
 |   58.10                          121                     |  240px
-|   (finish time, 280px font)      km/h  (radar speed)     |
+|   (finish time, 280px font)      kph   (radar speed)     |
 |                                  ----------------        |
 |                                  SDMA  (club)            |
 +----------------------------------------------------------+
@@ -126,7 +126,7 @@ standings cannot disagree about who is in the series.
 ### Radar Speed
 
 The top of the right column shows the maximum speed recorded by the radar for the
-current run, in whole km/h, polled from `speed.current` on the track display's
+current run, in whole kph, polled from `speed.current` on the track display's
 refresh interval.
 
 The panel is **blank whenever there is no speed for the run on course** — the radar
