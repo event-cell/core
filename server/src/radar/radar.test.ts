@@ -117,6 +117,11 @@ check('withholds a pass that has recorded no speed yet', () =>
 check('shows the pass when the run is unknown', () =>
   assert.equal(selectDisplaySpeed(pass(2000, 99.5), null), 99.5),
 )
+check('shows a pass under way when the run was only just observed', () =>
+  // runTracker stamps a first observation with 0 rather than now: the run did
+  // not change, so a pass already under way must not be withheld
+  assert.equal(selectDisplaySpeed(pass(2000, 118.4), run(0)), 118.4),
+)
 
 console.log(failures === 0 ? '\nAll radar checks passed' : `\n${failures} FAILED`)
 process.exit(failures === 0 ? 0 : 1)
