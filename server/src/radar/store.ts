@@ -3,8 +3,15 @@
 // Speeds live in Speeds.db alongside the event databases, in the schema that
 // was already in use before the server took ownership of writing it:
 //
-//   speeds(event, time_t, speed)          every pass, attributed or not
+//   speeds(event, time_t, speed)          every reading, attributed or not
 //   car_speeds(event, heat, car, speed)   best speed per competitor per heat
+//   run_speeds(event, heat, car, time_t, speed)
+//                                         every attributed reading, kept in full
+//
+// The first two are the harness's schema and stay exactly as they were, so the
+// history already collected keeps working. run_speeds is added for readings that
+// can be placed in a run: several per run are expected, and screens that want
+// more than one number per run read from here.
 //
 // Speeds are integers in tenths of a km/h (1273 = 127.3 km/h) and `event` is the
 // numeric event id. Existing history therefore stays readable, and the displays
@@ -19,8 +26,9 @@ import { dirname } from 'path'
 import { PrismaClient as pcSpeeds } from '../prisma/generated/speeds/index.js'
 import { config } from '../config.js'
 import { setupLogger } from '../utils/index.js'
-import type { RadarPass } from './protocol.js'
+import type { RadarPass, RadarPassMessage } from './protocol.js'
 import { getCurrentRun } from './runTracker.js'
+import { findRunForTimestamp } from './attribution.js'
 
 const logger = setupLogger('radar/store')
 
@@ -81,6 +89,9 @@ async function getClient(): Promise<pcSpeeds | null> {
     )
     await client.$executeRawUnsafe(
       `CREATE TABLE IF NOT EXISTS car_speeds ( event INT NOT NULL, heat INT NOT NULL, car INT NOT NULL, speed INT NOT NULL, CONSTRAINT Tuple UNIQUE (event, heat, car, speed))`,
+    )
+    await client.$executeRawUnsafe(
+      `CREATE TABLE IF NOT EXISTS run_speeds ( event INT NOT NULL, heat INT NOT NULL, car INT NOT NULL, time_t INT NOT NULL, speed INT NOT NULL, CONSTRAINT RunTuple UNIQUE (event, heat, car, time_t, speed))`,
     )
 
     initialised = true
@@ -155,9 +166,71 @@ export async function recordPassSpeed(pass: RadarPass): Promise<void> {
     return
   }
 
+  await recordBestSpeed(db, eventId, run.heat, run.competitor, speed, pass.maxSpeed)
+}
+
+/**
+ * Records one reading from the MQTT feed.
+ *
+ * Unlike the WebSocket path, which records a pass the server watched happen,
+ * these readings carry their own timestamp and may arrive late, out of order, in
+ * a burst after the network returns, or more than once. So the run is looked up
+ * from the timestamp rather than from what is on course now, every reading is
+ * kept rather than only the fastest, and every write is idempotent — replaying a
+ * message changes nothing.
+ */
+export async function recordReading(reading: RadarPassMessage): Promise<void> {
+  const db = await getClient()
+  if (!db) return
+
+  const eventId = parseEventId(config.eventId)
+  if (eventId === null) {
+    logger.warn(`Event id ${config.eventId} is not numeric, not recording speed`)
+    return
+  }
+
+  const speed = toTenths(reading.maxSpeed)
+
+  // The raw log takes every reading, attributed or not, so nothing is lost
+  await db.$executeRaw`
+    INSERT OR IGNORE INTO speeds (event, time_t, speed)
+    VALUES (${eventId}, ${reading.time}, ${speed})
+  `
+
+  if (reading.daySecs === null) {
+    logger.info(`Reading at ${reading.time} has no Day_secs, so cannot be attributed`)
+    return
+  }
+
+  const run = await findRunForTimestamp(reading.daySecs)
+  if (!run) return
+
+  // Keep the reading in full, against its run
+  await db.$executeRaw`
+    INSERT OR IGNORE INTO run_speeds (event, heat, car, time_t, speed)
+    VALUES (${eventId}, ${run.heat}, ${run.car}, ${reading.time}, ${speed})
+  `
+
+  await recordBestSpeed(db, eventId, run.heat, run.car, speed, reading.maxSpeed)
+}
+
+/**
+ * Keeps car_speeds at one row per competitor per heat, holding their best.
+ *
+ * The table's unique constraint spans the speed as well, so inserting blindly
+ * would accumulate a row per reading — the legacy data has one such pair.
+ */
+async function recordBestSpeed(
+  db: pcSpeeds,
+  eventId: number,
+  heat: number,
+  car: number,
+  speed: number,
+  kmh: number,
+): Promise<void> {
   const existing = await db.$queryRaw<{ speed: bigint | number | null }[]>`
     SELECT MAX(speed) AS speed FROM car_speeds
-    WHERE event = ${eventId} AND heat = ${run.heat} AND car = ${run.competitor}
+    WHERE event = ${eventId} AND heat = ${heat} AND car = ${car}
   `
   // SQLite INTEGER columns come back from a raw query as BigInt, which cannot be
   // compared with or divided by a Number without an explicit conversion
@@ -167,24 +240,22 @@ export async function recordPassSpeed(pass: RadarPass): Promise<void> {
   if (best === null) {
     await db.$executeRaw`
       INSERT INTO car_speeds (event, heat, car, speed)
-      VALUES (${eventId}, ${run.heat}, ${run.competitor}, ${speed})
+      VALUES (${eventId}, ${heat}, ${car}, ${speed})
     `
   } else if (speed > best) {
     await db.$executeRaw`
       UPDATE car_speeds SET speed = ${speed}
-      WHERE event = ${eventId} AND heat = ${run.heat} AND car = ${run.competitor}
+      WHERE event = ${eventId} AND heat = ${heat} AND car = ${car}
     `
   } else {
-    logger.info(
-      `Pass ${pass.passSeq} (${pass.maxSpeed} km/h) not faster than the recorded ` +
-        `${best / 10} km/h for heat ${run.heat} car ${run.competitor}`,
+    logger.debug(
+      `${kmh} km/h is not faster than the recorded ${best / 10} km/h ` +
+        `for heat ${heat} car ${car}`,
     )
     return
   }
 
-  logger.info(
-    `Recorded ${pass.maxSpeed} km/h for event ${eventId} heat ${run.heat} car ${run.competitor}`,
-  )
+  logger.info(`Recorded ${kmh} km/h for event ${eventId} heat ${heat} car ${car}`)
 }
 
 /**

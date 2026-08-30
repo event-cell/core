@@ -12,7 +12,7 @@ import {
 } from '../scheduledTasks/index.js'
 import dayjs from 'dayjs'
 import { exportRefreshConfig } from '../scheduledTasks/utils.js'
-import { radarClient } from '../radar/client.js'
+import { restartSpeedSources } from '../radar/source.js'
 import { resetStore } from '../radar/store.js'
 
 // ✅ Initialize tRPC
@@ -62,6 +62,8 @@ export const configRoute = t.router({
         uploadLiveTiming: z.boolean(),
         liveTimingOutputPath: z.string(),
         speedMonitorUrl: z.string(),
+        speedMqttUrl: z.string(),
+        speedMqttTopic: z.string(),
       }),
     )
     .query(async () => {
@@ -114,6 +116,8 @@ export const configRoute = t.router({
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath,
         speedMonitorUrl: config.speedMonitorUrl,
+        speedMqttUrl: config.speedMqttUrl,
+        speedMqttTopic: config.speedMqttTopic,
       }
     }),
 
@@ -234,6 +238,8 @@ export const configRoute = t.router({
         uploadLiveTiming: z.boolean(),
         liveTimingOutputPath: z.string(),
         speedMonitorUrl: z.string(),
+        speedMqttUrl: z.string(),
+        speedMqttTopic: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -242,17 +248,21 @@ export const configRoute = t.router({
       const wasUploadEnabled = config.uploadLiveTiming
       const oldEventId = config.eventId
       const oldSpeedMonitorUrl = config.speedMonitorUrl
+      const oldSpeedMqttUrl = config.speedMqttUrl
+      const oldSpeedMqttTopic = config.speedMqttTopic
       const oldSpeedDatabasePath = config.speedDatabasePath
 
       config.set(input)
       config.storeConfig()
 
-      // Reconnect the radar when it has been pointed somewhere else
-      if (config.speedMonitorUrl !== oldSpeedMonitorUrl) {
-        logger.info(
-          `Speed monitor URL changed to ${config.speedMonitorUrl}, reconnecting radar`,
-        )
-        radarClient.restart()
+      // Reconnect the radar when either source has been pointed somewhere else
+      if (
+        config.speedMonitorUrl !== oldSpeedMonitorUrl ||
+        config.speedMqttUrl !== oldSpeedMqttUrl ||
+        config.speedMqttTopic !== oldSpeedMqttTopic
+      ) {
+        logger.info('Radar configuration changed, reconnecting the speed sources')
+        restartSpeedSources()
       }
 
       if (config.speedDatabasePath !== oldSpeedDatabasePath) {
@@ -349,6 +359,8 @@ export const configRoute = t.router({
         uploadLiveTiming: config.uploadLiveTiming,
         liveTimingOutputPath: config.liveTimingOutputPath,
         speedMonitorUrl: config.speedMonitorUrl,
+        speedMqttUrl: config.speedMqttUrl,
+        speedMqttTopic: config.speedMqttTopic,
       }
     }),
 })

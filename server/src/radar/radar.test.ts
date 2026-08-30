@@ -9,10 +9,12 @@ import assert from 'assert'
 import {
   getRadarSocketUrl,
   parseRadarMessage,
+  parseRadarPassMessage,
   selectDisplaySpeed,
   type RadarPass,
 } from './protocol.js'
 import type { CurrentRun } from './runTracker.js'
+import { chooseRun, MICROS_PER_SECOND } from './attribution.js'
 
 let failures = 0
 const check = (name: string, fn: () => void) => {
@@ -88,6 +90,31 @@ check('returns null for junk', () =>
   assert.equal(parseRadarMessage('hello world'), null),
 )
 
+console.log('parseRadarPassMessage')
+check('parses a pass message', () =>
+  assert.deepEqual(parseRadarPassMessage('Time: 1787900000 MaxSpeed: 118.4 Day_secs: 45123'), {
+    time: 1787900000,
+    maxSpeed: 118.4,
+    daySecs: 45123,
+  }),
+)
+check('reads fields by label, not position', () =>
+  assert.deepEqual(
+    parseRadarPassMessage('Day_secs: 45123 Extra: 9 Time: 1787900000 MaxSpeed: 118.4'),
+    { time: 1787900000, maxSpeed: 118.4, daySecs: 45123 },
+  ),
+)
+check('tolerates a message with no Day_secs', () =>
+  assert.equal(parseRadarPassMessage('Time: 1787900000 MaxSpeed: 118.4')?.daySecs, null),
+)
+check('rejects a message missing MaxSpeed', () =>
+  assert.equal(parseRadarPassMessage('Time: 1787900000 Day_secs: 45123'), null),
+)
+check('rejects a zero speed', () =>
+  assert.equal(parseRadarPassMessage('Time: 1787900000 MaxSpeed: 0.0'), null),
+)
+check('rejects junk', () => assert.equal(parseRadarPassMessage('hello world'), null))
+
 console.log('selectDisplaySpeed')
 const run = (changedAt: number): CurrentRun => ({
   heat: 1,
@@ -122,6 +149,46 @@ check('shows a pass under way when the run was only just observed', () =>
   // not change, so a pass already under way must not be withheld
   assert.equal(selectDisplaySpeed(pass(2000, 118.4), run(0)), 118.4),
 )
+
+console.log('chooseRun (attribution by timestamp)')
+const S = MICROS_PER_SECOND
+// a car that crossed the first split at 100s and finished at 160s
+const running = (heat: number, car: number, inter: number, finish: number | null) => ({
+  heat, car, interMicros: inter * S, finishMicros: finish === null ? null : finish * S,
+})
+
+check('places a reading inside the run it falls in', () =>
+  assert.deepEqual(chooseRun([running(1, 42, 100, 160)], 120 * S), { heat: 1, car: 42 }),
+)
+check('prefers the run that started most recently before the reading', () =>
+  assert.deepEqual(
+    chooseRun([running(1, 42, 100, 160), running(2, 7, 140, 200)], 150 * S),
+    { heat: 2, car: 7 },
+  ),
+)
+check('ignores a run that had already finished', () =>
+  assert.equal(chooseRun([running(1, 42, 100, 130)], 150 * S), null),
+)
+check('ignores a run that had not started', () =>
+  assert.equal(chooseRun([running(1, 42, 200, 260)], 150 * S), null),
+)
+check('accepts a run still under way with no finish recorded', () =>
+  assert.deepEqual(chooseRun([running(1, 42, 100, null)], 150 * S), { heat: 1, car: 42 }),
+)
+check('rejects an unfinished run older than a plausible run length', () =>
+  assert.equal(chooseRun([running(1, 42, 100, null)], 500 * S), null),
+)
+check('rejects a run longer than a plausible run length', () =>
+  assert.equal(chooseRun([running(1, 42, 100, 900)], 500 * S), null),
+)
+check('returns null when nothing was on course', () =>
+  assert.equal(chooseRun([], 150 * S), null),
+)
+check('places a late message on the run it belonged to, not the latest one', () => {
+  // the reading is from 120s; a later run has since started and finished
+  const candidates = [running(1, 42, 100, 160), running(2, 7, 300, 360)]
+  assert.deepEqual(chooseRun(candidates, 120 * S), { heat: 1, car: 42 })
+})
 
 console.log(failures === 0 ? '\nAll radar checks passed' : `\n${failures} FAILED`)
 process.exit(failures === 0 ? 0 : 1)

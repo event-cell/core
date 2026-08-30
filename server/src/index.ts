@@ -14,7 +14,7 @@ import { executeScheduledTasks } from './scheduledTasks/index.js'
 import { getCurrentHeat, setupLogger } from './utils/index.js'
 import { getCompetitorJSON } from './router/shared.js'
 import { getCurrentCompetitor } from './router/currentCompetitor.js'
-import { radarClient } from './radar/client.js'
+import { startSpeedSources, stopSpeedSources } from './radar/source.js'
 import { closeStore } from './radar/store.js'
 import { readFileSync, writeFileSync, chmodSync, statSync } from 'fs'
 
@@ -129,9 +129,10 @@ const app = express()
     // Setup SSH key with proper permissions
     await setupSshKey()
 
-    // Connect to the radar speed monitor. This keeps retrying in the background
-    // and never throws, so an unreachable radar does not hold up the server.
-    radarClient.start()
+    // Connect to the radar. MQTT is preferred, with the WebSocket as a fallback;
+    // both keep retrying in the background and never throw, so an unreachable
+    // radar does not hold up the server.
+    startSpeedSources()
 
     // Log working directory and paths
     const workingDir = cwd()
@@ -238,7 +239,7 @@ const app = express()
       logger.info(`Received ${signal}, shutting down`)
 
       httpServer.close()
-      radarClient.stop()
+      stopSpeedSources()
 
       try {
         await closeStore()
