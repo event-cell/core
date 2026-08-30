@@ -14,7 +14,19 @@ Only competitors with at least one valid (non-zero) time are included in class p
 
 ## Points Table
 
-Points are awarded based on finishing position within a class. The number of points available scales with class size:
+Points are awarded on finishing position within a class. **Class size does not affect the
+points on offer** — a win scores 10 whether the class holds two drivers or twenty:
+
+| Position | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 | P9 | P10 | P11+ |
+|----------|----|----|----|----|----|----|----|----|----|-----|------|
+| Points | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+
+Eleventh place and beyond receive 0 points.
+
+### Superseded: the 2025 scheme
+
+Until the 2026 season, the points available scaled with class size, so a win in a small class
+was worth less than a win in a large one:
 
 | Class size | P1 | P2 | P3 | P4 | P5 | P6 | P7 |
 |-----------|----|----|----|----|----|----|-----|
@@ -26,7 +38,11 @@ Points are awarded based on finishing position within a class. The number of poi
 | 6 | 6 | 5 | 4 | 3 | 2 | 1 | — |
 | 7+ | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
 
-Positions beyond the table (e.g., 4th in a class of 3) receive 0 points.
+That version is kept, commented out and labelled "Pointscore for 2025", in
+`calculatePoints()` rather than deleted.
+
+**Standings are not comparable across the two schemes.** Results calculated under the 2025
+system would need recalculating to sit alongside results from the current one.
 
 ---
 
@@ -40,17 +56,17 @@ Implemented in `shared/src/logic/clubPoints.ts`:
    a. Filter to competitors with at least one valid time (`time > 0`)
    b. Sort by best time ascending (lowest time = position 1)
    c. Assign positions 1, 2, 3, ...
-   d. Look up points for each position using the table above (based on class size)
+   d. Award points for each position from the table above
 4. **Accumulate** points by club: for each competitor with a club assigned, add their points to their club's running total
 5. **Sort** clubs by total points descending
 
 ```typescript
 // Example: class of 4 drivers
-// P1: 4 points, P2: 3 points, P3: 2 points, P4: 1 point
+// P1: 10 points, P2: 9 points, P3: 8 points, P4: 7 points
 
-// Club A has drivers finishing P1 and P3 → 4 + 2 = 6 points
-// Club B has a driver finishing P2 → 3 points
-// Final: Club A wins with 6 points
+// Club A has drivers finishing P1 and P3 → 10 + 8 = 18 points
+// Club B has a driver finishing P2 → 9 points
+// Final: Club A wins with 18 points
 ```
 
 ---
