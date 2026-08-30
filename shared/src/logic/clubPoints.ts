@@ -12,6 +12,20 @@ export interface ClassPosition {
     points: number
 }
 
+/** The class the timing software uses for entries outside the club championship */
+export const NON_TRISERIES_CLASS = 'Non TriSeries'
+
+/**
+ * Whether a competitor is part of the club championship.
+ *
+ * Entries in the "Non TriSeries" class score no club points, so their club is of
+ * no consequence — which is why the track display gives their club's space over
+ * to the speed instead.
+ */
+export function isTriSeriesCompetitor(competitor: { class: string }): boolean {
+  return competitor.class !== NON_TRISERIES_CLASS
+}
+
 /**
  * Calculate points for a position based on class size
  */
@@ -91,7 +105,7 @@ function getClassPositions(
  */
 export function calculateClubPoints(competitors: CompetitorList): ClubPoints[] {
     // Filter out competitors in "Non TriSeries" class
-    const eligibleCompetitors = competitors.filter(c => c.class !== 'Non TriSeries')
+    const eligibleCompetitors = competitors.filter(isTriSeriesCompetitor)
 
     const clubPointsMap = new Map<string, { points: number; competitors: number }>()
 

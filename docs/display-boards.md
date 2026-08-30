@@ -113,6 +113,16 @@ The layout uses a CSS Grid with two columns:
 - **Left (2fr):** finish time (left-justified, 280px font)
 - **Right (1fr):** radar speed above the club name (both centered)
 
+### Club name, or a bigger speed
+
+The right-hand column shows the club name beneath the speed — but only when the club means
+something. An entry in the **Non TriSeries** class scores no club points, and some entries have no
+club recorded at all; in both cases the club panel is dropped and the speed takes the full column
+height at a substantially larger size.
+
+That is the same rule the points calculation uses (`isTriSeriesCompetitor`), so the board and the
+standings cannot disagree about who is in the series.
+
 ### Radar Speed
 
 The top of the right column shows the maximum speed recorded by the radar for the

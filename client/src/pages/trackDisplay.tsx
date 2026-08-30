@@ -4,7 +4,7 @@ import React, { useEffect, useCallback, useMemo } from 'react';
 
 import { trpc } from '../App.js';
 import { requestWrapper } from '../components/requestWrapper.js';
-import { refreshConfigService } from 'ui-shared';
+import { refreshConfigService, isTriSeriesCompetitor } from 'ui-shared';
 
 import {
   calculateTimes,
@@ -301,6 +301,13 @@ export const TrackDisplay = () => {
   // leaves the panel blank rather than disturbing the rest of the display
   const maxSpeed = speed.data?.speed ?? null;
 
+  // A "Non TriSeries" entry scores no club points, so its club is of no
+  // consequence here — and a competitor with no club recorded has nothing to
+  // show either. In both cases the space goes to the speed, which is what
+  // anyone watching trackside is actually there for.
+  const showClub =
+    isTriSeriesCompetitor(currentCompetitor) && Boolean(currentCompetitor.club);
+
   // CSS Grid layout with fixed dimensions
   const layout = {
     display: 'grid',
@@ -360,21 +367,24 @@ export const TrackDisplay = () => {
         </Box>
       </Box>
 
-      {/* Speed over club name - right side */}
+      {/* Speed, over the club name when the club is worth showing - right side */}
       <Box sx={{ gridColumn: '2 / 3', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {/* Radar speed. Empty (never zero) when no pass belongs to this run, so
-            the panel holds its size and the layout does not shift */}
+            the panel holds its size and the layout does not shift. Without a
+            club beneath it, it takes the whole column and grows to suit. */}
         <Box sx={{
           ...commonStyles,
           bgcolor: 'background.default',
-          height: SPEED_PANEL_HEIGHT,
+          height: showClub ? SPEED_PANEL_HEIGHT : HEIGHTS.FINISH_TIME,
           flexDirection: 'column',
         }}>
           {typeof maxSpeed === 'number' && (
             <>
               <Typography
                 sx={{
-                  fontSize: 'clamp(96px, 7vw, 140px)',
+                  fontSize: showClub
+                    ? 'clamp(96px, 7vw, 140px)'
+                    : 'clamp(150px, 11vw, 220px)',
                   fontWeight: '700',
                   fontFamily: 'Roboto',
                   color: 'text.primary',
@@ -385,7 +395,9 @@ export const TrackDisplay = () => {
               </Typography>
               <Typography
                 sx={{
-                  fontSize: 'clamp(24px, 2vw, 36px)',
+                  fontSize: showClub
+                    ? 'clamp(24px, 2vw, 36px)'
+                    : 'clamp(36px, 3vw, 56px)',
                   fontWeight: '400',
                   fontFamily: 'Roboto',
                   color: 'text.secondary',
@@ -398,7 +410,8 @@ export const TrackDisplay = () => {
           )}
         </Box>
 
-        {/* Club name */}
+        {/* Club name, only when it means something */}
+        {showClub && (
         <Box sx={{
           ...commonStyles,
           bgcolor: 'background.default',
@@ -424,6 +437,7 @@ export const TrackDisplay = () => {
             {currentCompetitor.club ? currentCompetitor.club.toUpperCase() : ''}
           </Typography>
         </Box>
+        )}
       </Box>
 
       {/* 20px spacer between finish time and competitor name */}
