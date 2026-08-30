@@ -97,6 +97,9 @@ export const Announcer = () => {
   const currentCompetitorId = trpc.currentcompetitor.number.useQuery(undefined);
   const competitorList = trpc.competitors.list.useQuery(undefined);
   const runCount = trpc.runs.count.useQuery(undefined);
+  // Asked for directly rather than read out of the class table: the announcer
+  // needs the speed for the car on course at a glance, not buried in a row
+  const speed = trpc.speed.current.useQuery(undefined);
 
   // Dynamic refresh intervals from configuration
   const [announcerRefresh, setAnnouncerRefresh] = React.useState(2)
@@ -133,6 +136,7 @@ export const Announcer = () => {
         currentCompetitorId.refetch(),
         competitorList.refetch(),
         runCount.refetch(),
+        speed.refetch(),
       ]);
       console.log(`✅ [PRIMARY] React Query refetch completed successfully`)
     } catch (error) {
@@ -141,7 +145,7 @@ export const Announcer = () => {
       console.log('🔄 [ERROR-FALLBACK] Refetch failed, performing full page refresh')
       window.location.reload()
     }
-  }, [currentCompetitorId.refetch, competitorList.refetch, runCount.refetch]);
+  }, [currentCompetitorId.refetch, competitorList.refetch, runCount.refetch, speed.refetch]);
 
   // Primary refresh: React Query refetch at announcer intervals
   useEffect(() => {
@@ -232,6 +236,15 @@ export const Announcer = () => {
     );
   }
 
+  // The live pass if the car is on the trap now, otherwise what was recorded for
+  // the run they are on. Deliberately not an earlier run's speed: a stale number
+  // read out as current is worse than none.
+  const liveSpeed = speed.data?.speed ?? null;
+  const thisRunSpeed = currentCompetitor.times.find(
+    (time) => time && time.run === runCount.data
+  )?.speed;
+  const shownSpeed = liveSpeed ?? thisRunSpeed ?? null;
+
   return (
     <Container maxWidth={false}>
       <Typography component={'span'}>
@@ -256,7 +269,7 @@ export const Announcer = () => {
               {currentCompetitor.class}
             </PrimaryPaper>
           </Grid>
-          <Grid size={{ xs: 4 }}>
+          <Grid size={{ xs: 3 }}>
             <PrimaryPaperCenter
               sx={{
                 fontSize: 48,
@@ -270,7 +283,7 @@ export const Announcer = () => {
               {currentCompetitor.special}
             </PrimaryPaperCenter>
           </Grid>
-          <Grid size={{ xs: 4 }}>
+          <Grid size={{ xs: 2 }}>
             <PrimaryPaperCenter
               sx={{
                 fontSize: 48,
@@ -282,6 +295,25 @@ export const Announcer = () => {
               }}
             >
               Run {runCount.data}
+            </PrimaryPaperCenter>
+          </Grid>
+          {/* Speed for the car on course, stated outright */}
+          <Grid size={{ xs: 3 }}>
+            <PrimaryPaperCenter
+              sx={{
+                height: 96,
+                borderRadius: 2,
+                border: '1px solid rgba(0, 0, 0, 0.12)',
+                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <Box sx={{ fontSize: 16, color: 'text.secondary', lineHeight: 1 }}>SPEED</Box>
+              <Box sx={{ fontSize: 48, fontWeight: 500, lineHeight: 1.2 }}>
+                {typeof shownSpeed === 'number' ? `${Math.round(shownSpeed)} kph` : '--'}
+              </Box>
             </PrimaryPaperCenter>
           </Grid>
           <Grid size={{ xs: 4 }}>

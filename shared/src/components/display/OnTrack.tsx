@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import React from 'react'
 import { RenderInfo } from '../display.js'
@@ -16,6 +17,17 @@ export const OnTrack = ({
   )
 
   if (!currentRun) return <div />
+
+  // The speed for the run they are on. Taken from the run itself rather than
+  // any earlier one: on a board describing the car currently out, a stale
+  // number would be read as this run's.
+  const latestRun = currentRun.times
+    .filter((time) => time)
+    .reduce<(typeof currentRun.times)[number]>(
+      (latest, time) => (!latest || time!.run > latest.run ? time : latest),
+      undefined,
+    )
+  const speed = latestRun?.speed
 
   return (
     <Grid>
@@ -44,6 +56,10 @@ export const OnTrack = ({
           {currentRun.vehicle}
           <br></br>
           {currentRun.class}
+          {' · '}
+          <Box component="span" sx={{ fontWeight: 700 }}>
+            {typeof speed === 'number' ? `${Math.round(speed)} kph` : '-- kph'}
+          </Box>
         </PrimaryPaper>
       </Grid>
       <Grid size={{ xs: 4 }}>
